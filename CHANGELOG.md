@@ -1,5 +1,12 @@
 # Versions
 
+## 1.12.0 — 9 octobre 2026
+
+- Second écran interactif : pages Personnage, Sorts et Options, par glissement horizontal ou onglets. Défilement vertical conservé pour les listes longues.
+- Onglets Féca, Iop et Sram avec les icônes originales. Toucher un sort actif pour choisir Auto ou Manuel ; exceptions sauvegardées par classe, même pour un sort encore à débloquer.
+- Auto respecte le mode global (désactivé, buffs seuls ou tous les sorts). Les automatismes d’origine du jeu sont identifiés et conservés. Une exception manuelle annule aussi un ciblage automatique déjà en préparation.
+- Mode d’assistance, visée radiale, curseur, repères, joystick, alerte PV, sensibilité et opacité modifiables depuis le bas. Interface FR/EN/ES et mises à jour différentielles des listes.
+
 ## 1.11.1 — 9 octobre 2026
 
 - Maintien L2/R2 corrigé : les mouvements des sticks ne relâchent plus une gâchette signalée comme bouton par Android. Retour du Bâton et les autres sorts à viser restent en visée jusqu’au vrai relâchement.

@@ -1,5 +1,11 @@
 # Visuels de présentation
 
+## Pages interactives 1.12.0
+
+Le README montre désormais [Sorts par classe sur Thor](screenshots/thor-dual-sorts.png) et [Options sur Thor](screenshots/thor-dual-options.png), composés avec FFmpeg à partir de captures de l’APK finale signée **1.12.0** : accueil sur l’écran du haut, pages interactives sur celui du bas. Le boîtier reste le visuel de présentation initial. Les captures lisibles séparément sont [Sorts](screenshots/second-ecran-sorts.png) et [Options](screenshots/second-ecran-options.png). La capture des sorts montre une exception manuelle de démonstration ; les réglages de test ont ensuite été retirés de l’appareil.
+
+## Partie enregistrée 1.11.0
+
 Le README utilise désormais deux images et un GIF issus d’une partie réelle enregistrée le 9 octobre 2026 sur l’APK **1.11.0**. Les vidéos des deux écrans sont intégrées avec FFmpeg dans les ouvertures d’un visuel du Thor. Le gameplay et la fiche du personnage sont ceux de l’appareil, sans régénération par IA.
 
 Fichiers actuels : [Combat et fiche](screenshots/thor-dual-combat.png), [Visée radiale et fiche](screenshots/thor-dual-radial.png), [Gameplay animé](screenshots/thor-gameplay.gif).

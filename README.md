@@ -24,6 +24,8 @@ Dans **⚙ APK / Select → Assistance des sorts** :
 
 Les sorts déjà automatiques du jeu restent automatiques dans les trois modes. Tes commandes manuelles sont prioritaires ; l’aide s’arrête pendant les choix, la pause et hors de l’application. Elle ne garantit pas la survie.
 
+**Auto avec tes exceptions :** sur le second écran, touche une icône dans **Sorts → Féca / Iop / Sram** pour garder ce sort manuel. Tes choix sont sauvegardés par classe ; les autres sorts suivent le mode global.
+
 ## Une manette, une visée simple
 
 - **Stick gauche / croix** : déplacement et sélection dans les menus.
@@ -45,15 +47,15 @@ Exemples du mode radial sur Thor, capturés avec l’interface des versions 1.5/
 
 Sur un appareil compatible comme le Thor : cœur de PV, kamas, caractéristiques, équipement et collection permanente. Sur téléphone ou tablette, le jeu fonctionne sur un seul écran.
 
-| Combat en haut, fiche en bas | Visée radiale au stick droit |
-|---|---|
-| ![AYN Thor avec gameplay et fiche du personnage sur ses deux écrans](docs/screenshots/thor-dual-combat.png) | ![AYN Thor avec visée radiale et fiche du personnage sur ses deux écrans](docs/screenshots/thor-dual-radial.png) |
+**Glisse à gauche ou à droite : Personnage → Sorts → Options.** Les onglets restent accessibles au toucher. Règle directement l’assistance, la visée et la sensibilité sur l’écran du bas.
 
-| Paramètres de l’assistance | Fiche du second écran |
+| Auto avec exceptions par sort | Options sur l’écran du bas |
 |---|---|
-| ![Choix entre buffs et tous les sorts](docs/screenshots/sorts-auto-parametres.png) | ![Fiche compacte avec cœur, kamas et équipement](docs/screenshots/fiche-personnage-actuelle.png) |
+| ![AYN Thor avec les icônes par classe et un sort réglé en manuel](docs/screenshots/thor-dual-sorts.png) | ![AYN Thor avec la page Options interactive](docs/screenshots/thor-dual-options.png) |
 
-Captures de l’APK **1.11.0** sur AYN Thor. Autres appareils et manettes externes : compatibles selon Android, non testés matériellement.
+[Voir les sorts en grand](docs/screenshots/second-ecran-sorts.png) · [Voir les options en grand](docs/screenshots/second-ecran-options.png)
+
+Pages capturées sur l’APK **1.12.0** signée, intégrées dans un visuel du Thor. Autres appareils et manettes externes : compatibles selon Android, non testés matériellement.
 
 ## Installer et jouer
 

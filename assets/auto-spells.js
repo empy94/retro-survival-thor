@@ -53,18 +53,19 @@
  }
  const api={plan};if(typeof module==='object')module.exports=api;
  if(!root?.document)return;
- let enabled=false,mode='off',timer=null,lastAttempt=new Map(),casts=0,lastSpell=null,lastMs=0,badge=null;
+ let manual={},enabled=false,mode='off',timer=null,lastAttempt=new Map(),casts=0,lastSpell=null,lastMs=0,badge=null;
  function tick(){
    if(!enabled||root.document.hidden||!root.thorControls?.autoAvailable())return;
    const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return;
    const start=performance.now(),now=Date.now(),s=root.thorDashboard?.combatState(mode!=='buffs');
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))],id=null;for(let i=0;f&&i<4;i++,f=f.return){if(f.key){id=f.key;break;}}return {el,id,ready:el.getAttribute('aria-disabled')!=='true'&&now-(lastAttempt.get(id)||0)>=800,aimed:root.thorSpellBindings.needsAim(id,s?.awakenings||{})};});
-   const chosen=plan(s,spells,root.thorSpellBindings,mode);lastMs=performance.now()-start;if(!chosen)return;
+   const eligible=root.thorSpellPolicy?spells.filter(spell=>root.thorSpellPolicy.allowed(spell.id,s?.character,mode,manual)):spells;
+   const chosen=plan(s,eligible,root.thorSpellBindings,mode);lastMs=performance.now()-start;if(!chosen)return;
    const travel=chosen.target?root.thorDashboard.travelState():null;if(chosen.target&&!travel)return;
    const target=chosen.target?{x:travel.x+(chosen.target.x-s.player.x)*travel.scaleX,y:travel.y+(chosen.target.y-s.player.y)*travel.scaleY}:null;
    lastAttempt.set(chosen.spell.id,now);
    if(root.thorControls.autoCast(chosen.spell,target)){casts++;lastSpell=chosen.spell.id;}
  }
- root.thorAutoSpells={refreshLabel(){if(badge){badge.hidden=!enabled;const key=mode==='buffs'?'Buffs auto':'Sorts auto',label=root.thorLocale?.text(key)||key;if(badge.textContent!==label)badge.textContent=label;}},configure(value){const next=value===true?'full':['full','buffs'].includes(value)?value:'off';if(mode!==next)lastAttempt.clear();mode=next;enabled=mode!=='off';if(!enabled){clearInterval(timer);timer=null;}else if(timer===null)timer=setInterval(tick,80);this.refreshLabel();},status(){return {enabled,mode,attempts:casts,lastSpell,plannerMs:lastMs};}};
+ root.thorAutoSpells={refreshLabel(){if(badge){badge.hidden=!enabled;const key=mode==='buffs'?'Buffs auto':'Sorts auto',label=root.thorLocale?.text(key)||key;if(badge.textContent!==label)badge.textContent=label;}},configure(value,exclusions={}){manual=root.thorSpellPolicy?.sanitize(exclusions)||{};const next=value===true?'full':['full','buffs'].includes(value)?value:'off';if(mode!==next)lastAttempt.clear();mode=next;enabled=mode!=='off';if(!enabled){clearInterval(timer);timer=null;}else if(timer===null)timer=setInterval(tick,80);this.refreshLabel();},status(){return {enabled,mode,attempts:casts,lastSpell,plannerMs:lastMs};}};
  document.addEventListener('DOMContentLoaded',()=>{badge=document.createElement('span');badge.id='thor-auto-status';badge.style.cssText='position:fixed;top:45px;left:104px;z-index:2147483645;border:1px solid #bbce9780;border-radius:5px;padding:3px 7px;background:#17251ccc;color:#cce5aa;font:600 10px sans-serif;pointer-events:none';badge.hidden=true;document.body.append(badge);});
 })(typeof window==='object'?window:null);

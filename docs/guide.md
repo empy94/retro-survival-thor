@@ -2,6 +2,16 @@
 
 [Télécharger et découvrir l’application](../README.md)
 
+## Pages du second écran
+
+Glisse horizontalement pour parcourir **Personnage**, **Sorts** et **Options**, ou touche un onglet. Les listes longues défilent verticalement. Les options s’appliquent directement au jeu sans quitter le combat.
+
+Dans **Sorts**, choisis Féca, Iop ou Sram, puis touche une icône active pour basculer entre **Auto** et **Manuel**. Tu peux préparer les exceptions avant de débloquer un sort. Elles sont conservées après fermeture ou mise à jour, indépendamment pour chaque classe.
+
+**Auto** suit le réglage global : désactivé ne lance rien, buffs seuls ne lance que les buffs, tous les sorts utilise le planificateur complet. **Auto · en attente** indique qu’un sort n’est pas automatisé dans le mode global actuel. **Manuel** l’exclut de l’assistance de l’APK et annule un éventuel ciblage automatique en préparation ; sa commande manuelle reste disponible. Les sorts **Auto du jeu** sont gérés par le jeu original et ne peuvent pas être désactivés par cette page.
+
+Les pages interactives nécessitent un second écran Android compatible. Sur un seul écran, les options globales restent accessibles dans **⚙ APK / Select**.
+
 ## Appareils et manettes
 
 Android 9 ou plus, connexion Internet et Android System WebView à jour. Le tactile suffit. Une manette USB/Bluetooth est reconnue après connexion dans Android ; son nom apparaît dans **⚙ APK / Select**. Les inscriptions Nintendo peuvent différer des noms de boutons Android.
