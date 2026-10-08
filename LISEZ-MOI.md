@@ -13,7 +13,7 @@ Application personnelle de lancement du site officiel https://retrosurvival.onli
 | Start ou B | Pause / reprise |
 | Select / bouton ⚙ Thor | Paramètres des commandes et aide |
 
-Le tactile reste disponible. Les choix de niveau, menus et achats se font au pointeur avec R3. Les attaques automatiques du mode Android restent gérées par le jeu. Version 1.3.0 : les sorts à viser reçoivent en priorité L1/R1/L2/R2 ; maintenir, viser au stick droit, relâcher. Les repères sur les sorts donnent leur affectation actuelle, qui peut changer après un déblocage. Six sorts maximum sur les boutons ; les autres restent accessibles au tactile/pointeur. L’évolution instantanée du Glyphe enflammé est prise en compte.
+Le tactile reste disponible. Version 1.7.0 : parcourir les boutons avec le stick gauche ou la croix ; R3 ou A valide le contour doré. Le stick droit retrouve le pointeur. Les attaques automatiques du mode Android restent gérées par le jeu. Version 1.3.0 : les sorts à viser reçoivent en priorité L1/R1/L2/R2 ; maintenir, viser au stick droit, relâcher. Les repères sur les sorts donnent leur affectation actuelle, qui peut changer après un déblocage. Six sorts maximum sur les boutons ; les autres restent accessibles au tactile/pointeur. L’évolution instantanée du Glyphe enflammé est prise en compte.
 
 Version 1.5.0 : **Téléportation du Féca** et **Bond du Iop** ont une visée radiale. Maintenir leur touche : destination devant le personnage, selon le stick gauche ou son orientation à l’arrêt. Le stick droit choisit directement une direction dans le rayon de portée ; elle reste choisie quand le stick revient au centre. Relâcher la touche du sort pour lancer à portée maximale. La destination suit le déplacement du personnage et le jeu gère les obstacles. L’évolution de Téléportation permettant un retour garde son point de départ imposé.
 
@@ -21,7 +21,7 @@ Version 1.6.0 : les sorts à cibler ou à placer utilisent également le mode ra
 
 Le pointeur est masqué pendant la visée radiale et retrouve sa position précédente ensuite. **Select / ⚙ Thor → Visée radiale des sorts à cibler** permet de retrouver la visée au pointeur pour ces sorts, tout en gardant le radial des téléportations. Dans **Sensibilité du curseur**, régler la vitesse du pointeur de 25 % à 250 % ; 100 % par défaut, réglages mémorisés.
 
-Depuis la version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**.
+Depuis la version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur le second écran**.
 
 Le joystick visuel est ancré en bas à gauche ; les étiquettes X/Y/L1/R1/L2/R2 sur les sorts actifs débloqués, leur affichage et leur opacité sont réglables dans les paramètres. Les réglages sont enregistrés. Voir également [README.md](README.md).
 
@@ -40,3 +40,7 @@ La sauvegarde locale de cette application est distincte de celle de Chrome. Les 
 - Le test manuel complet des sticks, de la visée et des sorts avec les boutons physiques reste à faire par l’utilisateur.
 
 L’application charge le jeu en ligne ; les mises à jour du site peuvent nécessiter une adaptation des commandes.
+
+Android 9 ou plus : manettes USB/Bluetooth reconnues après connexion dans Android, avec leur nom dans les paramètres. Aucun modèle AYN ni second écran exigé. La fiche utilise uniquement un second écran compatible détecté. Autres Android et manettes externes non encore essayés.
+
+Les indications, paramètres, aide et fiche suivent la langue du jeu : français, anglais ou espagnol. La fiche ne reconstruit plus l’équipement lors d’un simple changement de PV ; les lectures de repères sont mises en cache avec actualisation immédiate au lancement du sort.

@@ -2,6 +2,23 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.7.0
+
+- APK signé 1.7.0 installé en remplacement sans désinstallation ; version 8 / 1.7.0 et débogage désactivé vérifiés. Scripts embarqués comparés exactement aux sources vérifiées.
+- En partie active pendant cinq secondes : 592 callbacks d’animation du navigateur, soit 118,36 par seconde sur le Thor ; intervalle maximum 16,67 ms, toutes les observations en phase-playing. Ce relevé ponctuel concerne l’animation de la WebView, pas un compteur interne des FPS du jeu ni un essai prolongé de toutes les situations.
+
+- Langue changée par les vrais boutons du jeu : anglais, espagnol puis français. Titres, contrôles, réglages et boutons du dialogue Android relevés sur le Thor dans les trois langues. Même essai depuis la pause pour la fiche réelle du second écran : titres, caractéristiques et valeurs numériques conservées, dont +15 % de dommages d’attaque. Retour au français à la fin.
+- Suite langue/panneau : synchronisation initiale, FR/EN/ES, langue invalide ignorée et mises à jour incrémentales. Suite observateur : valeurs de caractéristiques anglaises/espagnoles, expiration du cache et lecture immédiate au lancement couverts.
+- Mesure ponctuelle sur Thor : 100 lectures forcées des améliorations prennent 2,5 ms ; 100 lectures en cache sont en dessous de la résolution du chronomètre. Une autre mesure donne 20 snapshots en 2,1 ms. Ce sont des coûts de fonctions, pas une comparaison des FPS avant/après ni une garantie de performance dans toutes les scènes. Le relevé d’animation à 118,8 images/s a été pris pendant une transition de sélection de niveau et n’est donc pas présenté comme une validation du gameplay en combat.
+- Désactivation de la fiche dans les paramètres : sa WebView disparaît alors que celle du jeu reste présente ; réactivation vérifiée. Second écran compatible détecté affiché dans les paramètres.
+
+- Six suites Node réussies, dont la navigation : pressions distinctes, répétition temporisée, boucle entre boutons, choix désactivés ignorés, changement de phase, sélection périmée rejetée et validation unique. Les quatre suites précédentes restent réussies.
+- Sur le Thor, croix droite injectée via Android : JOUER sélectionné à l’accueil, puis R3 ouvre le choix de niveau. Sélection de JOUER et lancement de partie par R3 observés après la transition du jeu.
+- Choix d’amélioration débloqué naturellement : droite sélectionne Science du Bâton, droite passe aux dommages d’attaque, gauche retrouve Science du Bâton. R3 ferme le choix et reprend la partie. Capture réelle ajoutée au README. Aucun état de jeu modifié pour forcer le niveau ou les choix.
+- Pause réelle ouverte avec Start injecté via Android ; manette interne « Odin Controller » détectée et affichée dans les paramètres. Le stick est vérifié par le même pont que la boucle native et par les tests automatisés ; les pressions sur la croix et R3 sont des événements Android injectés.
+- Les fenêtres avec saisie de texte et les sélecteurs non constitués de boutons peuvent encore nécessiter le tactile ou le pointeur.
+- Une manette Xbox/Switch externe, son appairage Bluetooth, sa déconnexion physique et un autre appareil Android n’ont pas été essayés. Leurs chemins d’entrée sont compilés et comparés aux API Android, sans prétendre à une validation matérielle. Le retrait physique d’un second écran n’a pas été essayé.
+
 ## Version 1.6.0
 
 - Quatre suites Node réussies. Direction, distance réglable et conservée au retour au centre, seuil tactile minimal, évolution dynamique de portée de Couper, destination imposée du Double, attaques directionnelles sans faux rayon et exception du Glyphe enflammé instantané couverts.

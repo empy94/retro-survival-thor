@@ -18,6 +18,16 @@ Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/)
 
 Le boîtier est un visuel de présentation généré à partir d’une référence du Thor. Les deux écrans du GIF montrent les enregistrements réels de l’application. Les captures originales sont disponibles dans la galerie ci-dessous. [Création des visuels et référence AYN](docs/visuels.md).
 
+## Viser directement dans le rayon du sort
+
+Maintenir la touche du sort, orienter le stick droit, puis relâcher. La cible suit le personnage ; pour les placements, l’inclinaison du stick règle aussi la distance.
+
+| Téléportation : choisir une direction | Glyphe : choisir direction et distance |
+|---|---|
+| ![Portée radiale de Téléportation autour du personnage](docs/screenshots/teleportation-radiale.png) | ![Rayon de placement d’un glyphe, visée au stick droit](docs/screenshots/placements-radiaux.png) |
+
+Captures réelles sur le Thor. Le cercle indique la portée de visée ; le jeu conserve ses règles de terrain et de placement. Les améliorations de portée sont prises en compte, tandis que la taille de la zone d’un glyphe reste distincte de sa portée de placement.
+
 ## Deux écrans, deux usages
 
 L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche une fiche de personnage, dans les couleurs et le style du menu de caractéristiques du jeu :
@@ -27,7 +37,7 @@ L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche u
 - Équipement porté : coiffe, cape, amulette, arme, bouclier, ceinture, bottes, anneaux et Dofus.
 - Toucher un objet équipé pour lire ses effets ; faire défiler la colonne si nécessaire.
 
-Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
+Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ Thor → Personnage sur le second écran**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
 
 La fiche lit les informations disponibles dans le jeu, sans modifier la partie. Si le site change et que ces informations deviennent inaccessibles, elle indique qu’elles sont indisponibles plutôt que d’afficher des valeurs inventées.
 
@@ -76,18 +86,32 @@ Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a
 
 ## Commandes
 
+Depuis la version **1.7.0**, parcourir les boutons des menus et choix au **stick gauche ou à la croix** : gauche/droite passe au bouton précédent/suivant, haut/bas change de ligne. Le contour doré indique la sélection ; **R3 ou A valide**. Les boutons désactivés sont ignorés. Le stick droit efface cette sélection et retrouve le pointeur.
+
+![Choix d’amélioration sélectionné à la manette](docs/screenshots/choix-manette.png)
+
+L’APK peut aussi être installé sur un téléphone, une tablette ou une console **Android 9 ou plus**, avec Android System WebView à jour. Aucune exigence de matériel AYN ni de second écran. Le tactile reste disponible sans manette.
+
+Connecter une manette USB ou l’appairer dans les paramètres Bluetooth d’Android : elle est ensuite reconnue automatiquement si Android expose ses commandes. Son nom apparaît dans les paramètres du jeu, avec actualisation lors d’une connexion ou déconnexion. Une déconnexion de la manette utilisée remet les commandes à zéro.
+
+Les noms des boutons suivent Android : A/B/X/Y, L1/R1/L2/R2, Start/Select et R3. Une manette Xbox ou Switch peut fonctionner si Android expose ces entrées ; les inscriptions Nintendo peuvent différer des noms Android. Le stick droit prend en charge les axes Z/RZ et RX/RY ; les gâchettes analogiques et zones mortes déclarées par la manette sont utilisées. [Documentation Android](https://developer.android.com/games/sdk/game-controller/controller-input).
+
+La fiche apparaît uniquement sur un second écran compatible détecté par Android ; l’ajout ou le retrait d’écran est surveillé. Les paramètres indiquent si cet écran existe. La fiche conserve ses PV, caractéristiques et équipements sans dupliquer les choix du jeu.
+
+Cette version a été essayée sur le Thor. Les manettes Xbox/Switch externes et autres appareils Android n’ont pas encore été testés matériellement. Voir [VALIDATION.md](VALIDATION.md).
+
 | Touche | Action |
 |---|---|
-| Stick gauche / croix | Déplacement avec le joystick tactile du jeu |
+| Stick gauche / croix | Déplacement en partie ; sélection dans les menus et choix |
 | Stick droit | Déplacement du pointeur doré |
-| R3 / A | Clic tactile à la position du pointeur |
+| R3 / A | Valider la sélection ; sinon clic au pointeur |
 | L1, R1, L2, R2 | Priorité aux sorts à viser |
 | X, Y | Priorité aux sorts instantanés |
 | Bouton de sort maintenu + stick droit | Viser, puis relâcher pour les sorts directionnels |
 | Start / B | Pause et reprise |
 | Select / bouton **⚙ Thor** | Paramètres des commandes |
 
-Les menus et les choix de niveau se sélectionnent au pointeur avec R3. Le tactile reste disponible. Les attaques automatiques du mode Android restent gérées par le jeu.
+Les menus et les choix de niveau se sélectionnent directement à la manette, ou au pointeur avec le stick droit et R3. Le tactile reste disponible. Les attaques automatiques du mode Android restent gérées par le jeu.
 
 En **visée au pointeur**, la trajectoire des sorts à viser part du personnage et suit ses déplacements pendant le maintien. Le point ciblé reste à l’endroit choisi à l’écran ; le stick droit permet de l’ajuster. La direction du lancement est recalculée au relâchement. La portée et les contraintes du sort restent celles du jeu.
 
@@ -100,6 +124,14 @@ Depuis la version **1.6.0**, la visée radiale est également activée par défa
 Le rayon suit la portée actuelle du sort : améliorations et évolutions de portée de Téléportation, Bond, Retour du Bâton et Couper prises en compte. Les glyphes ont actuellement une portée de placement fixe de 200 unités du jeu ; agrandir leur zone d’effet ne permet pas de les poser plus loin. Les attaques purement directionnelles, comme Épée du Destin et Peur, montrent une direction sans annoncer un rayon de portée. Le Double du Sram se place dans son rayon d’invocation ; son évolution d’échange avec un Double existant indique ce point imposé.
 
 Pour retrouver la visée au pointeur sur les sorts ciblés, désactiver **Select / ⚙ Thor → Visée radiale des sorts à cibler**. Téléportation et Bond conservent leur mode radial. Les sorts instantanés se lancent toujours par une simple pression.
+
+## Langue et performances
+
+Les indications de l’APK, paramètres Android, aide et fiche du personnage suivent **la langue sélectionnée dans le jeu : français, anglais ou espagnol**, y compris lorsque la langue change depuis le menu pause.
+
+La visée reste actualisée à chaque image. Les lectures pour les repères sont mises en cache pendant 250 ms, avec lecture immédiate lors d’un lancement de sort. Les décorations sont regroupées toutes les 120 ms ; la fiche reste actualisée deux fois par seconde et reconstruit ses statistiques ou son équipement seulement lorsqu’ils changent. La navigation ne mesure pas tous les boutons à chaque image quand le stick est au repos.
+
+Les mesures sur Thor et leurs limites sont dans [VALIDATION.md](VALIDATION.md) ; elles ne constituent pas une garantie d’absence de ralentissement dans toutes les scènes et sur tous les Android.
 
 ## Affichage réglable
 

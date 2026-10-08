@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+const classes=initial=>{const values=new Set(initial);return {contains:v=>values.has(v),add:v=>values.add(v),remove:v=>values.delete(v)};};
+let phase='phase-title',clicked=0;
+function item(text,left,top=20){return {text,isConnected:true,disabled:false,classList:classes([]),getAttribute:()=>null,matches:()=>false,closest:()=>null,getBoundingClientRect:()=>({left,top,width:80,height:50,right:left+80,bottom:top+50}),scrollIntoView(){},click(){clicked++}};}
+const first=item('Jouer',10),second=item('Classement',110),disabled=item('Verrouillé',210);disabled.disabled=true;
+let items=[first,second,disabled];
+const main={get className(){return phase},classList:{contains:v=>phase.includes(v)},querySelector:()=>null,querySelectorAll:s=>s.startsWith('[role=')?[]:items};
+const window={};vm.runInNewContext(fs.readFileSync('assets/menu-navigation.js','utf8'),{window,document:{querySelector:()=>main,addEventListener(){}},innerWidth:500,innerHeight:500,getComputedStyle:()=>({display:'block',visibility:'visible'})});
+const menu=window.thorMenu,selected=el=>el.classList.contains('thor-menu-selected');
+assert.equal(menu.tick(0,0,0),true);assert.equal(menu.activate(),false);
+menu.tick(1,0,10);assert(selected(first));
+menu.tick(1,0,30);assert(selected(first),'held direction does not immediately repeat');
+menu.tick(1,0,410);assert(selected(second));
+menu.tick(1,0,560);assert(selected(first),'wraps and skips disabled choices');
+menu.tick(0,0,600);menu.tick(-1,0,620);assert(selected(second));
+assert.equal(menu.activate(),true);assert.equal(clicked,1);assert.equal(menu.activate(),false,'release/repeat cannot activate twice');
+phase='phase-playing';assert.equal(menu.tick(1,0,700),false);assert(!selected(second));
+phase='phase-playing modal-open';menu.tick(1,0,800);assert(selected(first));
+items=[second];first.isConnected=false;menu.tick(0,0,850);assert(!selected(first));assert.equal(menu.activate(),false,'stale choice never launches');
+menu.tick(1,0,900);assert(selected(second));menu.clear();assert(!selected(second));
+items=[first,second];first.isConnected=true;menu.step(1,0,1000);assert(selected(first));menu.step(1,0,1010);assert(selected(second),'separate brief presses each move once');
+console.log('Menu navigation: repeat delay, wrap, disabled choices, phase changes, stale choices and single activation passed');

@@ -1,5 +1,17 @@
 # Versions
 
+## 1.7.0 — 8 octobre 2026
+
+- Paramètres, aide, indications de visée et fiche du personnage en français, anglais ou espagnol selon la langue choisie dans le jeu.
+- Lectures de repères mises en cache avec actualisation immédiate au lancement ; décorations regroupées, navigation au repos allégée et panneau actualisé sans reconstruire les blocs inchangés.
+- Captures radiales mises en avant dans le README.
+
+- Navigation entre les boutons des menus et choix au stick gauche ou à la croix : contour doré, répétition temporisée, validation R3/A et retour au pointeur avec le stick droit.
+- Prise en compte directe des pressions brèves sur la croix.
+- Détection des manettes Android USB/Bluetooth, nom dans les paramètres et annulation des commandes lors d’une déconnexion.
+- Zones mortes déclarées par la manette, axes du stick droit Z/RZ ou RX/RY et gâchettes analogiques ; aucun matériel AYN ni second écran exigé.
+- Présence du second écran compatible indiquée dans les paramètres ; fiche utilisée après détection Android.
+
 ## 1.6.0 — 8 octobre 2026
 
 - Visée radiale étendue aux sorts dirigés et aux sorts à placer : glyphes, pièges, invocation du Double, attaques ciblées.

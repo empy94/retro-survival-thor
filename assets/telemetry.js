@@ -2,7 +2,8 @@
  'use strict';
  const labels={'damage':'Dommages','spell-damage':'Dommages des sorts','basic-damage':'Dommages attaque','basic-speed':'Vitesse d’attaque','critical':'Critique','critical-damage':'Dégâts critiques','move-speed':'Vitesse','evasion':'Esquive','cooldown':'Vitesse récup.','effect-duration':'Durée des effets','spell-size':'Taille des sorts','experience-gain':'XP reçue','prospection':'Prospection'};
  const slots={hat:'Coiffe',cape:'Cape',amulet:'Amulette',weapon:'Arme',shield:'Bouclier',belt:'Ceinture',boots:'Bottes',ring:'Anneaux',dofus:'Dofus'};
- let liveRef=null,liveCanvas=null;
+ let liveRef=null,liveCanvas=null,abilityCache=null,abilityAt=0;
+ const text=value=>window.thorLocale?.text(value)||value;
  // Read the mounted React tree, including the current side of double buffering.
  // No game state, score, inventory or input is written by this observer.
  function state(){
@@ -38,11 +39,12 @@
    if(!live||![live.player?.x,live.player?.y,live.width,live.height,rect.left,rect.top,rect.width,rect.height].every(Number.isFinite)||live.width<=0||live.height<=0||rect.width<=0||rect.height<=0)return null;
    return {x:rect.left+live.player.x/live.width*rect.width,y:rect.top+live.player.y/live.height*rect.height};
  },
- abilities(){const {hud}=state();return {awakenings:hud?.awakenings||{}};},snapshot(){
+ abilities(refresh=false){const now=Date.now();if(refresh||!abilityCache||now-abilityAt>=250){const {hud}=state();abilityCache={awakenings:hud?.awakenings||{}};abilityAt=now;}return abilityCache;},snapshot(){
    const phase=document.querySelector('main')?.className||'';
-   if(phase.includes('phase-title'))return {status:'title'};
+   const locale=window.thorLocale?.sync()||'fr';
+   if(phase.includes('phase-title'))return {status:'title',locale};
    const {live,hud}=state();
-   if(!live||!hud||![live.player.hp,live.player.maxHp,live.kamas,live.level,live.wave].every(Number.isFinite)||live.player.maxHp<=0)return {status:'unavailable'};
+   if(!live||!hud||![live.player.hp,live.player.maxHp,live.kamas,live.level,live.wave].every(Number.isFinite)||live.player.maxHp<=0)return {status:'unavailable',locale};
    const cards=[...document.querySelectorAll('.hud-inventory .filled')];
    const items=Object.entries(live.equipment).flatMap(([slot,value])=>(Array.isArray(value)?value:value?[value]:[]).map(item=>{
      const card=cards.find(el=>el.querySelector('img')?.getAttribute('src')?.includes('item-'+item.id+'.'));
@@ -52,8 +54,8 @@
      const icon=img?.src;
      return {slot,name,effects,icon:icon?.startsWith('https://retrosurvival.online/assets/')?icon:null};
    }));
-   return {status:'run',phase:document.querySelector('.pause-panel')?'paused':live.phase,level:live.level,wave:live.wave,hp:live.player.hp,maxHp:live.player.maxHp,kamas:live.kamas,
-     stats:Object.entries(labels).map(([key,name])=>{const b=hud.statBreakdowns[key];const match=b?.detail?.match(/^Actuellement\s*:\s*([^·]+)/);return {name,value:match?match[1].trim():null,gear:b?.gear||''};}),
-     slots,items};
+   return {status:'run',locale,phase:document.querySelector('.pause-panel')?'paused':live.phase,level:live.level,wave:live.wave,hp:live.player.hp,maxHp:live.player.maxHp,kamas:live.kamas,
+     stats:Object.entries(labels).map(([key,name])=>{const b=hud.statBreakdowns[key];const match=b?.detail?.match(/^(?:Actuellement|Currently|Current|Actualmente)\s*:\s*([^·]+)/);return {name:text(name),value:match?match[1].trim():null,gear:b?.gear||''};}),
+     slots:Object.fromEntries(Object.entries(slots).map(([key,name])=>[key,text(name)])),items};
  }};
 })();
