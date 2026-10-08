@@ -17,7 +17,9 @@ Le tactile reste disponible. Les choix de niveau, menus et achats se font au poi
 
 Version 1.5.0 : **Téléportation du Féca** et **Bond du Iop** ont une visée radiale. Maintenir leur touche : destination devant le personnage, selon le stick gauche ou son orientation à l’arrêt. Le stick droit choisit directement une direction dans le rayon de portée ; elle reste choisie quand le stick revient au centre. Relâcher la touche du sort pour lancer à portée maximale. La destination suit le déplacement du personnage et le jeu gère les obstacles. L’évolution de Téléportation permettant un retour garde son point de départ imposé.
 
-Le pointeur est masqué pendant la visée radiale et retrouve sa position précédente ensuite. Pour les autres sorts, la cible reste au point choisi à l’écran et s’ajuste avec le stick droit. Dans **Select / ⚙ Thor → Sensibilité du curseur**, régler sa vitesse de 25 % à 250 % ; 100 % par défaut, réglage mémorisé.
+Version 1.6.0 : les sorts à cibler ou à placer utilisent également le mode radial par défaut. Maintenir leur touche, régler la direction au stick droit et, pour les placements, la distance avec l’inclinaison du stick. Relâcher la touche pour lancer. La cible choisie suit le personnage et reste choisie lorsque le stick revient au centre. Les améliorations de portée sont prises en compte ; agrandir la zone d’un glyphe ne change pas sa portée de placement.
+
+Le pointeur est masqué pendant la visée radiale et retrouve sa position précédente ensuite. **Select / ⚙ Thor → Visée radiale des sorts à cibler** permet de retrouver la visée au pointeur pour ces sorts, tout en gardant le radial des téléportations. Dans **Sensibilité du curseur**, régler la vitesse du pointeur de 25 % à 250 % ; 100 % par défaut, réglages mémorisés.
 
 Depuis la version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**.
 

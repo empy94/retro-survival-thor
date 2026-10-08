@@ -29,7 +29,7 @@ assert.equal(c.rightStick(-1,0),true);frame();assert.deepEqual(target(),{x:355,y
 c.rightStick(0,0);c.move(900,550);player={x:440,y:275};frame();assert.deepEqual(target(),{x:365,y:275});
 c.button(2,false);assert.equal(cursor.style.display,'block');assert.equal(c.rightStick(1,0),false);
 // Cursor navigation resumes at its previous position, not at the radial reticle.
-id='burningGlyph';c.button(2,true);frame();assert.deepEqual(target(),{x:800,y:500});c.cancel();
+id='burningGlyph';c.configure({radialAim:false});c.button(2,true);frame();assert.deepEqual(target(),{x:800,y:500});c.cancel();c.configure({radialAim:true});
 // Iop range, including awakening, and screen-space diagonal on nonuniform scale.
 id='jump';travel.upgrades={jumpRange:3};travel.awakenings={jump:1};c.button(2,true);c.rightStick(1,1);frame();
 const t=target(),dx=(t.x-player.x)/.5,dy=(t.y-player.y)/.25;
@@ -40,4 +40,13 @@ assert.deepEqual(target(),{x:100,y:120});c.cancel();assert.equal(frames.size,0);
 // Starting at rest uses the character's facing, never a stale mouse location.
 c.stick(0,0);travel.returnTarget=null;travel.upgrades={};travel.awakenings={};
 c.button(2,true);frame();assert.deepEqual(target(),{x:440,y:312.5});c.cancel();
+// Placements use proportional stick distance, retain it at rest, and track range.
+id='burningGlyph';c.button(2,true);c.rightStick(.58,0);frame();
+assert.deepEqual(target(),{x:490,y:275});c.rightStick(0,0);frame();assert.deepEqual(target(),{x:490,y:275});
+c.rightStick(.1601,0);frame();assert.ok(target().x-player.x>=12);c.cancel();
+id='cut';travel.upgrades={cutRange:0};c.button(2,true);c.rightStick(1,0);frame();assert.equal(target().x,615);
+travel.upgrades.cutRange=2;frame();assert.equal(target().x,685);c.cancel();
+id='sramDouble';travel.doubleTarget={x:120,y:80};c.button(2,true);c.rightStick(1,0);frame();assert.deepEqual(target(),{x:120,y:80});c.cancel();
+assert.equal(mapping.radialSpec('fear').showRange,false);
+assert.equal(mapping.radialSpec('burningGlyph',{}, {burningGlyph:2}),null);
 console.log('Travel aiming: forward, follow, direct stick direction, retained direction, range, return, cursor restoration and spell isolation passed');

@@ -12,6 +12,19 @@
    return null;
  }
  function needsAim(id,awakenings={}){return aimed.has(id)&&!(id==='burningGlyph'&&awakenings.burningGlyph===2);}
+ function radialSpec(id,upgrades={},awakenings={}){
+   if(!needsAim(id,awakenings))return null;
+   if(isTravel(id))return {distance:travelRange(id,upgrades,awakenings),variable:false,showRange:true};
+   const upgrade=key=>Number.isFinite(upgrades[key])?Math.max(0,upgrades[key]):0;
+   if(id==='staffBoomerang')return {distance:310*(1+upgrade('staffRange')*.2),variable:false,showRange:true};
+   if(id==='cut')return {distance:350*(1+upgrade('cutRange')*.2)*(awakenings.cut===1?1.65:1),variable:true,showRange:true};
+   const ranges={burningGlyph:200,immobilizationGlyph:200,celestialSword:360,iopSword:380,lethalAttack:80,massTrap:230,repulsiveTrap:330,sramDouble:80};
+   if(id in ranges)return {distance:ranges[id],variable:true,showRange:true};
+   // These casts use direction rather than distance. This is a visible aiming
+   // handle, not a claim about their attack range or area of effect.
+   if(id==='swordOfFate'||id==='fear')return {distance:150,variable:false,showRange:false};
+   return null;
+ }
  function assign(spells,awakenings={}){
    const slots=Array(6).fill(null);
    const entries=spells.map(spell=>({...spell,aimed:needsAim(spell.id,awakenings)}));
@@ -22,6 +35,6 @@
    }
    return slots;
  }
- const api={names,needsAim,assign,isTravel,travelRange};
+ const api={names,needsAim,assign,isTravel,travelRange,radialSpec};
  if(typeof module==='object'&&module.exports)module.exports=api;else root.thorSpellBindings=api;
 })(typeof window==='object'?window:globalThis);

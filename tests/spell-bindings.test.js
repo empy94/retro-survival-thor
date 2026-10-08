@@ -22,7 +22,7 @@ assert.deepEqual(slots.slice(2).map(s=>s.id),['dash','burningGlyph','jump','cut'
 assert.deepEqual(slots.slice(0,2).map(s=>s.id),['fear','shield']);
 // Exercise real input routing: another button release must not launch a held glyph.
 const received=[];
-const surface={getBoundingClientRect:()=>({left:0,top:0}),classList:{add(){},remove(){}},style:{setProperty(){}}};
+const surface={append(){},getBoundingClientRect:()=>({left:0,top:0}),classList:{add(){},remove(){}},style:{setProperty(){}}};
 const buttons=['shield','burningGlyph','immobilizationGlyph'].map(id=>({
  isConnected:true,closest:()=>surface,
  __reactFiberTest:{key:id},setPointerCapture(){},
@@ -31,8 +31,8 @@ const buttons=['shield','burningGlyph','immobilizationGlyph'].map(id=>({
  querySelector(){return null;},
  dispatchEvent(e){received.push([id,e.type,e.pointerId]);}
 }));
-const context={window:{thorSpellBindings:mapping,thorDashboard:{abilities:()=>({awakenings:{}}),playerPosition:()=>({x:50,y:60})}},
- document:{querySelectorAll:()=>buttons,querySelector:()=>null,addEventListener(){}},
+const context={window:{thorSpellBindings:mapping,thorDashboard:{abilities:()=>({awakenings:{}}),playerPosition:()=>({x:50,y:60}),travelState:()=>({scaleX:1,scaleY:1,angle:0})}},
+ document:{querySelectorAll:()=>buttons,querySelector:()=>null,addEventListener(){},createElement:()=>({style:{},remove(){}})},
  requestAnimationFrame:()=>1,cancelAnimationFrame(){},
  PointerEvent:function(type,props){this.type=type;Object.assign(this,props);}};
 vm.runInNewContext(fs.readFileSync(require.resolve('../assets/controls.js'),'utf8'),context);

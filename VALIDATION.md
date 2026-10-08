@@ -2,6 +2,16 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.6.0
+
+- Quatre suites Node réussies. Direction, distance réglable et conservée au retour au centre, seuil tactile minimal, évolution dynamique de portée de Couper, destination imposée du Double, attaques directionnelles sans faux rayon et exception du Glyphe enflammé instantané couverts.
+- Portées comparées aux fonctions du jeu actuel. Téléportation, Bond, Retour du Bâton et Couper lisent leurs améliorations à chaque image ; la taille des zones de glyphes reste distincte de leur portée de placement fixe de 200 unités.
+- Glyphe d’immobilisation débloqué normalement sur le Thor. Maintien de la touche du sort et déplacement injectés par Android ; direction et inclinaison envoyées au pont du stick droit. Aucun déblocage ou déplacement forcé par écriture dans l’état du jeu.
+- Guide observé à la position du personnage pendant son déplacement. Inclinaison à mi-course utile : vecteur (0 ; -53,522) pixels CSS. Stick à fond : (0 ; -107,045). Retour au centre : direction et distance conservées. Relâchement d’une autre touche : maintien conservé. Relâchement de la touche du sort : récupération réelle démarrée, guide et rayon supprimés, pointeur réaffiché.
+- Nouveau réglage affiché sur l’appareil, désactivation/réactivation au toucher et stockage de la préférence activée vérifiés. Sensibilité existante à 200 % et opacité à 45 % conservées.
+- APK signé 1.6.0 installé en remplacement sans désinstallation. Version 7 / 1.6.0, débogage désactivé et préférence radiale activée après mise à jour vérifiés.
+- Capture réelle du placement ajoutée au README. Les améliorations de portée et les autres classes sont vérifiées par tests automatisés et lecture des fonctions du jeu, pas toutes essayées en partie. Les sticks physiques ensemble restent à essayer manuellement.
+
 ## Version 1.5.0
 
 - Quatre suites Node réussies : visée radiale, suivi de visée au pointeur, attribution des sorts et observateur. Direction du stick gauche, orientation à l’arrêt, suivi du personnage, direction directe du stick droit, conservation au retour au centre, portée de Bond améliorée et doublée, destination de retour imposée et restauration du pointeur couverts.

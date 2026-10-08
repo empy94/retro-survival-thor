@@ -1,5 +1,13 @@
 # Versions
 
+## 1.6.0 — 8 octobre 2026
+
+- Visée radiale étendue aux sorts dirigés et aux sorts à placer : glyphes, pièges, invocation du Double, attaques ciblées.
+- Pour les sorts à placer, le stick droit règle direction et distance selon son inclinaison ; la cible choisie est conservée au retour au centre et suit le personnage.
+- Portée actualisée depuis les améliorations de la partie, notamment Retour du Bâton et Couper ; portée de placement fixe des glyphes respectée, distincte de leur taille.
+- Les attaques purement directionnelles gardent un guide de direction sans rayon de portée fictif. Les échanges avec un Double existant gardent leur destination imposée.
+- Réglage mémorisé **Visée radiale des sorts à cibler**, activé par défaut ; le désactiver rétablit le pointeur pour ces sorts. Téléportation et Bond gardent leur mode radial.
+
 ## 1.5.0 — 8 octobre 2026
 
 - Visée radiale dédiée à Téléportation (Féca) et Bond (Iop), identifiés automatiquement parmi les sorts débloqués.

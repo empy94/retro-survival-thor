@@ -17,6 +17,7 @@ const context={window:{thorSpellBindings:mapping,thorDashboard:{abilities:()=>({
  PointerEvent:function(type,props){this.type=type;Object.assign(this,props);}};
 vm.runInNewContext(fs.readFileSync('assets/controls.js','utf8'),context);domReady();
 const controls=context.window.thorControls;
+controls.configure({radialAim:false});
 function frame(){const queued=[...frames.values()];frames.clear();queued.forEach(f=>f());}
 controls.move(700,350);controls.button(2,true);
 assert.deepEqual(events.at(-1),{type:'pointerdown',x:400,y:250}); // Never the icon at 775,475.

@@ -4,7 +4,7 @@
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
  let px=0,py=0,aimFrame=null;
  let leftX=0,leftY=0;
- let settings={showLabels:true,labelOpacity:.45,showJoystick:true};
+ let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true};
  function bindings(){
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{
      let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))];
@@ -30,22 +30,27 @@
  function event(el,type,id,x,y){el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===177,clientX:x,clientY:y,pageX:x,pageY:y,buttons:type==='pointerup'||type==='pointercancel'?0:1,button:0,bubbles:true,cancelable:true}));}
  function aimPoint(held){
    const player=window.thorDashboard?.playerPosition();if(!player)return null;
-   let targetX=px,targetY=py,range=null,travel=null;
-   if(held.travel){
+   let targetX=px,targetY=py,range=null,travel=null,showRange=true,fixed=null;
+   if(held.radial){
      travel=window.thorDashboard?.travelState();if(!travel)return null;
-     range=window.thorSpellBindings.travelRange(held.id,travel.upgrades,travel.awakenings);
-     if(held.id==='dash'&&travel.returnTarget){targetX=travel.returnTarget.x;targetY=travel.returnTarget.y;range=0;}
+     const spec=window.thorSpellBindings.radialSpec(held.id,travel.upgrades,travel.awakenings);if(!spec)return null;
+     range=spec.distance;showRange=spec.showRange;
+     const fixedTarget=held.id==='dash'?travel.returnTarget:held.id==='sramDouble'?travel.doubleTarget:null;
+     if(fixedTarget){targetX=fixedTarget.x;targetY=fixedTarget.y;range=0;fixed=held.id==='dash'?'Retour au point de départ':'Échange avec le double';}
      else{
        if(Math.hypot(leftX,leftY)>.16)held.forward={x:leftX,y:leftY};
        const d=held.rightDirection?{x:held.rightDirection.x/travel.scaleX,y:held.rightDirection.y/travel.scaleY}:held.forward;
        const length=Math.hypot(d.x,d.y)||1;
-       targetX=player.x+d.x/length*range*travel.scaleX;targetY=player.y+d.y/length*range*travel.scaleY;
+       // Preserve the chosen distance when the stick returns to its dead zone.
+       // Stay above the game's touch-vector threshold to avoid an auto-aim cast.
+       const ratio=spec.variable?Math.min(1,Math.max(held.distanceRatio,12.1/(range*Math.min(travel.scaleX,travel.scaleY)))):1;
+       targetX=player.x+d.x/length*range*ratio*travel.scaleX;targetY=player.y+d.y/length*range*ratio*travel.scaleY;
      }
    }
    const rect=held.controls.getBoundingClientRect(),dx=targetX-player.x,dy=targetY-player.y;
    // The game keeps a fixed touch origin; translate the virtual finger so its
    // vector always equals cursor minus current player. Never write game state.
-   return {x:rect.left+held.originX+dx,y:rect.top+held.originY+dy,player,rect,dx,dy,targetX,targetY,range,travel};
+   return {x:rect.left+held.originX+dx,y:rect.top+held.originY+dy,player,rect,dx,dy,targetX,targetY,range,travel,showRange,fixed};
  }
  function updateAim(){
    if(!ability)return;
@@ -57,7 +62,7 @@
    style.setProperty('--thor-aim-x',(p.player.x-p.rect.left)+'px');style.setProperty('--thor-aim-y',(p.player.y-p.rect.top)+'px');
    style.setProperty('--thor-aim-distance',Math.hypot(p.dx,p.dy)+'px');style.setProperty('--thor-aim-angle',Math.atan2(p.dy,p.dx)+'rad');
    style.setProperty('--thor-target-x',(p.targetX-p.rect.left)+'px');style.setProperty('--thor-target-y',(p.targetY-p.rect.top)+'px');
-   if(ability.radius){const ring=ability.radius.style;ring.left=(p.player.x-p.rect.left)+'px';ring.top=(p.player.y-p.rect.top)+'px';ring.width=p.range*p.travel.scaleX*2+'px';ring.height=p.range*p.travel.scaleY*2+'px';ring.display=p.range?'':'none';const caption=p.range?'Stick droit : direction':'Retour au point de départ';if(ability.caption.textContent!==caption)ability.caption.textContent=caption;ability.caption.style.left=(p.player.x-p.rect.left)+'px';ability.caption.style.top=(p.player.y-p.rect.top+20)+'px';}
+   if(ability.radius){const ring=ability.radius.style;ring.left=(p.player.x-p.rect.left)+'px';ring.top=(p.player.y-p.rect.top)+'px';ring.width=p.range*p.travel.scaleX*2+'px';ring.height=p.range*p.travel.scaleY*2+'px';ring.display=p.range&&p.showRange?'':'none';const caption=p.fixed||(ability.variable?'Stick droit : direction et distance':'Stick droit : direction');if(ability.caption.textContent!==caption)ability.caption.textContent=caption;ability.caption.style.left=(p.player.x-p.rect.left)+'px';ability.caption.style.top=(p.player.y-p.rect.top+20)+'px';}
  }
  function aimTick(){aimFrame=null;updateAim();if(ability)aimFrame=requestAnimationFrame(aimTick);}
  function finish(type){
@@ -70,7 +75,7 @@
  }
  window.thorControls={
    bindings(){return bindings().map(s=>s?{button:s.button,id:s.id,name:s.name,aimed:s.aimed,travel:window.thorSpellBindings.isTravel(s.id)}:null);},
-   rightStick(x,y){if(!ability?.travel)return false;if(Math.hypot(x,y)>.16)ability.rightDirection={x,y};return true;},
+   rightStick(x,y){if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
    cancel(){finish('pointercancel');},
    configure(value){settings={...settings,...value};decorate();},
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
@@ -101,11 +106,12 @@
      const player=window.thorDashboard?.playerPosition(true),controls=el.closest('.touch-controls');
      if(!player||!controls)return;
      const rect=controls.getBoundingClientRect();
-     const travel=window.thorSpellBindings.isTravel(spell.id),state=travel?window.thorDashboard?.travelState():null;
-     if(travel&&!state)return;
-     ability={el,index,controls,id:spell.id,travel,x:player.x,y:player.y,originX:player.x-rect.left,originY:player.y-rect.top,
+     const travel=window.thorSpellBindings.isTravel(spell.id),radial=travel||settings.radialAim,state=radial?window.thorDashboard?.travelState():null;
+     const spec=radial&&state?window.thorSpellBindings.radialSpec(spell.id,state.upgrades,state.awakenings):null;
+     if(radial&&!spec)return;
+     ability={el,index,controls,id:spell.id,travel,radial,variable:spec?.variable,distanceRatio:1,x:player.x,y:player.y,originX:player.x-rect.left,originY:player.y-rect.top,
        forward:Math.hypot(leftX,leftY)>.16?{x:leftX,y:leftY}:{x:Math.cos(state?.angle||0),y:Math.sin(state?.angle||0)}};
-     if(travel){
+     if(radial){
        ability.cursor=document.querySelector('#thor-cursor');if(ability.cursor){ability.cursorDisplay=ability.cursor.style.display;ability.cursor.style.display='none';}
        const ring=document.createElement('div');ring.className='thor-travel-radius';ring.style.cssText='position:absolute;transform:translate(-50%,-50%);border:1px dashed #ffe19299;border-radius:50%;pointer-events:none;box-sizing:border-box';controls.append(ring);ability.radius=ring;
        const caption=document.createElement('span');caption.style.cssText='position:absolute;transform:translateX(-50%);white-space:nowrap;color:#ffe4a0;background:#17251ccc;border-radius:5px;padding:3px 5px;font:600 10px sans-serif;pointer-events:none';controls.append(caption);ability.caption=caption;
@@ -128,7 +134,7 @@
    c.style.cssText='position:fixed;z-index:2147483647;pointer-events:none;width:18px;height:18px;border:2px solid #ffe192;border-radius:50%;box-shadow:0 0 3px 2px #000;transform:translate(-50%,-50%);left:50%;top:50%;display:none';
    document.body.append(c);
    window.thorControls.move=function(x,y){
-     if(ability?.travel)return;
+     if(ability?.radial)return;
      px=Math.max(1,Math.min(innerWidth-2,x));py=Math.max(1,Math.min(innerHeight-2,y));
      c.style.display='block';c.style.left=px+'px';c.style.top=py+'px';
      const el=document.elementFromPoint(px,py);

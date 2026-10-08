@@ -27,8 +27,9 @@
    const p=live.player,returning=live.awakenings?.dash===3&&p.teleportReturnTimer>0;
    const returnTarget=returning&&[p.teleportReturnX,p.teleportReturnY].every(Number.isFinite)?{x:rect.left+p.teleportReturnX*scaleX,y:rect.top+p.teleportReturnY*scaleY}:null;
    return {...position,scaleX,scaleY,angle:Number.isFinite(p.angle)?p.angle:0,
-     upgrades:{dashRange:live.upgrades?.dashRange,jumpRange:live.upgrades?.jumpRange},
-     awakenings:{dash:live.awakenings?.dash,jump:live.awakenings?.jump},returnTarget};
+     upgrades:{dashRange:live.upgrades?.dashRange,jumpRange:live.upgrades?.jumpRange,staffRange:live.upgrades?.staffRange,cutRange:live.upgrades?.cutRange},
+     awakenings:{dash:live.awakenings?.dash,jump:live.awakenings?.jump,cut:live.awakenings?.cut,burningGlyph:live.awakenings?.burningGlyph},returnTarget,
+     doubleTarget:live.awakenings?.sramDouble===2&&live.sram?.double?.hp>0&&live.sram.double.life>0&&[live.sram.double.x,live.sram.double.y].every(Number.isFinite)?{x:rect.left+live.sram.double.x*scaleX,y:rect.top+live.sram.double.y*scaleY}:null};
  },
  playerPosition(refresh=false){
    const canvas=document.querySelector('canvas');if(!canvas)return null;

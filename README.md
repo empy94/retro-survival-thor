@@ -34,6 +34,10 @@ La fiche lit les informations disponibles dans le jeu, sans modifier la partie. 
 <details>
 <summary>Voir les captures originales sur le Thor</summary>
 
+Version 1.6.0 : placement radial d’un glyphe, direction et distance au stick droit.
+
+![Placement radial d’un glyphe sur le Thor](docs/screenshots/placements-radiaux.png)
+
 Version 1.5.0 : visée radiale de Téléportation, avec rayon centré sur le personnage et direction choisie au stick droit.
 
 ![Visée radiale de Téléportation sur le Thor](docs/screenshots/teleportation-radiale.png)
@@ -85,11 +89,17 @@ Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a
 
 Les menus et les choix de niveau se sélectionnent au pointeur avec R3. Le tactile reste disponible. Les attaques automatiques du mode Android restent gérées par le jeu.
 
-Depuis la version **1.4.0**, la trajectoire des sorts à viser part du personnage et suit ses déplacements pendant le maintien. Le point ciblé reste à l’endroit choisi à l’écran ; le stick droit permet de l’ajuster. La direction du lancement est recalculée au relâchement. La portée et les contraintes du sort restent celles du jeu.
+En **visée au pointeur**, la trajectoire des sorts à viser part du personnage et suit ses déplacements pendant le maintien. Le point ciblé reste à l’endroit choisi à l’écran ; le stick droit permet de l’ajuster. La direction du lancement est recalculée au relâchement. La portée et les contraintes du sort restent celles du jeu.
 
 Depuis la version **1.5.0**, **Téléportation du Féca** et **Bond du Iop** utilisent une visée radiale : maintenir la touche du sort pour afficher sa portée autour du personnage. La destination est d’abord devant lui, dans la direction du stick gauche (ou son orientation à l’arrêt). Le **stick droit choisit directement la direction**, sans déplacer la souris ; cette direction reste choisie quand le stick revient au centre. Relâcher la touche du sort pour lancer à portée maximale. Le rayon et la destination suivent le personnage pendant son déplacement, en tenant compte des améliorations de portée. Le jeu décide de la position d’arrivée selon les limites du terrain et les obstacles.
 
-Le curseur habituel est masqué pendant cette visée et retrouve sa position précédente ensuite. Les glyphes, pièges et autres sorts conservent leur visée au pointeur. L’évolution de Téléportation permettant un retour garde sa destination imposée et l’indique à l’écran. Le Double du Sram garde son fonctionnement d’invocation puis d’échange avec un double déjà placé ; il ne reçoit pas une direction de téléportation libre.
+Le curseur habituel est masqué pendant cette visée et retrouve sa position précédente ensuite. L’évolution de Téléportation permettant un retour garde sa destination imposée et l’indique à l’écran.
+
+Depuis la version **1.6.0**, la visée radiale est également activée par défaut pour les **sorts à cibler ou à placer**. Maintenir la touche du sort, choisir la direction au stick droit, puis relâcher pour lancer. Pour les glyphes, pièges, invocations et attaques dont la distance est réglable, incliner légèrement le stick pour viser près et à fond pour viser loin. Direction et distance restent choisies quand le stick revient au centre, et la cible suit le personnage.
+
+Le rayon suit la portée actuelle du sort : améliorations et évolutions de portée de Téléportation, Bond, Retour du Bâton et Couper prises en compte. Les glyphes ont actuellement une portée de placement fixe de 200 unités du jeu ; agrandir leur zone d’effet ne permet pas de les poser plus loin. Les attaques purement directionnelles, comme Épée du Destin et Peur, montrent une direction sans annoncer un rayon de portée. Le Double du Sram se place dans son rayon d’invocation ; son évolution d’échange avec un Double existant indique ce point imposé.
+
+Pour retrouver la visée au pointeur sur les sorts ciblés, désactiver **Select / ⚙ Thor → Visée radiale des sorts à cibler**. Téléportation et Bond conservent leur mode radial. Les sorts instantanés se lancent toujours par une simple pression.
 
 ## Affichage réglable
 
