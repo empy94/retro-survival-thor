@@ -19,7 +19,7 @@
    }
    return {live,hud};
  }
- window.thorDashboard={snapshot(){
+ window.thorDashboard={abilities(){const {hud}=state();return {awakenings:hud?.awakenings||{}};},snapshot(){
    const phase=document.querySelector('main')?.className||'';
    if(phase.includes('phase-title'))return {status:'title'};
    const {live,hud}=state();

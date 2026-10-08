@@ -67,7 +67,8 @@ Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a
 | Stick gauche / croix | Déplacement avec le joystick tactile du jeu |
 | Stick droit | Déplacement du pointeur doré |
 | R3 / A | Clic tactile à la position du pointeur |
-| X, Y, L1, R1, L2, R2 | Sorts actifs de gauche à droite |
+| L1, R1, L2, R2 | Priorité aux sorts à viser |
+| X, Y | Priorité aux sorts instantanés |
 | Bouton de sort maintenu + stick droit | Viser, puis relâcher pour les sorts directionnels |
 | Start / B | Pause et reprise |
 | Select / bouton **⚙ Thor** | Paramètres des commandes |
@@ -78,6 +79,8 @@ Les menus et les choix de niveau se sélectionnent au pointeur avec R3. Le tacti
 
 - Le joystick visuel du stick gauche est fixé dans le coin inférieur gauche pendant le déplacement.
 - Les sorts actifs débloqués affichent leur bouton physique : **X, Y, L1, R1, L2, R2**.
+- Depuis la version **1.3.0**, les sorts à viser (glyphes, pièges, déplacements ciblés…) occupent d’abord **L1, R1, L2, R2**. Maintenir la touche, viser au stick droit, puis relâcher pour lancer. Les sorts instantanés occupent d’abord **X et Y**, puis les boutons encore libres. Lire les repères sur les sorts après un déblocage : les affectations peuvent changer.
+- L’évolution du Glyphe enflammé qui supprime la visée est reconnue comme un sort instantané. Six sorts au maximum sont associés aux boutons ; les autres restent accessibles au tactile ou avec le pointeur et R3.
 - Dans **⚙ Thor** ou avec **Select**, afficher ou masquer ces étiquettes et régler leur opacité entre 15 % et 85 %.
 - Le joystick visuel peut être masqué sans désactiver le déplacement.
 - Les préférences restent enregistrées après fermeture et mise à jour de l’application.
@@ -98,7 +101,7 @@ Les chemins sont également configurables par les paramètres `-AndroidSdk` et `
 
 Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé, uniquement pour les essais. L’APK publié n’active pas ce débogage.
 
-Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu.
+Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu. `node tests/spell-bindings.test.js` vérifie la priorité des sorts à viser, l’exception du Glyphe enflammé, la limite de six boutons, le relâchement du bon bouton et l’annulation de la visée.
 
 ## Projet indépendant
 

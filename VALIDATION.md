@@ -2,6 +2,16 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.3.0
+
+- Tests Node du routage des sorts et de l’observateur réussis ; compilation et signature vérifiées.
+- Classification comparée au gestionnaire tactile du site en ligne : 14 types de sorts à viser, avec exception du Glyphe enflammé à l’évolution 2. Aucune modification de l’état du jeu pour ces vérifications.
+- Sur le Thor, Glyphe d’immobilisation débloqué normalement et attribué à L1 ; Bouclier Féca attribué à X.
+- Sur une autre partie, Glyphe enflammé débloqué normalement : maintien de L1 injecté via Android, déplacement du pointeur par le même pont JavaScript que le stick droit. Guide de visée réellement affiché. Relâchement d’un autre bouton : guide conservé. Relâchement de L1 : guide disparu et récupération du glyphe démarrée (`aria-disabled=true`).
+- Les tests automatisés couvrent aussi le lancement instantané sans terminer une visée maintenue et l’annulation sans lancement lors de la perte de focus.
+- APK signé 1.3.0 installé en remplacement sur le Thor, sans désinstallation ; lancement du jeu sur l’écran supérieur et fiche de personnage sur l’écran inférieur observés. Le débogage WebView est désactivé dans cet APK publié.
+- La visée a été observée dans le jeu réel avec une commande Android injectée. Un essai manuel des gâchettes et du stick droit physiques ensemble reste à faire ; toutes les classes et évolutions n’ont pas été testées en partie.
+
 ## Version 1.2.0
 
 - Compilation, signature APK et syntaxe JavaScript vérifiées ; contrat de l’observateur validé avec `node tests/telemetry.test.js`.

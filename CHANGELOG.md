@@ -1,5 +1,14 @@
 # Versions
 
+## 1.3.0 — 8 octobre 2026
+
+- Attribution automatique de L1/R1/L2/R2 en priorité aux sorts à viser ; X/Y en priorité aux sorts instantanés.
+- Identification par les identifiants du jeu, indépendante de la langue ; prise en compte de l’évolution instantanée du Glyphe enflammé.
+- Repères des touches mis à jour après le déblocage des sorts.
+- Une visée maintenue n’est plus terminée par le relâchement d’un autre bouton ; un sort instantané peut être lancé pendant la visée.
+- Annulation de la visée lors de la perte de focus ou de l’ouverture des paramètres.
+- Aide des commandes et tests de routage mis à jour.
+
 ## 1.2.0 — 8 octobre 2026
 
 - Fiche de personnage sur le deuxième écran : PV, kamas, niveau, vague et 13 caractéristiques.

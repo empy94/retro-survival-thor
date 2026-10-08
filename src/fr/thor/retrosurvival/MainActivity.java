@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
    super.onCreate(state);
    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
    immersive();
-   try(InputStream in=getAssets().open("controls.js");InputStream telemetry=getAssets().open("telemetry.js")){bootstrap=read(in)+"\n"+read(telemetry);}catch(Exception ex){throw new RuntimeException(ex);}
+   try(InputStream mapping=getAssets().open("spell-bindings.js");InputStream in=getAssets().open("controls.js");InputStream telemetry=getAssets().open("telemetry.js")){bootstrap=read(mapping)+"\n"+read(in)+"\n"+read(telemetry);}catch(Exception ex){throw new RuntimeException(ex);}
    displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
    web=new WebView(this);setContentView(web);
    web.addJavascriptInterface(new Object(){@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&web.getUrl().startsWith("https://retrosurvival.online/"))settings();});}},"ThorPreferences");
@@ -131,7 +131,7 @@ public class MainActivity extends Activity {
  private void key(String k,String c,boolean down){if(ready){if("Escape".equals(k)){if(down)web.evaluateJavascript("window.thorControls.pause()",null);}else if(c.startsWith("Digit"))web.evaluateJavascript("window.thorControls.button("+(Integer.parseInt(k)-1)+","+down+")",null);else web.evaluateJavascript("window.thorControls.key("+quote(k)+","+quote(c)+","+down+")",null);}}
  private String quote(String s){return "\""+s+"\"";}
  private void direction(String k,boolean down){if(down&&directions.add(k))key(k,k,true);else if(!down&&directions.remove(k))key(k,k,false);}
- private void reset(){for(String k:new HashSet<>(directions))direction(k,false);for(int k:new HashSet<>(held)){String[] b=binding(k);if(b!=null)key(b[0],b[1],false);}if(ready)web.evaluateJavascript("window.thorControls.stick(0,0)",null);held.clear();lx=ly=rx=ry=hx=hy=0;}
+ private void reset(){if(ready)web.evaluateJavascript("window.thorControls.cancel()",null);for(String k:new HashSet<>(directions))direction(k,false);for(int k:new HashSet<>(held)){String[] b=binding(k);if(b!=null)key(b[0],b[1],false);}if(ready)web.evaluateJavascript("window.thorControls.stick(0,0)",null);held.clear();lx=ly=rx=ry=hx=hy=0;}
  public boolean dispatchGenericMotionEvent(MotionEvent e){
    if((e.getSource()&InputDevice.SOURCE_JOYSTICK)==InputDevice.SOURCE_JOYSTICK&&e.getAction()==MotionEvent.ACTION_MOVE){
      lx=e.getAxisValue(MotionEvent.AXIS_X);ly=e.getAxisValue(MotionEvent.AXIS_Y);rx=e.getAxisValue(MotionEvent.AXIS_Z);ry=e.getAxisValue(MotionEvent.AXIS_RZ);hx=e.getAxisValue(MotionEvent.AXIS_HAT_X);hy=e.getAxisValue(MotionEvent.AXIS_HAT_Y);
@@ -169,7 +169,7 @@ public class MainActivity extends Activity {
    web.dispatchTouchEvent(event);event.recycle();
  }
  private void help(){reset();new AlertDialog.Builder(this).setTitle("Commandes AYN Thor")
-   .setMessage("Stick gauche / croix : déplacement\nStick droit : pointeur\nR3 ou A : clic\nX, Y, L1, R1 : sorts actifs 1, 2, 3, 4\nL2, R2 : sorts actifs 5, 6\nStart ou B : pause / reprendre\nSelect ou ⚙ Thor : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Les choix se font au pointeur avec R3.\n\nLa sauvegarde de cette application est distincte de Chrome.")
+   .setMessage("Stick gauche / croix : déplacement\nStick droit : pointeur\nR3 ou A : clic\nL1, R1, L2, R2 : priorité aux sorts à viser\nX, Y : priorité aux sorts instantanés\nStart ou B : pause / reprendre\nSelect ou ⚙ Thor : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Les choix se font au pointeur avec R3.\n\nLa sauvegarde de cette application est distincte de Chrome.")
    .setPositiveButton("Jouer",(d,w)->{web.requestFocus();immersive();}).setNeutralButton("Ajouter à l’accueil",(d,w)->pin()).show();}
  private void applySettings(){if(!ready)return;android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorControls.configure({showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
  private void settings(){

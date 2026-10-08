@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fr.thor.retrosurvival" android:versionCode="3" android:versionName="1.2.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fr.thor.retrosurvival" android:versionCode="4" android:versionName="1.3.0">
   <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="33"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <application android:label="Retro Survival" android:icon="@drawable/icon" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="true" android:hardwareAccelerated="true">
