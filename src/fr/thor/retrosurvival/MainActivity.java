@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
  };
  private final Handler handler=new Handler(Looper.getMainLooper());
  private float lx,ly,rx,ry,hx,hy,px=-1,py=-1;
+ private float cursorSensitivity=1f;
  private boolean ready=false,active=false;
  private final Set<String> directions=new HashSet<>();
  private final Set<Integer> held=new HashSet<>();
@@ -52,8 +53,8 @@ public class MainActivity extends Activity {
      web.evaluateJavascript("window.thorControls.stick("+mx+","+my+")",null);
      if(Math.abs(rx)>.16f||Math.abs(ry)>.16f){
        if(px<0){px=web.getWidth()/2f;py=web.getHeight()/2f;}
-       px=Math.max(2,Math.min(web.getWidth()-2,px+curve(rx)*900*dt));
-       py=Math.max(2,Math.min(web.getHeight()-2,py+curve(ry)*900*dt));
+       px=Math.max(2,Math.min(web.getWidth()-2,px+curve(rx)*900*cursorSensitivity*dt));
+       py=Math.max(2,Math.min(web.getHeight()-2,py+curve(ry)*900*cursorSensitivity*dt));
        pointer();
      }
    }
@@ -62,6 +63,7 @@ public class MainActivity extends Activity {
  private float curve(float v){return Math.abs(v)<=.16f?0:Math.copySign((Math.abs(v)-.16f)/.84f,v);}
  public void onCreate(Bundle state){
    super.onCreate(state);
+   cursorSensitivity=Math.max(25,Math.min(250,getPreferences(0).getInt("cursorSensitivity",100)))/100f;
    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
    immersive();
    try(InputStream mapping=getAssets().open("spell-bindings.js");InputStream in=getAssets().open("controls.js");InputStream telemetry=getAssets().open("telemetry.js")){bootstrap=read(mapping)+"\n"+read(in)+"\n"+read(telemetry);}catch(Exception ex){throw new RuntimeException(ex);}
@@ -181,6 +183,9 @@ public class MainActivity extends Activity {
    Switch labels=new Switch(this);labels.setText("Touches sur les sorts actifs");labels.setChecked(p.getBoolean("showLabels",true));layout.addView(labels);
    TextView opacity=new TextView(this);opacity.setText("Opacité des touches : "+p.getInt("labelOpacity",45)+" %");layout.addView(opacity);
    SeekBar slider=new SeekBar(this);slider.setMax(85);slider.setMin(15);slider.setProgress(p.getInt("labelOpacity",45));layout.addView(slider);
+   TextView sensitivity=new TextView(this);sensitivity.setText("Sensibilité du curseur : "+Math.round(cursorSensitivity*100)+" %");layout.addView(sensitivity);
+   SeekBar speed=new SeekBar(this);speed.setMax(250);speed.setMin(25);speed.setProgress(Math.round(cursorSensitivity*100));layout.addView(speed);
+   speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int value,boolean user){cursorSensitivity=value/100f;sensitivity.setText("Sensibilité du curseur : "+value+" %");p.edit().putInt("cursorSensitivity",value).apply();}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
    Switch joystick=new Switch(this);joystick.setText("Joystick visuel en bas à gauche");joystick.setChecked(p.getBoolean("showJoystick",true));layout.addView(joystick);
    Switch second=new Switch(this);second.setText("Personnage sur l’écran du bas");second.setChecked(p.getBoolean("characterScreen",true));layout.addView(second);
    second.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("characterScreen",v).apply();showCharacterScreen();});
@@ -188,7 +193,8 @@ public class MainActivity extends Activity {
    labels.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showLabels",v).apply();applySettings();});
    joystick.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showJoystick",v).apply();applySettings();});
    slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int value,boolean user){opacity.setText("Opacité des touches : "+value+" %");p.edit().putInt("labelOpacity",value).apply();applySettings();}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
-   boolean[] showHelp={false};AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Paramètres AYN Thor").setView(layout).setPositiveButton("Fermer",null).setNeutralButton("Commandes",(d,w)->{showHelp[0]=true;help();}).create();
+   ScrollView scroll=new ScrollView(this);scroll.addView(layout);
+   boolean[] showHelp={false};AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Paramètres AYN Thor").setView(scroll).setPositiveButton("Fermer",null).setNeutralButton("Commandes",(d,w)->{showHelp[0]=true;help();}).create();
    dialog.setOnDismissListener(d->{if(resumeGame&&!showHelp[0]&&ready)web.evaluateJavascript("window.thorControls.endPreferences()",null);web.requestFocus();immersive();});dialog.show();
  }
  private void pin(){ShortcutManager sm=getSystemService(ShortcutManager.class);if(sm.isRequestPinShortcutSupported())sm.requestPinShortcut(new ShortcutInfo.Builder(this,"retro-survival").setShortLabel("Retro Survival").setIcon(Icon.createWithResource(this,fr.thor.retrosurvival.R.drawable.icon)).setIntent(new Intent(this,MainActivity.class).setAction(Intent.ACTION_MAIN)).build(),null);else Toast.makeText(this,"L’icône est disponible dans la liste des applications.",Toast.LENGTH_LONG).show();}

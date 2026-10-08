@@ -15,7 +15,9 @@ Application personnelle de lancement du site officiel https://retrosurvival.onli
 
 Le tactile reste disponible. Les choix de niveau, menus et achats se font au pointeur avec R3. Les attaques automatiques du mode Android restent gérées par le jeu. Version 1.3.0 : les sorts à viser reçoivent en priorité L1/R1/L2/R2 ; maintenir, viser au stick droit, relâcher. Les repères sur les sorts donnent leur affectation actuelle, qui peut changer après un déblocage. Six sorts maximum sur les boutons ; les autres restent accessibles au tactile/pointeur. L’évolution instantanée du Glyphe enflammé est prise en compte.
 
-Version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**.
+Version 1.4.0 : la visée part de la position actuelle du personnage et suit ses déplacements pendant le maintien. La cible reste au point choisi à l’écran et s’ajuste avec le stick droit. Dans **Select / ⚙ Thor → Sensibilité du curseur**, régler sa vitesse de 25 % à 250 % ; 100 % par défaut, réglage mémorisé.
+
+Depuis la version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**.
 
 Le joystick visuel est ancré en bas à gauche ; les étiquettes X/Y/L1/R1/L2/R2 sur les sorts actifs débloqués, leur affichage et leur opacité sont réglables dans les paramètres. Les réglages sont enregistrés. Voir également [README.md](README.md).
 

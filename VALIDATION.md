@@ -2,6 +2,16 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.4.0
+
+- Tests Node de la visée, des affectations et de l’observateur réussis. Visée depuis une position différente de l’icône, déplacement du personnage avec cible fixe, actualisation entre deux images au relâchement, annulation si la position devient indisponible, coordonnées avec mise à l’échelle du canvas et remplacement du modèle de partie couverts.
+- Partie réelle sur Thor, Glyphe d’immobilisation débloqué normalement. L1 et croix droite maintenus par injection Android ; pointeur déplacé par le pont utilisé par le stick droit.
+- Position initiale du personnage lue à (410,708 ; 312,861), puis à (414,489 ; 312,662), en pixels CSS. Départ du guide observé aux mêmes coordonnées. Cible immobile à (249,9 ; 211,05) ; le vecteur de visée lu dans le jeu correspond exactement à cible moins position actuelle du personnage dans les deux relevés.
+- Relâchement de L1 : guide supprimé et récupération du glyphe commencée. Aucun état de jeu modifié pour forcer les déblocages ou la position.
+- Réglage de sensibilité affiché sur l’appareil, extrêmes 25 % et 250 % sélectionnés au toucher ; stockage Android vérifié. Retour à 100 % et réouverture du menu vérifiés.
+- APK signé 1.4.0 installé en remplacement sans désinstallation. Version installée vérifiée, débogage désactivé, réglage 100 % conservé après mise à jour et observé dans les paramètres de cet APK.
+- Les essais utilisent des commandes Android injectées et le pont du pointeur. Un essai manuel combinant les deux sticks et toutes les gâchettes physiques reste nécessaire pour valider le confort ; tous les sorts et toutes les situations de déplacement n’ont pas été essayés.
+
 ## Version 1.3.0
 
 - Tests Node du routage des sorts et de l’observateur réussis ; compilation et signature vérifiées.

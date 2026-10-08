@@ -34,6 +34,12 @@ La fiche lit les informations disponibles dans le jeu, sans modifier la partie. 
 <details>
 <summary>Voir les captures originales sur le Thor</summary>
 
+Version 1.4.0 :
+
+| Visée depuis le personnage en déplacement | Sensibilité du curseur |
+|---|---|
+| ![Glyphe : trajectoire depuis le personnage vers la cible](docs/screenshots/visee-personnage.png) | ![Sensibilité du curseur dans les paramètres du Thor](docs/screenshots/sensibilite.png) |
+
 Captures réelles de la version 1.2.0, avant mise en situation dans les visuels du Thor.
 
 | Fiche de personnage | Effets de l’équipement |
@@ -75,6 +81,8 @@ Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a
 
 Les menus et les choix de niveau se sélectionnent au pointeur avec R3. Le tactile reste disponible. Les attaques automatiques du mode Android restent gérées par le jeu.
 
+Depuis la version **1.4.0**, la trajectoire des sorts à viser part du personnage et suit ses déplacements pendant le maintien. Le point ciblé reste à l’endroit choisi à l’écran ; le stick droit permet de l’ajuster. La direction du lancement est recalculée au relâchement. La portée et les contraintes du sort restent celles du jeu.
+
 ## Affichage réglable
 
 - Le joystick visuel du stick gauche est fixé dans le coin inférieur gauche pendant le déplacement.
@@ -82,6 +90,7 @@ Les menus et les choix de niveau se sélectionnent au pointeur avec R3. Le tacti
 - Depuis la version **1.3.0**, les sorts à viser (glyphes, pièges, déplacements ciblés…) occupent d’abord **L1, R1, L2, R2**. Maintenir la touche, viser au stick droit, puis relâcher pour lancer. Les sorts instantanés occupent d’abord **X et Y**, puis les boutons encore libres. Lire les repères sur les sorts après un déblocage : les affectations peuvent changer.
 - L’évolution du Glyphe enflammé qui supprime la visée est reconnue comme un sort instantané. Six sorts au maximum sont associés aux boutons ; les autres restent accessibles au tactile ou avec le pointeur et R3.
 - Dans **⚙ Thor** ou avec **Select**, afficher ou masquer ces étiquettes et régler leur opacité entre 15 % et 85 %.
+- Régler aussi la **sensibilité du curseur** de **25 %** (précis) à **250 %** (rapide), avec **100 %** par défaut. Ce réglage s’applique au stick droit dans les menus et pendant la visée.
 - Le joystick visuel peut être masqué sans désactiver le déplacement.
 - Les préférences restent enregistrées après fermeture et mise à jour de l’application.
 
@@ -102,6 +111,8 @@ Les chemins sont également configurables par les paramètres `-AndroidSdk` et `
 Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé, uniquement pour les essais. L’APK publié n’active pas ce débogage.
 
 Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu. `node tests/spell-bindings.test.js` vérifie la priorité des sorts à viser, l’exception du Glyphe enflammé, la limite de six boutons, le relâchement du bon bouton et l’annulation de la visée.
+
+`node tests/aim-follow.test.js` vérifie une visée dont la cible reste fixe pendant le déplacement du personnage, le calcul au relâchement et l’annulation si sa position est indisponible. Le test de l’observateur vérifie aussi les coordonnées du personnage après mise à l’échelle du canvas et remplacement de la partie.
 
 ## Projet indépendant
 

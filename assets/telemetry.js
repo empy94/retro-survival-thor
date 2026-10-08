@@ -2,6 +2,7 @@
  'use strict';
  const labels={'damage':'Dommages','spell-damage':'Dommages des sorts','basic-damage':'Dommages attaque','basic-speed':'Vitesse d’attaque','critical':'Critique','critical-damage':'Dégâts critiques','move-speed':'Vitesse','evasion':'Esquive','cooldown':'Vitesse récup.','effect-duration':'Durée des effets','spell-size':'Taille des sorts','experience-gain':'XP reçue','prospection':'Prospection'};
  const slots={hat:'Coiffe',cape:'Cape',amulet:'Amulette',weapon:'Arme',shield:'Bouclier',belt:'Ceinture',boots:'Bottes',ring:'Anneaux',dofus:'Dofus'};
+ let liveRef=null,liveCanvas=null;
  // Read the mounted React tree, including the current side of double buffering.
  // No game state, score, inventory or input is written by this observer.
  function state(){
@@ -13,13 +14,21 @@
    while(stack.length&&count++<2500){const f=stack.pop();if(f.sibling)stack.push(f.sibling);if(f.child)stack.push(f.child);
      let h=f.memoizedState;
      for(let i=0;h&&i<120;i++,h=h.next){const s=h.memoizedState;
-       if(s?.current?.player&&s.current.equipment)live=s.current;
+       if(s?.current?.player&&s.current.equipment){live=s.current;liveRef=s;liveCanvas=canvas;}
        if(s?.statBreakdowns&&s.equipment)hud=s;
      }
    }
    return {live,hud};
  }
- window.thorDashboard={abilities(){const {hud}=state();return {awakenings:hud?.awakenings||{}};},snapshot(){
+ window.thorDashboard={
+ playerPosition(refresh=false){
+   const canvas=document.querySelector('canvas');if(!canvas)return null;
+   if(refresh||!liveRef||canvas!==liveCanvas){liveRef=null;state();}
+   const live=liveRef?.current,rect=canvas.getBoundingClientRect();
+   if(!live||![live.player?.x,live.player?.y,live.width,live.height,rect.left,rect.top,rect.width,rect.height].every(Number.isFinite)||live.width<=0||live.height<=0||rect.width<=0||rect.height<=0)return null;
+   return {x:rect.left+live.player.x/live.width*rect.width,y:rect.top+live.player.y/live.height*rect.height};
+ },
+ abilities(){const {hud}=state();return {awakenings:hud?.awakenings||{}};},snapshot(){
    const phase=document.querySelector('main')?.className||'';
    if(phase.includes('phase-title'))return {status:'title'};
    const {live,hud}=state();

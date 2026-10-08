@@ -1,5 +1,14 @@
 # Versions
 
+## 1.4.0 — 8 octobre 2026
+
+- Correction de la visée : la direction est calculée depuis le personnage, et non depuis l’icône du sort.
+- Départ de la trajectoire actualisé à chaque image pendant le maintien, même lorsque seul le personnage se déplace ; la cible choisie reste fixe à l’écran.
+- Position du personnage recalculée également au relâchement, sans modifier l’état du jeu.
+- Sensibilité du curseur réglable de 25 % à 250 % dans les paramètres, enregistrée entre les sessions ; 100 % par défaut.
+- Paramètres défilables pour garder tous les réglages accessibles.
+- Captures réelles de la visée et du réglage de sensibilité ajoutées à la galerie.
+
 ## 1.3.0 — 8 octobre 2026
 
 - Attribution automatique de L1/R1/L2/R2 en priorité aux sorts à viser ; X/Y en priorité aux sorts instantanés.
