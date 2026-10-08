@@ -51,4 +51,15 @@ travel.upgrades.cutRange=2;frame();assert.equal(target().x,685);c.cancel();
 id='sramDouble';travel.doubleTarget={x:120,y:80};c.button(2,true);c.rightStick(1,0);frame();assert.deepEqual(target(),{x:120,y:80});c.cancel();
 assert.equal(mapping.radialSpec('fear').showRange,false);
 assert.equal(mapping.radialSpec('burningGlyph',{}, {burningGlyph:2}),null);
+// Retour du Baton must remain aimed through many right-stick updates, and cast
+// exactly once at the matching button release, even while the player moves.
+id='staffBoomerang';travel.upgrades={staffRange:2};travel.awakenings={};
+const start=events.length;c.button(2,true);
+for(let i=0;i<300;i++){player={x:440+i*.1,y:275};c.rightStick(Math.cos(i*.02),Math.sin(i*.02));frame();}
+assert.equal(events.slice(start).filter(e=>e.type==='pointerup').length,0);
+assert.equal(events.slice(start).filter(e=>e.type==='pointercancel').length,0);
+const lastTarget=target();assert.ok(Math.abs(Math.hypot((lastTarget.x-player.x)/.5,(lastTarget.y-player.y)/.25)-434)<1e-9);
+c.button(3,false);assert.equal(events.slice(start).filter(e=>e.type==='pointerup').length,0);
+c.button(2,false);c.button(2,false);
+assert.equal(events.slice(start).filter(e=>e.type==='pointerup').length,1);assert.equal(frames.size,0);
 console.log('Travel aiming: forward, follow, direct stick direction, retained direction, range, return, cursor restoration and spell isolation passed');

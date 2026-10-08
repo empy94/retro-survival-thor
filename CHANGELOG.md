@@ -1,5 +1,10 @@
 # Versions
 
+## 1.11.1 — 9 octobre 2026
+
+- Maintien L2/R2 corrigé : les mouvements des sticks ne relâchent plus une gâchette signalée comme bouton par Android. Retour du Bâton et les autres sorts à viser restent en visée jusqu’au vrai relâchement.
+- Les manettes qui signalent les gâchettes comme boutons, axes ou les deux sont gérées sans double lancer. Les maintiens sont annulés lors d’une perte de focus ou d’une déconnexion.
+
 ## 1.11.0 — 9 octobre 2026
 
 - Trois choix exclusifs : désactivée, buffs auto uniquement, tous les sorts intelligents. Ancien réglage conservé lors de la mise à jour.

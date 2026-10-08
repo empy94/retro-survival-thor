@@ -147,3 +147,14 @@ La lecture s’appuie sur l’état et le HUD actuellement exposés par le site.
 - Pause via Start vérifiée en partie.
 
 Ces vérifications ne remplacent pas un test manuel complet des boutons physiques, de tous les sorts, de leurs directions de visée et d’une session longue. Les autres appareils Android n’ont pas été testés.
+
+## Correctif 1.11.1 — maintien des gâchettes (9 octobre 2026)
+
+- Régression identifiée : `dispatchGenericMotionEvent` lisait un axe L2/R2 nul lors du mouvement des sticks et retirait le bouton du même ensemble `held` que les événements clavier. Cela pouvait relâcher un sort encore maintenu avec une gâchette signalée comme bouton.
+- Les états bouton et axe sont désormais indépendants, avec un seul appui/relâchement effectif. Annulation et nettoyage sur perte de focus, navigation et déconnexion conservés. Aucun délai artificiel de lancer, aucune modification du jeu distant.
+- Test Java `TriggerHoldTest` : L2/R2, 10 000 mouvements à axe nul par touche maintenue, répétitions, manettes bouton/axe/double signal, indépendance et remise à zéro. Tests JavaScript existants passés ; ajout de 300 mouvements radiaux avec Retour du Bâton, portée améliorée et un seul lancer au vrai relâchement.
+- Sur Thor, APK debug 1.11.1 : événements Android natifs injectés via le système (appui L2/R2, 15 mouvements du stick droit avec axes de gâchettes nuls, relâchement après environ 2 secondes). La trace WebView contient exactement un appui et un relâchement par touche, sans relâchement intermédiaire. Cela valide le chemin Android réel ; ce n’est pas une mesure du signal électrique des gâchettes physiques.
+- Partie réelle, Retour du Bâton débloqué par le choix normal d’amélioration, attribué à L1 : cercle et ligne présents à 800 et 1 600 ms malgré les mouvements du stick ; sort disponible pendant le maintien, puis repères supprimés et cooldown actif après relâchement. Assistance automatique désactivée pendant cet essai.
+- APK finale signée 1.11.1 (code 13) compilée et installée par-dessus l’existante, sans effacement des données. Signature v3 vérifiée ; paquet installé sans flag DEBUGGABLE. Le test détaillé instrumenté en jeu a porté sur l’APK debug, la finale a été installée et ouverte.
+- SHA-256 APK finale : `659f766e3e2f671da8a987790c003b63f4f8970254d4db9393617fb0dc3c15eb`.
+- Outil d’injection temporaire retiré du Thor et connexion de diagnostic fermée. Captures et résultats de test conservés uniquement sur PC ; aucune nouvelle vidéo de présentation.

@@ -61,6 +61,7 @@ public class MainActivity extends Activity {
  private boolean ready=false,active=false;
  private final Set<String> directions=new HashSet<>();
  private final Set<Integer> held=new HashSet<>();
+ private final TriggerHold triggerHold=new TriggerHold();
  private String bootstrap;
  private long previousTick;
  private long clickStart;
@@ -124,7 +125,7 @@ public class MainActivity extends Activity {
          return new WebResourceResponse("text/html","UTF-8",new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
        }catch(Exception ex){android.util.Log.e("ThorRetro","Loading controls",ex);return null;}
      }
-     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;controlGate.invalidate();dashboardGate.invalidate();directions.clear();held.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);}
+     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;controlGate.invalidate();dashboardGate.invalidate();directions.clear();held.clear();triggerHold.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);}
      public void onPageFinished(WebView v,String url){
        web.evaluateJavascript("!!(window.thorControls&&window.thorControls.move)",result->{ready="true".equals(result);android.util.Log.i("ThorRetro","controlsReady="+ready);if(ready)applySettings();else Toast.makeText(MainActivity.this,ui("Commandes indisponibles. Ferme puis rouvre le jeu."),Toast.LENGTH_LONG).show();});
        if(!getPreferences(0).getBoolean("helpSeen",false)){getPreferences(0).edit().putBoolean("helpSeen",true).apply();help();}
@@ -164,7 +165,7 @@ public class MainActivity extends Activity {
  private void key(String k,String c,boolean down){if(ready){if("Escape".equals(k)){if(down)web.evaluateJavascript("window.thorControls.pause()",null);}else if(c.startsWith("Digit"))web.evaluateJavascript("window.thorControls.button("+(Integer.parseInt(k)-1)+","+down+")",null);else web.evaluateJavascript("window.thorControls.key("+quote(k)+","+quote(c)+","+down+")",null);}}
  private String quote(String s){return "\""+s+"\"";}
  private void direction(String k,boolean down){if(down&&directions.add(k))key(k,k,true);else if(!down&&directions.remove(k))key(k,k,false);}
- private void reset(){if(nativeClickKey!=-1){click(false);nativeClickKey=-1;}if(ready)web.evaluateJavascript("window.thorControls.cancel()",null);for(String k:new HashSet<>(directions))direction(k,false);for(int k:new HashSet<>(held)){String[] b=binding(k);if(b!=null)key(b[0],b[1],false);}if(ready)web.evaluateJavascript("window.thorControls.stick(0,0)",null);held.clear();lx=ly=rx=ry=hx=hy=0;}
+ private void reset(){if(nativeClickKey!=-1){click(false);nativeClickKey=-1;}if(ready)web.evaluateJavascript("window.thorControls.cancel()",null);for(String k:new HashSet<>(directions))direction(k,false);for(int k:new HashSet<>(held)){String[] b=binding(k);if(b!=null)key(b[0],b[1],false);}if(ready)web.evaluateJavascript("window.thorControls.stick(0,0)",null);held.clear();triggerHold.clear();lx=ly=rx=ry=hx=hy=0;}
  public boolean dispatchGenericMotionEvent(MotionEvent e){
    if((e.getSource()&InputDevice.SOURCE_JOYSTICK)==InputDevice.SOURCE_JOYSTICK&&e.getAction()==MotionEvent.ACTION_MOVE){
      if(!getWindow().getDecorView().hasWindowFocus())return super.dispatchGenericMotionEvent(e);
@@ -177,7 +178,12 @@ public class MainActivity extends Activity {
      android.util.Log.d("ThorRetro","sticks "+lx+","+ly+" right "+rx+","+ry);return true;
    }return super.dispatchGenericMotionEvent(e);
  }
- private void trigger(int k,boolean down){if(down&&!held.contains(k)){held.add(k);String[] b=binding(k);key(b[0],b[1],true);}else if(!down&&held.remove(k)){String[] b=binding(k);key(b[0],b[1],false);}}
+ private void trigger(int k,boolean down){triggerInput(k,down,true);}
+ private void triggerInput(int k,boolean down,boolean axis){
+   int change=triggerHold.update(k,down,axis);if(change==0)return;
+   if(change>0)held.add(k);else held.remove(k);
+   String[] b=binding(k);key(b[0],b[1],change>0);
+ }
  private String[] binding(int k){
    switch(k){
      case KeyEvent.KEYCODE_BUTTON_X:return new String[]{"1","Digit1"};case KeyEvent.KEYCODE_BUTTON_Y:return new String[]{"2","Digit2"};
@@ -195,7 +201,7 @@ public class MainActivity extends Activity {
      if(e.getRepeatCount()==0){if(down){held.add(k);if(ready)web.evaluateJavascript("window.thorMenu ? window.thorMenu.activate() : false",used->{if(!active||!ready||!getWindow().getDecorView().hasWindowFocus())return;if(!"true".equals(used)){click(true);if(held.contains(k))nativeClickKey=k;else click(false);}});}else{held.remove(k);if(nativeClickKey==k){click(false);nativeClickKey=-1;}}}return true;
    }
    if(k>=KeyEvent.KEYCODE_DPAD_UP&&k<=KeyEvent.KEYCODE_DPAD_RIGHT){if(down){held.add(k);if(ready){int x=k==KeyEvent.KEYCODE_DPAD_LEFT?-1:k==KeyEvent.KEYCODE_DPAD_RIGHT?1:0,y=k==KeyEvent.KEYCODE_DPAD_UP?-1:k==KeyEvent.KEYCODE_DPAD_DOWN?1:0;web.evaluateJavascript("window.thorMenu && window.thorMenu."+(e.getRepeatCount()==0?"step":"tick")+"("+x+","+y+",performance.now())",null);}}else held.remove(k);return true;}
-   String[] b=binding(k);if(b!=null){if(e.getRepeatCount()==0){if(down){if(held.add(k))key(b[0],b[1],true);}else if(held.remove(k))key(b[0],b[1],false);}return true;}
+   String[] b=binding(k);if(b!=null){if(e.getRepeatCount()==0){if(k==KeyEvent.KEYCODE_BUTTON_L2||k==KeyEvent.KEYCODE_BUTTON_R2)triggerInput(k,down,false);else if(down){if(held.add(k))key(b[0],b[1],true);}else if(held.remove(k))key(b[0],b[1],false);}return true;}
    return super.dispatchKeyEvent(e);
  }
  private void pointer(){float scale=web.getScale();web.evaluateJavascript("window.thorControls.move("+(px/scale)+","+(py/scale)+")",null);}
