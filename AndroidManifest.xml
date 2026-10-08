@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fr.thor.retrosurvival" android:versionCode="2" android:versionName="1.1.0">
+  <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="33"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <application android:label="Retro Survival" android:icon="@drawable/icon" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="true" android:hardwareAccelerated="true">
+    <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="landscape" android:configChanges="orientation|screenSize|keyboardHidden">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity>
+  </application>
+</manifest>

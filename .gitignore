@@ -1,0 +1,11 @@
+/build/
+/previous-version/
+/*.apk
+/*.idsig
+/*.png
+/site-*-audit.js
+/inspect-page.py
+*.jks
+*.keystore
+*password*
+local.properties
