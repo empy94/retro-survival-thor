@@ -14,6 +14,7 @@ render({status:'title',locale:'en'});assert.equal(fixed[0].textContent,'Characte
 const data={status:'run',locale:'en',phase:'playing',hp:4,maxHp:5,kamas:100,level:2,wave:1,stats:[{name:'Damage',value:'+15 %'}],slots:{hat:'Hat'},items:[]};
 render(data);assert.equal(fixed[1].textContent,'♥ Health');const statUpdates=ids.get('stats').replacements,equipmentUpdates=ids.get('equipment').replacements;
 render({...data,hp:3});assert.equal(ids.get('hp').textContent,'3 / 5');assert.equal(ids.get('stats').replacements,statUpdates);assert.equal(ids.get('equipment').replacements,equipmentUpdates,'health updates do not rebuild equipment');
+assert.equal(ids.get('health').style.height,'60%');assert.equal(ids.get('hp-current').textContent,3);assert.equal(ids.get('hp-max').textContent,5);
 render({...data,locale:'es'});assert.equal(fixed[0].textContent,'Personaje');assert.equal(fixed[3].textContent,'Equipo');assert.equal(ids.get('equipment').replacements,equipmentUpdates+1);
 render({status:'title',locale:'fr'});assert.equal(fixed[0].textContent,'Personnage');
 const collection={status:'available',owned:0,total:2,entries:[{id:'cawotte',name:'Dofus Cawotte',level:'Île Wabbit',owned:false,ranges:[{label:'XP reçue',min:6,max:50,unit:'%',radiant:75}]}]};
@@ -21,4 +22,7 @@ render({status:'title',locale:'fr',collection});assert.equal(ids.get('collection
 ids.get('collection-items').children[0].onclick();assert.equal(ids.get('collection-detail').hidden,false);assert.match(ids.get('collection-detail').children[1].textContent,/6 \/ 50 %.*75 %/);
 ids.get('collection-items').children[0].onclick();assert.equal(ids.get('collection-detail').hidden,true,'second tap collapses details');
 render({...data,collection});const collectionUpdates=ids.get('collection-items').replacements;render({...data,hp:2,collection});assert.equal(ids.get('collection-items').replacements,collectionUpdates,'health changes do not rebuild collection');
+render({...data,hp:1,helper:{lowHealth:true}});assert.equal(ids.get('run').className,'danger');assert.match(ids.get('health-label').textContent,/Danger/);assert.equal(ids.get('phase').children.length,1,'no proximity counter in header');
+assert.equal(ids.get('health').style.height,'20%');render({...data,hp:0,helper:null});assert.equal(ids.get('health').style.height,'0%');render({...data,hp:5,helper:null});assert.equal(ids.get('health').style.height,'100%');
+render({...data,helper:null});assert.equal(ids.get('run').className,'');assert.equal(ids.get('phase').children.length,1,'disabled helper leaves no extra line');
 console.log('Locale and dashboard: FR/EN/ES, initial synchronization, invalid locale and incremental updates passed');

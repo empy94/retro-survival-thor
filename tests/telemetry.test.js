@@ -33,6 +33,9 @@ live.player.teleportReturnTimer=0;assert.equal(context.window.thorDashboard.trav
 paused=true;assert.equal(sample().phase,'paused');
 let now=1000;context.Date={now:()=>now};hud.awakenings={burningGlyph:1};assert.equal(context.window.thorDashboard.abilities().awakenings.burningGlyph,1);hud.awakenings={burningGlyph:2};assert.equal(context.window.thorDashboard.abilities().awakenings.burningGlyph,1);assert.equal(context.window.thorDashboard.abilities(true).awakenings.burningGlyph,2);hud.awakenings={burningGlyph:3};now+=251;assert.equal(context.window.thorDashboard.abilities().awakenings.burningGlyph,3);
 hud.statBreakdowns.critical.detail='Currently: +21 % · Before cap: +28 %';assert.equal(sample().stats.find(s=>s.name==='Critique').value,'+21 %');hud.statBreakdowns.critical.detail='Actualmente: +21 % · Antes del límite: +28 %';assert.equal(sample().stats.find(s=>s.name==='Critique').value,'+21 %');
+live.player.hp=1;const beforeHelper=JSON.stringify(live);assert.deepEqual(sample().helper,{lowHealth:true});assert.equal(JSON.stringify(live),beforeHelper,'helper never changes combat state');
+context.window.thorControls={helperEnabled:()=>false};assert.equal(sample().helper,null);context.window.thorControls.helperEnabled=()=>true;
+live.player.hp=2;assert.equal(sample().helper.lowHealth,false);live.player.hp=0;assert.equal(sample().helper.lowHealth,false,'game over is not a live danger alert');
 live.player.hp=NaN;assert.equal(sample().status,'unavailable');
 canvas=null;assert.equal(sample().status,'unavailable');
 console.log('Telemetry observer contract passed.');

@@ -46,3 +46,5 @@ Android 9 ou plus : manettes USB/Bluetooth reconnues après connexion dans Andro
 Les indications, paramètres, aide et fiche suivent la langue du jeu : français, anglais ou espagnol. La fiche ne reconstruit plus l’équipement lors d’un simple changement de PV ; les lectures de repères sont mises en cache avec actualisation immédiate au lancement du sort.
 
 Version 1.8.0 : collection permanente des Dofawa et Dofus Cawotte dans une zone compacte du second écran. Lecture seule de la sauvegarde du jeu ; aucun déblocage ajouté. Les Dofus ne sont plus répétés dans l’équipement. Les équipements rayonnants de la partie ont un repère dans leur ligne. Le fichier distribué est désormais Retro-Survival-Android.apk ; installer par-dessus l’application existante pour garder les données.
+
+Version 1.9.0 : pointeur masqué en combat, choix et fenêtres au pad. Le stick droit peut le montrer dans les menus ; la visée précise reste disponible. Sur le second écran : cœur de PV à remplissage vertical dans le style du jeu et alerte Danger à 25 % de vie ou moins, désactivable. Aucun compteur d’ennemis ajouté.

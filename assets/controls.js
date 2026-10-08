@@ -4,7 +4,16 @@
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
  let px=0,py=0,aimFrame=null;
  let leftX=0,leftY=0;
- let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true};
+ let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true,hideCombatCursor:true,combatHelper:true},pointerUsed=false,cursorPhase=null,cursorScope=null;
+ function refreshCursor(){
+   const cursor=document.querySelector('#thor-cursor');if(!cursor)return;
+   const phase=document.querySelector('main')?.className||'';
+   const scope=document.querySelector('.upgrade-panel,.loot-panel,.pause-panel,.gameover-panel,.level-select-panel,.intro-panel');
+   if(cursorPhase!==phase||cursorScope!==scope){cursorPhase=phase;cursorScope=scope;pointerUsed=false;}
+   const combat=phase.includes('phase-playing')&&!phase.includes('modal-open')&&!document.querySelector('.pause-panel');
+   const visible=!ability?.radial&&(pointerUsed||ability)&&(!settings.hideCombatCursor||!combat||ability&&!ability.radial);
+   const display=visible?'block':'none';if(cursor.style.display!==display)cursor.style.display=display;
+ }
  function text(value){return window.thorLocale?.text(value)||value;}
  function bindings(refresh=false){
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{
@@ -16,6 +25,7 @@
    return window.thorSpellBindings.assign(spells,window.thorDashboard?.abilities(refresh).awakenings||{});
  }
  function decorate(){
+   refreshCursor();
    window.thorLocale?.sync();
    document.querySelector('#thor-settings')?.setAttribute('aria-label',text('Paramètres de jeu et manette'));
    const slots=bindings();
@@ -73,11 +83,13 @@
    if(type==='pointerup'){const p=aimPoint(held);if(p){held.x=p.x;held.y=p.y;}else type='pointercancel';}
    ability=null;if(aimFrame!==null){cancelAnimationFrame(aimFrame);aimFrame=null;}
    event(held.el,type,179,held.x,held.y);held.controls?.classList.remove('thor-aiming');
-   held.radius?.remove();held.caption?.remove();if(held.cursor)held.cursor.style.display=held.cursorDisplay;
+   held.radius?.remove();held.caption?.remove();refreshCursor();
    const label=held.el.querySelector('.thor-button-label');if(label)label.style.background='#ffda83';
  }
  window.thorControls={
    bindings(){return bindings().map(s=>s?{button:s.button,id:s.id,name:s.name,aimed:s.aimed,travel:window.thorSpellBindings.isTravel(s.id)}:null);},
+   helperEnabled(){return settings.combatHelper;},
+   pad(){pointerUsed=false;refreshCursor();},
    rightStick(x,y){if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
    cancel(){finish('pointercancel');window.thorMenu?.clear();},
    configure(value){settings={...settings,...value};decorate();},
@@ -88,6 +100,8 @@
      el.dispatchEvent(new KeyboardEvent(down?'keydown':'keyup',{key,code,bubbles:true,cancelable:true}));
    },
    stick(x,y,digital=false){
+     if(Math.hypot(x,y)>.16)pointerUsed=false;
+     refreshCursor();
      if(digital?window.thorMenu?.active():window.thorMenu?.tick(x,y,performance.now())){x=0;y=0;}
      leftX=x;leftY=y;
      const next=document.querySelector('.touch-joystick-zone');
@@ -124,6 +138,7 @@
      const label=el.querySelector('.thor-button-label');if(label)label.style.background='#ffffff';
      if(!el.__thorCapture){const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179)real(id)};el.__thorCapture=true;}
      event(el,'pointerdown',179,ability.x,ability.y);
+     refreshCursor();
      aimFrame=requestAnimationFrame(aimTick);
    }
  };
@@ -133,7 +148,7 @@
    const menu=document.createElement('button');menu.id='thor-settings';menu.type='button';menu.textContent='⚙ APK';menu.setAttribute('aria-label',text('Paramètres de jeu et manette'));
    menu.style.cssText='position:fixed;top:12px;left:104px;z-index:2147483646;padding:6px 9px;border:1px solid #bfa77480;border-radius:8px;background:#17251ccc;color:#ffe4a0;font:600 12px sans-serif;opacity:.78';
    menu.addEventListener('click',()=>window.ThorPreferences?.openSettings());document.body.append(menu);
-   let queued=false;const observer=new MutationObserver(()=>{if(!queued){queued=true;setTimeout(()=>{queued=false;decorate()},120);}});observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['lang']});decorate();
+   let queued=false;const observer=new MutationObserver(()=>{if(!queued){queued=true;setTimeout(()=>{queued=false;decorate()},120);}});observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['lang','class']});decorate();
    const c=document.createElement('div'); c.id='thor-cursor';
    c.style.cssText='position:fixed;z-index:2147483647;pointer-events:none;width:18px;height:18px;border:2px solid #ffe192;border-radius:50%;box-shadow:0 0 3px 2px #000;transform:translate(-50%,-50%);left:50%;top:50%;display:none';
    document.body.append(c);
@@ -141,7 +156,7 @@
      if(ability?.radial)return;
      window.thorMenu?.clear();
      px=Math.max(1,Math.min(innerWidth-2,x));py=Math.max(1,Math.min(innerHeight-2,y));
-     c.style.display='block';c.style.left=px+'px';c.style.top=py+'px';
+     refreshCursor();pointerUsed=true;refreshCursor();c.style.left=px+'px';c.style.top=py+'px';
      const el=document.elementFromPoint(px,py);
      if(el){el.dispatchEvent(new PointerEvent('pointermove',{pointerType:'mouse',clientX:px,clientY:py,bubbles:true}));el.dispatchEvent(new MouseEvent('mousemove',{clientX:px,clientY:py,bubbles:true}));}
      // Aim is refreshed every animation frame, even with an idle right stick.

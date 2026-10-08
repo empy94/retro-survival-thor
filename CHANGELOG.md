@@ -1,5 +1,14 @@
 # Versions
 
+## 1.9.0 — 9 octobre 2026
+
+- Pointeur masqué en combat et dans les choix/fenêtres parcourus au pad. Utiliser le stick droit révèle le pointeur dans les menus ; le pad et les changements de fenêtre le masquent. Exception pour la visée précise au pointeur ; le relâchement radial ne fait plus réapparaître le curseur en combat.
+- Cœur de PV du second écran dans le style du jeu, remplissage vertical et valeurs actuelles/maximum, remplaçant la barre horizontale.
+- Symbole des kamas identique au jeu, chargé depuis son site officiel.
+- Alerte de PV faibles à 25 % ou moins dans la zone des PV existante, désactivable. Aucun compteur d’ennemis sur la fiche. Lecture seule à 2 Hz, sans commande automatique.
+- Réglages FR/EN/ES ; tests du pointeur, du cœur et du seuil d’alerte.
+- Une seule requête en attente par boucle de commandes/fiche, résultats périmés ignorés après navigation et fiches inchangées non renvoyées.
+
 ## 1.8.0 — 8 octobre 2026
 
 - Présentation Android et manettes USB/Bluetooth, commandes intégrées et double écran compatible ; téléchargement `Retro-Survival-Android.apk`. Identité de l’application et signature conservées pour les mises à jour.

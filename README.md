@@ -95,6 +95,20 @@ Commandes et interface de la version 1.1.0 :
 
 Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a été testée sur AYN Thor avec Android 13. Elle ne contient pas le jeu : elle charge le site en ligne.
 
+## Combat et menus sans pointeur
+
+Depuis la **1.9.0**, le pointeur se masque automatiquement pendant les combats. Les choix et fenêtres commencent aussi sans pointeur : le contour doré suffit pour naviguer au pad. Utiliser le stick droit le fait apparaître dans les menus ; revenir au pad le masque aussitôt. Un changement de fenêtre efface le pointeur précédent.
+
+La visée radiale garde son cercle et sa cible. Si la visée au pointeur est choisie, le pointeur reste visible pendant le maintien du sort pour viser précisément. Le réglage **Masquer le curseur pendant les combats** permet de garder le pointeur visible en combat après utilisation du stick droit.
+
+Sur le second écran, la barre de PV est remplacée par un cœur dans le style du jeu : remplissage de bas en haut, PV actuels et maximum dans le cœur. Il libère de la place pour les caractéristiques. Le montant des kamas reprend l’icône officielle chargée depuis le jeu. **Alerte de PV faibles sur la fiche** colore discrètement la zone à 25 % de vie ou moins. Cette option est désactivable dans **⚙ APK / Select**. Aucun compteur d’ennemis n’est ajouté. L’aide lit les PV à 2 Hz, sans déclencher de sort ni de déplacement.
+
+| Choix au pad, sans curseur | Cœur de PV et symbole du jeu |
+|---|---|
+| ![Choix de sort sans curseur, sélection au pad](docs/screenshots/choix-sans-curseur.png) | ![Cœur de PV et kamas sur le second écran](docs/screenshots/coeur-pv.png) |
+
+Captures réelles de la version signée 1.9.0 sur le Thor.
+
 ## Commandes
 
 Depuis la version **1.7.0**, parcourir les boutons des menus et choix au **stick gauche ou à la croix** : gauche/droite passe au bouton précédent/suivant, haut/bas change de ligne. Le contour doré indique la sélection ; **R3 ou A valide**. Les boutons désactivés sont ignorés. Le stick droit efface cette sélection et retrouve le pointeur.

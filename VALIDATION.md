@@ -1,6 +1,20 @@
 # Vérifications
 
-Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
+Vérifications effectuées les 8 et 9 octobre 2026 sur un AYN Thor connecté, Android 13.
+
+## Version 1.9.0
+
+- Sept suites Node réussies, enrichies avec les transitions combat/choix, navigation au pad qui masque le pointeur, masquage après relâchement radial, exception de la visée précise, réglage de masquage, seuil de PV et désactivation de l’alerte. Aucun état du combat modifié par l’observateur. Cœur : valeurs actuelles/maxi, remplissages 0/20/60/100 % vérifiés. Test Java supplémentaire de limitation des requêtes réussi.
+- Sur Thor : pointeur initialement masqué, visible après usage du stick droit dans un menu, masqué par une direction au pad et à l’entrée dans un choix ou une autre phase. Combat sans pointeur. Glyphe Enflammé débloqué par un vrai choix : cercle visible pendant le maintien, pointeur masqué pendant et après le lancement radial. Retour du Bâton maintenu en mode pointeur : visée active et pointeur visible, puis masqué après annulation.
+- Désactivation du masquage et de l’alerte vérifiées, réactivation ensuite. Les deux réglages sont traduits FR/EN/ES ; le cœur et la fiche ont été observés en FR/EN/ES après les changements par le bouton du jeu. Aucun compteur d’ennemis conservé dans l’affichage ou le calcul final.
+- Cœur inspiré de la forme et des couleurs observées dans le HUD officiel, rempli verticalement ; la barre horizontale est retirée. Alerte statique à 25 % ou moins, pas de clignotement ; donnée lue à 2 Hz. Une partie terminée à 0 PV n’est pas présentée comme une alerte de combat.
+- Le coût d’observation reste ponctuel : ce n’est pas une mesure des FPS ou une comparaison prolongée avant/après. Aucun nouveau balayage du jeu par image pour les alertes ; la boucle de commandes adapte uniquement l’affichage du curseur, sans mesure de position DOM.
+- Réglages natifs vérifiés sur appareil : les deux nouveaux interrupteurs ont été désactivés puis réactivés (préférences enregistrées), sensibilité 200 %, opacité 45 %, radial et second écran activés conservés. Langue du cœur observée FR/EN/ES, retour au français. Icône de kamas : URL relevée dans le HUD réel, `https://retrosurvival.online/assets/kama-symbol.svg`, réponse SVG 200 vérifiée ; symbole chargé en ligne, non copié dans l’APK.
+- Un ANR temporaire a été observé dans la version de travail pendant une navigation de test, avec requêtes d’entrée retardées. Un essai de navigation après cette protection s’est déroulé sans nouveau blocage observé ; cela reste un essai ponctuel. Protection ajoutée : une seule évaluation en attente par boucle, callbacks périmés ignorés après navigation, commandes suspendues hors focus et fiches identiques non renvoyées. Test Java : 10 000 tentatives pendant une réponse retardée, callbacks doublés et ancienne page, reprise normale. La cause complète de l’ANR n’est pas prouvée ; cette protection évite l’accumulation et ne constitue pas une garantie universelle.
+- APK signé 1.9.0 reconstruit et installé sans désinstallation : version 10 / 1.9.0, débogage désactivé. Tous les assets embarqués comparés exactement aux sources. SHA-256 : `6e0f8689a7c46b056f207b1419870dfa14aabc324f71b00562752a9154852fb2`.
+- Sur l’APK signé : choix de sort sélectionné par croix Android injectée, pointeur absent ; capture réelle publiée. Fiche avec cœur 5/5, symbole officiel des kamas chargé et 13 caractéristiques visibles capturée. Aucun nouveau ANR observé dans le journal durant cet essai après la protection.
+- L’alerte à 25 % est couverte par les tests isolés ; aucun PV ou état de jeu forcé pour une capture. Les captures montrent les valeurs réelles de la partie. Aucun test prolongé sur d’autres appareils ou manettes externes.
+- Graphify update tenté, même limitation locale de l’outil (`uv trampoline failed to canonicalize script path`), aucun graphe existant.
 
 ## Version 1.8.0
 

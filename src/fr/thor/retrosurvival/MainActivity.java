@@ -41,11 +41,13 @@ public class MainActivity extends Activity {
  private DisplayManager displays;
  private CharacterPresentation characterScreen;
  private String characterData="{\"status\":\"title\"}";
+ private final EvaluationGate controlGate=new EvaluationGate(),dashboardGate=new EvaluationGate();
  private final Runnable characterTick=new Runnable(){public void run(){
    if(!active)return;
-   if(ready&&characterScreen!=null)web.evaluateJavascript("window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'}",result->{
-     try{if(result.length()>65536)return;characterData=new JSONObject(result).toString();if(characterScreen!=null)characterScreen.update(characterData);}catch(Exception ignored){}
-   });
+   if(ready&&characterScreen!=null){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript("window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'}",result->{
+     if(!dashboardGate.complete(request)||!active||!ready)return;
+     try{if(result.length()>65536)return;String next=new JSONObject(result).toString();if(!next.equals(characterData)){characterData=next;if(characterScreen!=null)characterScreen.update(characterData);}}catch(Exception ignored){}
+   });}
    handler.postDelayed(this,500);
  }};
  private final DisplayManager.DisplayListener displayListener=new DisplayManager.DisplayListener(){
@@ -65,7 +67,8 @@ public class MainActivity extends Activity {
  private final Runnable tick=new Runnable(){public void run(){
    if(!active)return;
    long now=SystemClock.uptimeMillis();float dt=Math.min(.05f,(now-previousTick)/1000f);previousTick=now;
-   if(ready){
+   if(ready&&getWindow().getDecorView().hasWindowFocus()){
+     final long request=controlGate.begin();if(request!=0){
      float mx=lx,my=ly;
      if(hx!=0)mx=hx;if(hy!=0)my=hy;
      if(held.contains(KeyEvent.KEYCODE_DPAD_LEFT))mx=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_RIGHT))mx=1;
@@ -73,6 +76,7 @@ public class MainActivity extends Activity {
      final float rightX=rx,rightY=ry,elapsed=dt;
      boolean digital=held.contains(KeyEvent.KEYCODE_DPAD_LEFT)||held.contains(KeyEvent.KEYCODE_DPAD_RIGHT)||held.contains(KeyEvent.KEYCODE_DPAD_UP)||held.contains(KeyEvent.KEYCODE_DPAD_DOWN);
      web.evaluateJavascript("window.thorControls.stick("+mx+","+my+","+digital+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
+     if(!controlGate.complete(request))return;
      if(!active||!ready)return;
      if(!"true".equals(radial)&&(Math.abs(rightX)>.16f||Math.abs(rightY)>.16f)){
        if(px<0){px=web.getWidth()/2f;py=web.getHeight()/2f;}
@@ -80,7 +84,7 @@ public class MainActivity extends Activity {
        py=Math.max(2,Math.min(web.getHeight()-2,py+curve(rightY)*900*cursorSensitivity*elapsed));
        pointer();
      }
-     });
+     });}
    }
    handler.postDelayed(this,16);
  }};
@@ -120,7 +124,7 @@ public class MainActivity extends Activity {
          return new WebResourceResponse("text/html","UTF-8",new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
        }catch(Exception ex){android.util.Log.e("ThorRetro","Loading controls",ex);return null;}
      }
-     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;directions.clear();held.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);}
+     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;controlGate.invalidate();dashboardGate.invalidate();directions.clear();held.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);}
      public void onPageFinished(WebView v,String url){
        web.evaluateJavascript("!!(window.thorControls&&window.thorControls.move)",result->{ready="true".equals(result);android.util.Log.i("ThorRetro","controlsReady="+ready);if(ready)applySettings();else Toast.makeText(MainActivity.this,ui("Commandes indisponibles. Ferme puis rouvre le jeu."),Toast.LENGTH_LONG).show();});
        if(!getPreferences(0).getBoolean("helpSeen",false)){getPreferences(0).edit().putBoolean("helpSeen",true).apply();help();}
@@ -205,7 +209,7 @@ public class MainActivity extends Activity {
  private void help(){reset();new AlertDialog.Builder(this).setTitle(ui("Commandes de jeu et manette"))
    .setMessage(ui("Stick gauche / croix : déplacement\nStick droit : pointeur\nR3 ou A : clic\nL1, R1, L2, R2 : priorité aux sorts à viser\nX, Y : priorité aux sorts instantanés\nStart ou B : pause / reprendre\nSelect ou ⚙ APK : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Dans les menus et les choix, stick gauche / croix pour sélectionner, R3 ou A pour valider. Le stick droit permet toujours de choisir au pointeur.\n\nVisée radiale : direction du stick gauche par défaut, stick droit pour choisir la direction. Pour les sorts à placer, incliner le stick pour régler la distance. Relâcher la touche du sort pour lancer.\n\nLa portée suit les améliorations du sort. La visée au pointeur reste disponible dans les paramètres ; Téléportation et Bond restent radiaux.\n\nAndroid 9 ou plus : manette USB ou Bluetooth reconnue automatiquement après connexion dans Android. Les repères suivent les noms de boutons Android. Le second écran est utilisé uniquement si Android le détecte comme écran compatible.\n\nLa sauvegarde de cette application est distincte de Chrome."))
    .setPositiveButton(ui("Jouer"),(d,w)->{web.requestFocus();immersive();}).setNeutralButton(ui("Ajouter à l’accueil"),(d,w)->pin()).show();}
- private void applySettings(){if(!ready)return;android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorControls.configure({radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
+ private void applySettings(){if(!ready)return;android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorControls.configure({hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
  private void settings(){
    reset();if(ready)web.evaluateJavascript("window.thorControls.beginPreferences()",paused->settingsDialog("true".equals(paused)));else settingsDialog(false);
  }
@@ -219,6 +223,8 @@ public class MainActivity extends Activity {
    TextView sensitivity=new TextView(this);sensitivity.setText(ui("Sensibilité du curseur : ")+Math.round(cursorSensitivity*100)+" %");layout.addView(sensitivity);
    SeekBar speed=new SeekBar(this);speed.setMax(250);speed.setMin(25);speed.setProgress(Math.round(cursorSensitivity*100));layout.addView(speed);
    speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int value,boolean user){cursorSensitivity=value/100f;sensitivity.setText(ui("Sensibilité du curseur : ")+value+" %");p.edit().putInt("cursorSensitivity",value).apply();}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
+   Switch cursor=new Switch(this);cursor.setText(ui("Masquer le curseur pendant les combats"));cursor.setChecked(p.getBoolean("hideCombatCursor",true));layout.addView(cursor);cursor.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("hideCombatCursor",v).apply();applySettings();});
+   Switch helper=new Switch(this);helper.setText(ui("Alerte de PV faibles sur la fiche"));helper.setChecked(p.getBoolean("combatHelper",true));layout.addView(helper);helper.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("combatHelper",v).apply();applySettings();});
    Switch radial=new Switch(this);radial.setText(ui("Visée radiale des sorts à cibler"));radial.setChecked(p.getBoolean("radialAim",true));layout.addView(radial);radial.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("radialAim",v).apply();applySettings();});
    Switch joystick=new Switch(this);joystick.setText(ui("Joystick visuel en bas à gauche"));joystick.setChecked(p.getBoolean("showJoystick",true));layout.addView(joystick);
    Switch second=new Switch(this);second.setText(ui("Personnage sur le second écran"));second.setChecked(p.getBoolean("characterScreen",true));layout.addView(second);

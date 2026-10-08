@@ -5,10 +5,11 @@ function item(text,left,top=20){return {text,isConnected:true,disabled:false,cla
 const first=item('Jouer',10),second=item('Classement',110),disabled=item('Verrouillé',210);disabled.disabled=true;
 let items=[first,second,disabled];
 const main={get className(){return phase},classList:{contains:v=>phase.includes(v)},querySelector:()=>null,querySelectorAll:s=>s.startsWith('[role=')?[]:items};
-const window={};vm.runInNewContext(fs.readFileSync('assets/menu-navigation.js','utf8'),{window,document:{querySelector:()=>main,addEventListener(){}},innerWidth:500,innerHeight:500,getComputedStyle:()=>({display:'block',visibility:'visible'})});
+let padCalls=0;const window={thorControls:{pad:()=>padCalls++}};vm.runInNewContext(fs.readFileSync('assets/menu-navigation.js','utf8'),{window,document:{querySelector:()=>main,addEventListener(){}},innerWidth:500,innerHeight:500,getComputedStyle:()=>({display:'block',visibility:'visible'})});
 const menu=window.thorMenu,selected=el=>el.classList.contains('thor-menu-selected');
 assert.equal(menu.tick(0,0,0),true);assert.equal(menu.activate(),false);
 menu.tick(1,0,10);assert(selected(first));
+assert.equal(padCalls,1,'menu direction explicitly switches away from pointer mode');
 menu.tick(1,0,30);assert(selected(first),'held direction does not immediately repeat');
 menu.tick(1,0,410);assert(selected(second));
 menu.tick(1,0,560);assert(selected(first),'wraps and skips disabled choices');
