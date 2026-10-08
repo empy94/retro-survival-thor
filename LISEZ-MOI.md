@@ -14,7 +14,9 @@ Application personnelle de lancement du site officiel https://retrosurvival.onli
 
 Le tactile reste disponible. Les choix de niveau, menus et achats se font au pointeur avec R3. Les attaques automatiques du mode Android restent gérées par le jeu.
 
-Version 1.1.0 : joystick visuel ancré en bas à gauche, étiquettes X/Y/L1/R1/L2/R2 sur les sorts actifs débloqués, affichage et opacité réglables dans les paramètres. Les réglages sont enregistrés. Voir également [README.md](README.md).
+Version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**.
+
+Le joystick visuel est ancré en bas à gauche ; les étiquettes X/Y/L1/R1/L2/R2 sur les sorts actifs débloqués, leur affichage et leur opacité sont réglables dans les paramètres. Les réglages sont enregistrés. Voir également [README.md](README.md).
 
 La sauvegarde locale de cette application est distincte de celle de Chrome. Les fichiers et sauvegardes Chrome existants ne sont pas modifiés. Pour conserver les données de cette application, la mettre à jour avec installation de remplacement plutôt que la désinstaller.
 

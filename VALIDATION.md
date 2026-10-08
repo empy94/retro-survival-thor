@@ -2,6 +2,22 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.2.0
+
+- Compilation, signature APK et syntaxe JavaScript vérifiées ; contrat de l’observateur validé avec `node tests/telemetry.test.js`.
+- Le test de l’observateur couvre la branche React montée, les totaux avec bonus, plusieurs anneaux, l’absence de statistiques, les valeurs invalides et l’absence d’écriture dans l’état du jeu. Il reste distinct des essais sur appareil.
+- Panneau réellement affiché sur l’écran inférieur du Thor, pendant que le site officiel s’exécute sur l’écran supérieur.
+- Lecture de 5/5 PV, puis actualisation après dégât à 4/5 PV, observée pendant une partie d’essai.
+- Ceinture du Piou Jaune obtenue en partie : nom, icône et effet +15 % de vitesse d’attaque lus depuis le jeu ; total +15 % et bonus d’équipement +15 % vérifiés face aux caractéristiques du menu pause.
+- Amélioration de vitesse d’attaque choisie en partie : +15 % affiché avec bonus d’équipement vide, ce qui distingue l’amélioration du personnage du bonus d’un objet.
+- Kamas : compteur réel observé à 0, puis à 100 pendant la partie sur la version signée ; capture du panneau avec 100 kamas.
+- Version signée : Chapeau du Piou Jaune affiché avec icône et bonus ; appui tactile sur l’objet puis défilement de la colonne pour lire son effet +15 % de vitesse d’attaque.
+- Pause affichée sur la fiche ; suppression puis recréation du panneau vérifiées avec le réglage de deuxième écran.
+- Après un appui tactile sur l’écran inférieur, Start injecté via Android continue à commander la pause du jeu sur l’écran supérieur.
+- Version signée 1.2.0 installée sur le Thor ; captures du panneau issues de cet APK sans débogage.
+
+La lecture s’appuie sur l’état et le HUD actuellement exposés par le site. Une évolution de leur structure peut rendre le panneau indisponible. Le cycle de déconnexion physique d’un écran et les autres appareils Android n’ont pas été testés.
+
 ## Version 1.1.0
 
 - Compilation Java et vérification de syntaxe JavaScript réussies.

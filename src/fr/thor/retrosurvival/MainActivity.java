@@ -8,6 +8,8 @@ import android.graphics.drawable.Icon;
 import android.view.*;
 import android.webkit.*;
 import android.widget.*;
+import android.hardware.display.DisplayManager;
+import org.json.JSONObject;
 import java.io.*;
 import java.net.*;
 import android.webkit.CookieManager;
@@ -16,6 +18,21 @@ import java.util.*;
 
 public class MainActivity extends Activity {
  private WebView web;
+ private DisplayManager displays;
+ private CharacterPresentation characterScreen;
+ private String characterData="{\"status\":\"title\"}";
+ private final Runnable characterTick=new Runnable(){public void run(){
+   if(!active)return;
+   if(ready&&characterScreen!=null)web.evaluateJavascript("window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'}",result->{
+     try{if(result.length()>65536)return;characterData=new JSONObject(result).toString();if(characterScreen!=null)characterScreen.update(characterData);}catch(Exception ignored){}
+   });
+   handler.postDelayed(this,500);
+ }};
+ private final DisplayManager.DisplayListener displayListener=new DisplayManager.DisplayListener(){
+   public void onDisplayAdded(int id){showCharacterScreen();}
+   public void onDisplayRemoved(int id){showCharacterScreen();}
+   public void onDisplayChanged(int id){showCharacterScreen();}
+ };
  private final Handler handler=new Handler(Looper.getMainLooper());
  private float lx,ly,rx,ry,hx,hy,px=-1,py=-1;
  private boolean ready=false,active=false;
@@ -47,7 +64,8 @@ public class MainActivity extends Activity {
    super.onCreate(state);
    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
    immersive();
-   try(InputStream in=getAssets().open("controls.js")){bootstrap=read(in);}catch(Exception ex){throw new RuntimeException(ex);}
+   try(InputStream in=getAssets().open("controls.js");InputStream telemetry=getAssets().open("telemetry.js")){bootstrap=read(in)+"\n"+read(telemetry);}catch(Exception ex){throw new RuntimeException(ex);}
+   displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
    web=new WebView(this);setContentView(web);
    web.addJavascriptInterface(new Object(){@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&web.getUrl().startsWith("https://retrosurvival.online/"))settings();});}},"ThorPreferences");
    WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(false);
@@ -74,7 +92,7 @@ public class MainActivity extends Activity {
          return new WebResourceResponse("text/html","UTF-8",new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
        }catch(Exception ex){android.util.Log.e("ThorRetro","Loading controls",ex);return null;}
      }
-     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;directions.clear();held.clear();}
+     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;directions.clear();held.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);}
      public void onPageFinished(WebView v,String url){
        web.evaluateJavascript("!!(window.thorControls&&window.thorControls.move)",result->{ready="true".equals(result);android.util.Log.i("ThorRetro","controlsReady="+ready);if(ready)applySettings();else Toast.makeText(MainActivity.this,"Commandes indisponibles. Ferme puis rouvre le jeu.",Toast.LENGTH_LONG).show();});
        if(!getPreferences(0).getBoolean("helpSeen",false)){getPreferences(0).edit().putBoolean("helpSeen",true).apply();help();}
@@ -85,8 +103,31 @@ public class MainActivity extends Activity {
  private void immersive(){getWindow().getDecorView().setSystemUiVisibility(5894);}
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}
  public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)immersive();else reset();}
- protected void onResume(){super.onResume();active=true;previousTick=SystemClock.uptimeMillis();handler.post(tick);if(web!=null)web.onResume();}
- protected void onPause(){reset();active=false;handler.removeCallbacks(tick);if(web!=null)web.onPause();super.onPause();}
+ protected void onResume(){super.onResume();active=true;previousTick=SystemClock.uptimeMillis();handler.post(tick);handler.post(characterTick);if(web!=null)web.onResume();showCharacterScreen();}
+ protected void onPause(){reset();active=false;handler.removeCallbacks(tick);handler.removeCallbacks(characterTick);closeCharacterScreen();if(web!=null)web.onPause();super.onPause();}
+ protected void onDestroy(){if(displays!=null)displays.unregisterDisplayListener(displayListener);closeCharacterScreen();if(web!=null)web.destroy();super.onDestroy();}
+ private void closeCharacterScreen(){if(characterScreen!=null){characterScreen.dismiss();characterScreen=null;}}
+ private void showCharacterScreen(){
+   if(displays==null||!active||!getPreferences(0).getBoolean("characterScreen",true)){closeCharacterScreen();return;}
+   Display target=null;for(Display d:displays.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)){if(d.getDisplayId()!=getWindowManager().getDefaultDisplay().getDisplayId()){target=d;break;}}
+   if(target==null){closeCharacterScreen();return;}
+   if(characterScreen!=null&&characterScreen.getDisplay().getDisplayId()==target.getDisplayId())return;
+   closeCharacterScreen();CharacterPresentation panel=new CharacterPresentation(this,target);characterScreen=panel;
+   try{panel.show();}catch(WindowManager.InvalidDisplayException ex){characterScreen=null;}
+ }
+ private class CharacterPresentation extends Presentation {
+   private WebView panel;private boolean loaded;
+   CharacterPresentation(Context context,Display display){super(context,display);}
+   protected void onCreate(Bundle state){super.onCreate(state);
+     getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+     getWindow().getDecorView().setSystemUiVisibility(5894);
+     panel=new WebView(getContext());setContentView(panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
+     panel.setWebViewClient(new WebViewClient(){public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
+     try(InputStream in=getAssets().open("dashboard.html")){panel.loadDataWithBaseURL("https://retrosurvival.online/",read(in),"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
+   }
+   void update(String json){if(loaded&&panel!=null)panel.evaluateJavascript("window.renderThorDashboard("+json+")",null);}
+   public void dismiss(){if(panel!=null){panel.destroy();panel=null;}super.dismiss();}
+ }
  private void key(String k,String c,boolean down){if(ready){if("Escape".equals(k)){if(down)web.evaluateJavascript("window.thorControls.pause()",null);}else if(c.startsWith("Digit"))web.evaluateJavascript("window.thorControls.button("+(Integer.parseInt(k)-1)+","+down+")",null);else web.evaluateJavascript("window.thorControls.key("+quote(k)+","+quote(c)+","+down+")",null);}}
  private String quote(String s){return "\""+s+"\"";}
  private void direction(String k,boolean down){if(down&&directions.add(k))key(k,k,true);else if(!down&&directions.remove(k))key(k,k,false);}
@@ -141,6 +182,8 @@ public class MainActivity extends Activity {
    TextView opacity=new TextView(this);opacity.setText("Opacité des touches : "+p.getInt("labelOpacity",45)+" %");layout.addView(opacity);
    SeekBar slider=new SeekBar(this);slider.setMax(85);slider.setMin(15);slider.setProgress(p.getInt("labelOpacity",45));layout.addView(slider);
    Switch joystick=new Switch(this);joystick.setText("Joystick visuel en bas à gauche");joystick.setChecked(p.getBoolean("showJoystick",true));layout.addView(joystick);
+   Switch second=new Switch(this);second.setText("Personnage sur l’écran du bas");second.setChecked(p.getBoolean("characterScreen",true));layout.addView(second);
+   second.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("characterScreen",v).apply();showCharacterScreen();});
    TextView hint=new TextView(this);hint.setText("Les commandes restent actives lorsque leurs repères sont masqués.");hint.setPadding(0,pad/2,0,0);layout.addView(hint);
    labels.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showLabels",v).apply();applySettings();});
    joystick.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showJoystick",v).apply();applySettings();});

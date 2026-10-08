@@ -6,7 +6,32 @@ Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/)
 
 ## Aperçu sur AYN Thor
 
-Captures réelles de l’application sur AYN Thor, version 1.1.0.
+Captures réelles de l’application sur AYN Thor.
+
+**Version 1.2.0 : fiche de personnage sur l’écran du bas**
+
+![PV, kamas, caractéristiques et équipement sur l’écran inférieur du Thor](docs/screenshots/personnage.png)
+
+## Deux écrans, deux usages
+
+L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche une fiche de personnage, dans les couleurs et le style du menu de caractéristiques du jeu :
+
+- PV actuels et maximum, kamas de la partie, niveau et vague.
+- 13 caractéristiques calculées par le jeu, bonus d’équipement compris : dommages, critique, vitesse, esquive, récupération, prospection, etc.
+- Équipement porté : coiffe, cape, amulette, arme, bouclier, ceinture, bottes, anneaux et Dofus.
+- Toucher un objet équipé pour lire ses effets ; faire défiler la colonne si nécessaire.
+
+![Effets du chapeau équipé consultés au toucher sur l’écran inférieur](docs/screenshots/equipement-detail.png)
+
+Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
+
+La fiche lit les informations disponibles dans le jeu, sans modifier la partie. Si le site change et que ces informations deviennent inaccessibles, elle indique qu’elles sont indisponibles plutôt que d’afficher des valeurs inventées.
+
+**Paramètres de la version 1.2.0**
+
+![Paramètres avec activation de la fiche sur l’écran du bas](docs/screenshots/parametres-dual.png)
+
+Les captures suivantes présentent les commandes et l’interface de la version 1.1.0.
 
 **Accueil du jeu avec accès aux paramètres Thor**
 
@@ -69,6 +94,8 @@ $env:JAVA_HOME = 'C:\Java\jdk-19'
 Les chemins sont également configurables par les paramètres `-AndroidSdk` et `-JavaHome`. L’APK signé est produit dans `Retro-Survival-Thor.apk`. La clé de signature personnelle est créée hors du dépôt, dans `%USERPROFILE%\.android\thor-retrosurvival`. Conserver cette clé pour les mises à jour et ne jamais la publier.
 
 Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé, uniquement pour les essais. L’APK publié n’active pas ce débogage.
+
+Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu.
 
 ## Projet indépendant
 
