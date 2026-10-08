@@ -4,6 +4,26 @@ Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/)
 
 **[Télécharger l’APK](https://github.com/parthi1994/retro-survival-thor/releases/latest)**
 
+## Aperçu sur AYN Thor
+
+Captures réelles de l’application sur AYN Thor, version 1.1.0.
+
+**Accueil du jeu avec accès aux paramètres Thor**
+
+![Accueil de Retro Survival sur AYN Thor](docs/screenshots/accueil.png)
+
+**Déplacement : joystick visuel dans le coin inférieur gauche**
+
+![Partie avec le joystick visuel en bas à gauche](docs/screenshots/joystick.png)
+
+**Sort actif débloqué avec le repère X et pointeur doré**
+
+![Sort actif avec son bouton X en transparence](docs/screenshots/sorts.png)
+
+**Paramètres : affichage des touches, opacité et joystick visuel**
+
+![Menu des paramètres AYN Thor](docs/screenshots/parametres.png)
+
 ## Installation
 
 1. Télécharger `Retro-Survival-Thor.apk` depuis la dernière version publiée.
@@ -52,6 +72,6 @@ Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé
 
 ## Projet indépendant
 
-Cette application est un lanceur et une adaptation des commandes. Elle n’est affiliée ni aux auteurs de Retro Survival ni à Ankama. Le jeu, ses illustrations et son contenu restent la propriété de leurs auteurs et ayants droit. Aucun de leurs scripts ou ressources graphiques n’est inclus dans ce dépôt. Le site peut évoluer et nécessiter une mise à jour des commandes.
+Cette application est un lanceur et une adaptation des commandes. Elle n’est affiliée ni aux auteurs de Retro Survival ni à Ankama. Le jeu, ses illustrations et son contenu restent la propriété de leurs auteurs et ayants droit. Les captures ci-dessus montrent le jeu chargé depuis son site ; le dépôt ne contient pas ses scripts ni ses fichiers graphiques, hormis ces captures de présentation. Le site peut évoluer et nécessiter une mise à jour des commandes.
 
 Le code original de ce lanceur est distribué sous licence MIT.
