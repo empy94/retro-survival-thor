@@ -2,6 +2,16 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.5.0
+
+- Quatre suites Node réussies : visée radiale, suivi de visée au pointeur, attribution des sorts et observateur. Direction du stick gauche, orientation à l’arrêt, suivi du personnage, direction directe du stick droit, conservation au retour au centre, portée de Bond améliorée et doublée, destination de retour imposée et restauration du pointeur couverts.
+- Types et portées comparés aux fonctions du jeu : Téléportation (`dash`), Bond (`jump`) ; Double du Sram conserve son échange avec un double existant plutôt qu’une destination libre.
+- Téléportation débloquée normalement dans une partie réelle sur le Thor, attribuée à R1. R1 et croix droite injectés via Android : vecteur initial de visée (80,409 ; 0) pixels CSS, conservé pendant le déplacement du personnage ; rayon et destination suivent sa position.
+- Direction haute envoyée au même pont que le stick droit : vecteur (0 ; -80,283). Retour au centre du stick : direction haute conservée. Curseur habituel masqué pendant le maintien ; rayon visible. Relâchement de R1 : déplacement réel du personnage, récupération du sort démarrée, rayon supprimé et curseur réaffiché.
+- Capture réelle ajoutée au README. Les déblocages et déplacements n’ont pas été forcés par écriture dans l’état du jeu.
+- APK signé 1.5.0 installé en remplacement sur le Thor, sans désinstallation ; numéro de version et débogage désactivé vérifiés, accueil du jeu observé après lancement.
+- Bond et l’évolution de retour sont couverts par les tests automatisés et la comparaison aux fonctions du jeu ; ils n’ont pas été essayés en partie. L’essai manuel des sticks et gâchettes physiques ensemble reste à faire. Le rayon représente la portée du sort ; la position d’arrivée effective reste décidée par le jeu selon le terrain.
+
 ## Version 1.4.0
 
 - Tests Node de la visée, des affectations et de l’observateur réussis. Visée depuis une position différente de l’icône, déplacement du personnage avec cible fixe, actualisation entre deux images au relâchement, annulation si la position devient indisponible, coordonnées avec mise à l’échelle du canvas et remplacement du modèle de partie couverts.

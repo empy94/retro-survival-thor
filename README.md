@@ -34,6 +34,10 @@ La fiche lit les informations disponibles dans le jeu, sans modifier la partie. 
 <details>
 <summary>Voir les captures originales sur le Thor</summary>
 
+Version 1.5.0 : visée radiale de Téléportation, avec rayon centré sur le personnage et direction choisie au stick droit.
+
+![Visée radiale de Téléportation sur le Thor](docs/screenshots/teleportation-radiale.png)
+
 Version 1.4.0 :
 
 | Visée depuis le personnage en déplacement | Sensibilité du curseur |
@@ -83,6 +87,10 @@ Les menus et les choix de niveau se sélectionnent au pointeur avec R3. Le tacti
 
 Depuis la version **1.4.0**, la trajectoire des sorts à viser part du personnage et suit ses déplacements pendant le maintien. Le point ciblé reste à l’endroit choisi à l’écran ; le stick droit permet de l’ajuster. La direction du lancement est recalculée au relâchement. La portée et les contraintes du sort restent celles du jeu.
 
+Depuis la version **1.5.0**, **Téléportation du Féca** et **Bond du Iop** utilisent une visée radiale : maintenir la touche du sort pour afficher sa portée autour du personnage. La destination est d’abord devant lui, dans la direction du stick gauche (ou son orientation à l’arrêt). Le **stick droit choisit directement la direction**, sans déplacer la souris ; cette direction reste choisie quand le stick revient au centre. Relâcher la touche du sort pour lancer à portée maximale. Le rayon et la destination suivent le personnage pendant son déplacement, en tenant compte des améliorations de portée. Le jeu décide de la position d’arrivée selon les limites du terrain et les obstacles.
+
+Le curseur habituel est masqué pendant cette visée et retrouve sa position précédente ensuite. Les glyphes, pièges et autres sorts conservent leur visée au pointeur. L’évolution de Téléportation permettant un retour garde sa destination imposée et l’indique à l’écran. Le Double du Sram garde son fonctionnement d’invocation puis d’échange avec un double déjà placé ; il ne reçoit pas une direction de téléportation libre.
+
 ## Affichage réglable
 
 - Le joystick visuel du stick gauche est fixé dans le coin inférieur gauche pendant le déplacement.
@@ -90,7 +98,7 @@ Depuis la version **1.4.0**, la trajectoire des sorts à viser part du personnag
 - Depuis la version **1.3.0**, les sorts à viser (glyphes, pièges, déplacements ciblés…) occupent d’abord **L1, R1, L2, R2**. Maintenir la touche, viser au stick droit, puis relâcher pour lancer. Les sorts instantanés occupent d’abord **X et Y**, puis les boutons encore libres. Lire les repères sur les sorts après un déblocage : les affectations peuvent changer.
 - L’évolution du Glyphe enflammé qui supprime la visée est reconnue comme un sort instantané. Six sorts au maximum sont associés aux boutons ; les autres restent accessibles au tactile ou avec le pointeur et R3.
 - Dans **⚙ Thor** ou avec **Select**, afficher ou masquer ces étiquettes et régler leur opacité entre 15 % et 85 %.
-- Régler aussi la **sensibilité du curseur** de **25 %** (précis) à **250 %** (rapide), avec **100 %** par défaut. Ce réglage s’applique au stick droit dans les menus et pendant la visée.
+- Régler aussi la **sensibilité du curseur** de **25 %** (précis) à **250 %** (rapide), avec **100 %** par défaut. Ce réglage s’applique au déplacement du pointeur dans les menus et à la visée au pointeur. La visée radiale des téléportations utilise directement la direction du stick.
 - Le joystick visuel peut être masqué sans désactiver le déplacement.
 - Les préférences restent enregistrées après fermeture et mise à jour de l’application.
 
@@ -113,6 +121,8 @@ Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé
 Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu. `node tests/spell-bindings.test.js` vérifie la priorité des sorts à viser, l’exception du Glyphe enflammé, la limite de six boutons, le relâchement du bon bouton et l’annulation de la visée.
 
 `node tests/aim-follow.test.js` vérifie une visée dont la cible reste fixe pendant le déplacement du personnage, le calcul au relâchement et l’annulation si sa position est indisponible. Le test de l’observateur vérifie aussi les coordonnées du personnage après mise à l’échelle du canvas et remplacement de la partie.
+
+`node tests/travel-aim.test.js` vérifie la direction initiale, le suivi du personnage, le choix direct au stick droit, la direction conservée au retour au centre, la portée améliorée, le retour imposé et la restauration du pointeur pour les autres sorts.
 
 ## Projet indépendant
 

@@ -21,6 +21,15 @@
    return {live,hud};
  }
  window.thorDashboard={
+ travelState(){
+   const position=this.playerPosition();if(!position)return null;
+   const live=liveRef.current,rect=liveCanvas.getBoundingClientRect(),scaleX=rect.width/live.width,scaleY=rect.height/live.height;
+   const p=live.player,returning=live.awakenings?.dash===3&&p.teleportReturnTimer>0;
+   const returnTarget=returning&&[p.teleportReturnX,p.teleportReturnY].every(Number.isFinite)?{x:rect.left+p.teleportReturnX*scaleX,y:rect.top+p.teleportReturnY*scaleY}:null;
+   return {...position,scaleX,scaleY,angle:Number.isFinite(p.angle)?p.angle:0,
+     upgrades:{dashRange:live.upgrades?.dashRange,jumpRange:live.upgrades?.jumpRange},
+     awakenings:{dash:live.awakenings?.dash,jump:live.awakenings?.jump},returnTarget};
+ },
  playerPosition(refresh=false){
    const canvas=document.querySelector('canvas');if(!canvas)return null;
    if(refresh||!liveRef||canvas!==liveCanvas){liveRef=null;state();}

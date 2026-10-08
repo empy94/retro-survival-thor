@@ -1,5 +1,13 @@
 # Versions
 
+## 1.5.0 — 8 octobre 2026
+
+- Visée radiale dédiée à Téléportation (Féca) et Bond (Iop), identifiés automatiquement parmi les sorts débloqués.
+- Direction initiale donnée par le stick gauche, ou l’orientation du personnage à l’arrêt ; le stick droit choisit ensuite directement une direction, conservée lorsqu’il revient au centre.
+- Rayon de portée centré sur le personnage, actualisé pendant son déplacement, avec améliorations et évolutions de portée prises en compte.
+- Curseur de souris masqué pendant cette visée et conservé à sa position précédente pour les menus et les autres sorts.
+- L’évolution de Téléportation qui ramène au point de départ affiche cette destination imposée ; pas de direction trompeuse.
+
 ## 1.4.0 — 8 octobre 2026
 
 - Correction de la visée : la direction est calculée depuis le personnage, et non depuis l’icône du sort.

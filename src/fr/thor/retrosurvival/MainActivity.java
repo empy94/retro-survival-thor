@@ -50,13 +50,16 @@ public class MainActivity extends Activity {
      if(hx!=0)mx=hx;if(hy!=0)my=hy;
      if(held.contains(KeyEvent.KEYCODE_DPAD_LEFT))mx=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_RIGHT))mx=1;
      if(held.contains(KeyEvent.KEYCODE_DPAD_UP))my=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_DOWN))my=1;
-     web.evaluateJavascript("window.thorControls.stick("+mx+","+my+")",null);
-     if(Math.abs(rx)>.16f||Math.abs(ry)>.16f){
+     final float rightX=rx,rightY=ry,elapsed=dt;
+     web.evaluateJavascript("window.thorControls.stick("+mx+","+my+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
+     if(!active||!ready)return;
+     if(!"true".equals(radial)&&(Math.abs(rightX)>.16f||Math.abs(rightY)>.16f)){
        if(px<0){px=web.getWidth()/2f;py=web.getHeight()/2f;}
-       px=Math.max(2,Math.min(web.getWidth()-2,px+curve(rx)*900*cursorSensitivity*dt));
-       py=Math.max(2,Math.min(web.getHeight()-2,py+curve(ry)*900*cursorSensitivity*dt));
+       px=Math.max(2,Math.min(web.getWidth()-2,px+curve(rightX)*900*cursorSensitivity*elapsed));
+       py=Math.max(2,Math.min(web.getHeight()-2,py+curve(rightY)*900*cursorSensitivity*elapsed));
        pointer();
      }
+     });
    }
    handler.postDelayed(this,16);
  }};
@@ -171,7 +174,7 @@ public class MainActivity extends Activity {
    web.dispatchTouchEvent(event);event.recycle();
  }
  private void help(){reset();new AlertDialog.Builder(this).setTitle("Commandes AYN Thor")
-   .setMessage("Stick gauche / croix : déplacement\nStick droit : pointeur\nR3 ou A : clic\nL1, R1, L2, R2 : priorité aux sorts à viser\nX, Y : priorité aux sorts instantanés\nStart ou B : pause / reprendre\nSelect ou ⚙ Thor : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Les choix se font au pointeur avec R3.\n\nLa sauvegarde de cette application est distincte de Chrome.")
+   .setMessage("Stick gauche / croix : déplacement\nStick droit : pointeur\nR3 ou A : clic\nL1, R1, L2, R2 : priorité aux sorts à viser\nX, Y : priorité aux sorts instantanés\nStart ou B : pause / reprendre\nSelect ou ⚙ Thor : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Les choix se font au pointeur avec R3.\n\nTéléportation / Bond : direction du stick gauche par défaut, stick droit pour orienter dans le rayon. Relâcher la touche du sort pour lancer.\n\nLa sauvegarde de cette application est distincte de Chrome.")
    .setPositiveButton("Jouer",(d,w)->{web.requestFocus();immersive();}).setNeutralButton("Ajouter à l’accueil",(d,w)->pin()).show();}
  private void applySettings(){if(!ready)return;android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorControls.configure({showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
  private void settings(){

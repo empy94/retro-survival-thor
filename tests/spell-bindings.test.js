@@ -11,6 +11,11 @@ assert.deepEqual(slots.map(s=>s?.id||null),['shield','burningGlyph','speed',null
 assert.equal(mapping.needsAim('burningGlyph',{burningGlyph:1}),true);
 assert.equal(mapping.needsAim('fear'),true);
 assert.equal(mapping.needsAim('liberation'),false);
+assert.equal(mapping.isTravel('dash'),true);assert.equal(mapping.isTravel('jump'),true);
+for(const id of ['sramDouble','repulsiveTrap','burningGlyph','lethalAttack','fear'])assert.equal(mapping.isTravel(id),false);
+assert.equal(mapping.travelRange('dash'),150);
+assert.equal(mapping.travelRange('dash',{dashRange:2},{dash:1}),500);
+assert.equal(mapping.travelRange('jump',{jumpRange:3},{jump:1}),1080);
 slots=mapping.assign(spells(['shield','dash','burningGlyph','jump','cut','fear','speed','power']));
 assert.equal(new Set(slots.map(s=>s.id)).size,6);
 assert.deepEqual(slots.slice(2).map(s=>s.id),['dash','burningGlyph','jump','cut']);
