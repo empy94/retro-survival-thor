@@ -31,6 +31,14 @@ Les sorts déjà automatiques du jeu restent automatiques dans les trois modes. 
 
 Le rayon suit le personnage et les améliorations de portée. Le curseur se masque quand il est inutile. Le tactile et les manettes USB/Bluetooth reconnues par Android restent disponibles.
 
+| Téléportation : choisir la direction | Glyphe : choisir où le placer |
+|---|---|
+| ![Visée radiale de téléportation au stick droit](docs/screenshots/teleportation-radiale.png) | ![Placement d’un glyphe avec direction et distance au stick droit](docs/screenshots/placements-radiaux.png) |
+
+**Maintiens la touche → vise au stick droit → relâche pour lancer.** Pour les zones à placer, l’inclinaison du stick règle aussi la distance.
+
+Exemples du mode radial sur Thor, capturés avec l’interface des versions 1.5/1.6.
+
 ## Un second écran utile, si tu en as un
 
 Sur un appareil compatible comme le Thor : cœur de PV, kamas, caractéristiques, équipement et collection permanente. Sur téléphone ou tablette, le jeu fonctionne sur un seul écran.
