@@ -43,7 +43,7 @@ if(!(Test-Path $keyFile)){
  & "$jdk\bin\keytool.exe" -genkeypair -keystore $keyFile -storepass:file $passFile -keypass:file $passFile -alias retro -dname 'CN=Thor Retro Survival Local' -keyalg RSA -keysize 3072 -validity 10000
  if($LASTEXITCODE){throw 'Key generation failed'}
 }
-$apk=if($Debug){"$project\Retro-Survival-Thor-debug.apk"}else{"$project\Retro-Survival-Thor.apk"}
+$apk=if($Debug){"$project\Retro-Survival-Android-debug.apk"}else{"$project\Retro-Survival-Android.apk"}
 & "$bt\apksigner.bat" sign --ks $keyFile --ks-key-alias retro --ks-pass "file:$passFile" --out $apk "$build\aligned.apk"
 if($LASTEXITCODE){throw 'Signing failed'}
 & "$bt\apksigner.bat" verify --verbose $apk

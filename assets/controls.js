@@ -17,7 +17,7 @@
  }
  function decorate(){
    window.thorLocale?.sync();
-   document.querySelector('#thor-settings')?.setAttribute('aria-label',text('Paramètres des commandes AYN Thor'));
+   document.querySelector('#thor-settings')?.setAttribute('aria-label',text('Paramètres de jeu et manette'));
    const slots=bindings();
    document.querySelectorAll('.touch-ability').forEach(el=>{
      const spell=slots.find(s=>s?.el===el);
@@ -130,7 +130,7 @@
  document.addEventListener('DOMContentLoaded',()=>{
    px=innerWidth/2;py=innerHeight/2;
    const aimStyle=document.createElement('style');aimStyle.textContent='.thor-aiming .touch-target-line{left:var(--thor-aim-x)!important;top:var(--thor-aim-y)!important;width:var(--thor-aim-distance)!important;transform:translateY(-50%) rotate(var(--thor-aim-angle))!important}.thor-aiming .touch-map-target{left:var(--thor-target-x)!important;top:var(--thor-target-y)!important}';document.head.append(aimStyle);
-   const menu=document.createElement('button');menu.id='thor-settings';menu.type='button';menu.textContent='⚙ Thor';menu.setAttribute('aria-label',text('Paramètres des commandes AYN Thor'));
+   const menu=document.createElement('button');menu.id='thor-settings';menu.type='button';menu.textContent='⚙ APK';menu.setAttribute('aria-label',text('Paramètres de jeu et manette'));
    menu.style.cssText='position:fixed;top:12px;left:104px;z-index:2147483646;padding:6px 9px;border:1px solid #bfa77480;border-radius:8px;background:#17251ccc;color:#ffe4a0;font:600 12px sans-serif;opacity:.78';
    menu.addEventListener('click',()=>window.ThorPreferences?.openSettings());document.body.append(menu);
    let queued=false;const observer=new MutationObserver(()=>{if(!queued){queued=true;setTimeout(()=>{queued=false;decorate()},120);}});observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['lang']});decorate();

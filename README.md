@@ -1,6 +1,6 @@
-# Retro Survival — AYN Thor
+# Retro Survival — Android & manettes
 
-Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/) avec les commandes physiques de l’AYN Thor, tout en conservant l’interface tactile du jeu.
+Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/) avec une manette USB/Bluetooth ou les commandes intégrées d’une console Android comme l’AYN Thor, tout en conservant l’interface tactile du jeu.
 
 **[Télécharger l’APK](https://github.com/parthi1994/retro-survival-thor/releases/latest)**
 
@@ -28,16 +28,27 @@ Maintenir la touche du sort, orienter le stick droit, puis relâcher. La cible s
 
 Captures réelles sur le Thor. Le cercle indique la portée de visée ; le jeu conserve ses règles de terrain et de placement. Les améliorations de portée sont prises en compte, tandis que la taille de la zone d’un glyphe reste distincte de sa portée de placement.
 
+## Collection permanente et équipements rares
+
+Le jeu actuel conserve le **Dofawa (Astrub)** et le **Dofus Cawotte (île Wabbit)** entre les parties. Le meilleur jet du Cawotte est sauvegardé. Les versions rayonnantes sont aussi reconnues. La fiche du second écran leur réserve une zone compacte, même à l’accueil ; elle lit la collection déjà sauvegardée par le jeu et ne débloque rien.
+
+| Fiche compacte : 13 caractéristiques visibles | Jets consultables en touchant la carte |
+|---|---|
+| ![Collection permanente réelle sur le second écran](docs/screenshots/collection-permanente.png) | ![Jets mini et maxi du Dofus Cawotte](docs/screenshots/collection-jets.png) |
+
+Aucun Dofus associé à Litneg n’a été trouvé dans le code actuel. D’autres équipements rares existent, notamment Kritter et Casque du Chafer dans les butins de Kruorre, mais ils ne sont pas conservés entre les parties : le démarrage d’une partie réinitialise l’équipement et reprend uniquement les Dofus collectés. [Vérification des règles et sources](docs/collection.md).
+
 ## Deux écrans, deux usages
 
 L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche une fiche de personnage, dans les couleurs et le style du menu de caractéristiques du jeu :
 
 - PV actuels et maximum, kamas de la partie, niveau et vague.
 - 13 caractéristiques calculées par le jeu, bonus d’équipement compris : dommages, critique, vitesse, esquive, récupération, prospection, etc.
-- Équipement porté : coiffe, cape, amulette, arme, bouclier, ceinture, bottes, anneaux et Dofus.
-- Toucher un objet équipé pour lire ses effets ; faire défiler la colonne si nécessaire.
+- Équipement de la partie : coiffe, cape, amulette, arme, bouclier, ceinture, bottes et anneaux. Les objets rayonnants sont signalés dans leur ligne. Les emplacements vides ne remplissent pas la fiche.
+- Collection permanente séparée : Dofawa et Dofus Cawotte, statut obtenu/à obtenir et bonus sauvegardé. Les Dofus ne sont pas répétés dans l’équipement.
+- Toucher un objet équipé pour lire ses effets ; pour Kritter et Casque du Chafer, les jets mini/maxi et rayonnants sont indiqués. Toucher une carte Dofus pour ses bornes et son jet conservé. Les détails se replient pour garder la fiche lisible.
 
-Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ Thor → Personnage sur le second écran**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
+Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ APK → Personnage sur le second écran**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
 
 La fiche lit les informations disponibles dans le jeu, sans modifier la partie. Si le site change et que ces informations deviennent inaccessibles, elle indique qu’elles sont indisponibles plutôt que d’afficher des valeurs inventées.
 
@@ -78,9 +89,9 @@ Commandes et interface de la version 1.1.0 :
 
 ## Installation
 
-1. Télécharger `Retro-Survival-Thor.apk` depuis la dernière version publiée.
-2. Installer l’APK sur le Thor et ouvrir **Retro Survival**.
-3. Dans Cocoon : **Toutes les applis → Retro Survival → appui long → Ajouter au Menu Home**.
+1. Télécharger `Retro-Survival-Android.apk` depuis la dernière version publiée.
+2. Installer l’APK sur votre appareil Android et ouvrir **Retro Survival**.
+3. Sur AYN Thor, dans Cocoon : **Toutes les applis → Retro Survival → appui long → Ajouter au Menu Home**.
 
 Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a été testée sur AYN Thor avec Android 13. Elle ne contient pas le jeu : elle charge le site en ligne.
 
@@ -109,7 +120,7 @@ Cette version a été essayée sur le Thor. Les manettes Xbox/Switch externes et
 | X, Y | Priorité aux sorts instantanés |
 | Bouton de sort maintenu + stick droit | Viser, puis relâcher pour les sorts directionnels |
 | Start / B | Pause et reprise |
-| Select / bouton **⚙ Thor** | Paramètres des commandes |
+| Select / bouton **⚙ APK** | Paramètres des commandes |
 
 Les menus et les choix de niveau se sélectionnent directement à la manette, ou au pointeur avec le stick droit et R3. Le tactile reste disponible. Les attaques automatiques du mode Android restent gérées par le jeu.
 
@@ -123,7 +134,7 @@ Depuis la version **1.6.0**, la visée radiale est également activée par défa
 
 Le rayon suit la portée actuelle du sort : améliorations et évolutions de portée de Téléportation, Bond, Retour du Bâton et Couper prises en compte. Les glyphes ont actuellement une portée de placement fixe de 200 unités du jeu ; agrandir leur zone d’effet ne permet pas de les poser plus loin. Les attaques purement directionnelles, comme Épée du Destin et Peur, montrent une direction sans annoncer un rayon de portée. Le Double du Sram se place dans son rayon d’invocation ; son évolution d’échange avec un Double existant indique ce point imposé.
 
-Pour retrouver la visée au pointeur sur les sorts ciblés, désactiver **Select / ⚙ Thor → Visée radiale des sorts à cibler**. Téléportation et Bond conservent leur mode radial. Les sorts instantanés se lancent toujours par une simple pression.
+Pour retrouver la visée au pointeur sur les sorts ciblés, désactiver **Select / ⚙ APK → Visée radiale des sorts à cibler**. Téléportation et Bond conservent leur mode radial. Les sorts instantanés se lancent toujours par une simple pression.
 
 ## Langue et performances
 
@@ -139,7 +150,7 @@ Les mesures sur Thor et leurs limites sont dans [VALIDATION.md](VALIDATION.md) ;
 - Les sorts actifs débloqués affichent leur bouton physique : **X, Y, L1, R1, L2, R2**.
 - Depuis la version **1.3.0**, les sorts à viser (glyphes, pièges, déplacements ciblés…) occupent d’abord **L1, R1, L2, R2**. Maintenir la touche, viser au stick droit, puis relâcher pour lancer. Les sorts instantanés occupent d’abord **X et Y**, puis les boutons encore libres. Lire les repères sur les sorts après un déblocage : les affectations peuvent changer.
 - L’évolution du Glyphe enflammé qui supprime la visée est reconnue comme un sort instantané. Six sorts au maximum sont associés aux boutons ; les autres restent accessibles au tactile ou avec le pointeur et R3.
-- Dans **⚙ Thor** ou avec **Select**, afficher ou masquer ces étiquettes et régler leur opacité entre 15 % et 85 %.
+- Dans **⚙ APK** ou avec **Select**, afficher ou masquer ces étiquettes et régler leur opacité entre 15 % et 85 %.
 - Régler aussi la **sensibilité du curseur** de **25 %** (précis) à **250 %** (rapide), avec **100 %** par défaut. Ce réglage s’applique au déplacement du pointeur dans les menus et à la visée au pointeur. La visée radiale des téléportations utilise directement la direction du stick.
 - Le joystick visuel peut être masqué sans désactiver le déplacement.
 - Les préférences restent enregistrées après fermeture et mise à jour de l’application.
@@ -156,7 +167,7 @@ $env:JAVA_HOME = 'C:\Java\jdk-19'
 .\build.ps1
 ```
 
-Les chemins sont également configurables par les paramètres `-AndroidSdk` et `-JavaHome`. L’APK signé est produit dans `Retro-Survival-Thor.apk`. La clé de signature personnelle est créée hors du dépôt, dans `%USERPROFILE%\.android\thor-retrosurvival`. Conserver cette clé pour les mises à jour et ne jamais la publier.
+Les chemins sont également configurables par les paramètres `-AndroidSdk` et `-JavaHome`. L’APK signé est produit dans `Retro-Survival-Android.apk`. La clé de signature personnelle est créée hors du dépôt, dans `%USERPROFILE%\.android\thor-retrosurvival`. Conserver cette clé pour les mises à jour et ne jamais la publier.
 
 Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé, uniquement pour les essais. L’APK publié n’active pas ce débogage.
 

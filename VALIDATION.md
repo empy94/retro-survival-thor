@@ -2,6 +2,17 @@
 
 Vérifications effectuées le 8 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.8.0
+
+- Sept suites Node réussies : visée/sorts/navigation/observateur/langue et nouvelle suite collection. Lecture sans écriture de sauvegarde, collection vide, sauvegardes invalides, possession normale/rayonnante, bornes, objet inconnu et cache vérifiés. Le détail des jets est replié par défaut ; une seconde pression le ferme ; changer les PV ne reconstruit pas la collection.
+- Règles de collection et jets comparés au module actuel du site officiel ; méthode et valeurs dans [docs/collection.md](docs/collection.md). Aucun drop rare obtenu durant ces essais : les captures affichent la vraie collection **0/2**. Possession, meilleur jet et rayonnants couverts par lecture des fonctions du jeu et tests isolés.
+- Sur la WebView réelle du Thor : cartes permanentes à l’accueil et en partie ; ouverture/fermeture du détail Cawotte ; bornes 6/50 et rayonnant 75. Langue changée par le bouton du jeu : anglais, espagnol, français. Titres, cartes et détail vérifiés dans les trois langues ; retour au français.
+- Fiche compacte : les 13 caractéristiques tiennent dans la colonne du Thor lorsque le détail de collection est fermé. Les colonnes restent défilables lorsqu’un détail est ouvert. Les emplacements d’équipement vides ne remplissent plus la fiche, et les Dofus ne sont pas répétés dans l’équipement.
+- Mesure ponctuelle sur appareil : 100 snapshots en 7,8 ms et 100 lectures de collection inchangée en 0,2 ms. Fiche actualisée à 2 Hz, collection et blocs inchangés mis en cache. Le relevé de 593 callbacks d’animation en cinq secondes a été pris avec un choix d’amélioration ouvert : il ne constitue pas une mesure des FPS en combat. Pas de garantie de performance universelle ni de comparaison prolongée avant/après.
+- APK signé reconstruit et installé en remplacement sans désinstallation : version 9 / 1.8.0, débogage désactivé, tous les fichiers embarqués comparés exactement aux sources. Paramètres avant installation : sensibilité 200 %, opacité 45 %, fiche et visée radiale activées. Même package et même clé locale ; aucune remise à zéro des données. Paramètres après installation relevés dans le vrai dialogue Android : 200 %, 45 %, visée radiale et second écran activés, manette Odin Controller détectée. Captures finales prises sur l’APK signé : 13 caractéristiques visibles, puis ouverture du détail au toucher sur le second écran.
+- GitHub et le nom du téléchargement présentent Android et manettes. AYN Thor reste l’appareil réellement essayé ; manettes externes Xbox/Switch et autres appareils Android non essayés matériellement.
+- Actualisation Graphify tentée : outil indisponible (`uv trampoline failed to canonicalize script path`). Aucun graphe existant dans ce projet ; recherches ciblées et vérifications directes utilisées.
+
 ## Version 1.7.0
 
 - APK signé 1.7.0 installé en remplacement sans désinstallation ; version 8 / 1.7.0 et débogage désactivé vérifiés. Scripts embarqués comparés exactement aux sources vérifiées.

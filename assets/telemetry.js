@@ -41,10 +41,10 @@
  },
  abilities(refresh=false){const now=Date.now();if(refresh||!abilityCache||now-abilityAt>=250){const {hud}=state();abilityCache={awakenings:hud?.awakenings||{}};abilityAt=now;}return abilityCache;},snapshot(){
    const phase=document.querySelector('main')?.className||'';
-   const locale=window.thorLocale?.sync()||'fr';
-   if(phase.includes('phase-title'))return {status:'title',locale};
+   const locale=window.thorLocale?.sync()||'fr',collection=window.thorCollection?.snapshot()||{status:'unavailable'};
+   if(phase.includes('phase-title'))return {status:'title',locale,collection};
    const {live,hud}=state();
-   if(!live||!hud||![live.player.hp,live.player.maxHp,live.kamas,live.level,live.wave].every(Number.isFinite)||live.player.maxHp<=0)return {status:'unavailable',locale};
+   if(!live||!hud||![live.player.hp,live.player.maxHp,live.kamas,live.level,live.wave].every(Number.isFinite)||live.player.maxHp<=0)return {status:'unavailable',locale,collection};
    const cards=[...document.querySelectorAll('.hud-inventory .filled')];
    const items=Object.entries(live.equipment).flatMap(([slot,value])=>(Array.isArray(value)?value:value?[value]:[]).map(item=>{
      const card=cards.find(el=>el.querySelector('img')?.getAttribute('src')?.includes('item-'+item.id+'.'));
@@ -52,9 +52,9 @@
      const name=card?.querySelector('.equipment-tooltip strong')?.textContent||item.id;
      const effects=card?.querySelector('.equipment-tooltip')?.textContent?.slice(name.length).trim()||'';
      const icon=img?.src;
-     return {slot,name,effects,icon:icon?.startsWith('https://retrosurvival.online/assets/')?icon:null};
+     return {slot,name,effects,radiant:item.radiant===true,ranges:window.thorCollection?.describe(item)||null,icon:icon?.startsWith('https://retrosurvival.online/assets/')?icon:null};
    }));
-   return {status:'run',locale,phase:document.querySelector('.pause-panel')?'paused':live.phase,level:live.level,wave:live.wave,hp:live.player.hp,maxHp:live.player.maxHp,kamas:live.kamas,
+   return {status:'run',locale,collection,phase:document.querySelector('.pause-panel')?'paused':live.phase,level:live.level,wave:live.wave,hp:live.player.hp,maxHp:live.player.maxHp,kamas:live.kamas,
      stats:Object.entries(labels).map(([key,name])=>{const b=hud.statBreakdowns[key];const match=b?.detail?.match(/^(?:Actuellement|Currently|Current|Actualmente)\s*:\s*([^·]+)/);return {name:text(name),value:match?match[1].trim():null,gear:b?.gear||''};}),
      slots:Object.fromEntries(Object.entries(slots).map(([key,name])=>[key,text(name)])),items};
  }};

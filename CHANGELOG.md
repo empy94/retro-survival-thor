@@ -1,5 +1,13 @@
 # Versions
 
+## 1.8.0 — 8 octobre 2026
+
+- Présentation Android et manettes USB/Bluetooth, commandes intégrées et double écran compatible ; téléchargement `Retro-Survival-Android.apk`. Identité de l’application et signature conservées pour les mises à jour.
+- Collection permanente Dofawa/Cawotte sur deux cartes compactes, disponible même à l’accueil, bonus sauvegardé et versions rayonnantes. Aucun déblocage ni modification de sauvegarde.
+- Jets mini/maxi normaux et rayonnants consultables sur les cartes Dofus et dans le détail de Kritter/Casque du Chafer.
+- Dofus retirés des lignes d’équipement pour éviter la répétition ; équipements rayonnants distingués dans leur ligne. Collection mise en cache et blocs inchangés conservés.
+- Documentation des règles actuelles de butin et permanence, capture réelle de la collection vide, FR/EN/ES.
+
 ## 1.7.0 — 8 octobre 2026
 
 - Paramètres, aide, indications de visée et fiche du personnage en français, anglais ou espagnol selon la langue choisie dans le jeu.

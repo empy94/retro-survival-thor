@@ -1,4 +1,4 @@
-# Retro Survival sur AYN Thor
+# Retro Survival — Android & manettes
 
 Application personnelle de lancement du site officiel https://retrosurvival.online/ en interface Android tactile. Connexion Internet nécessaire. Entrée ajoutée au menu principal de Cocoon le 8 octobre 2026.
 
@@ -11,7 +11,7 @@ Application personnelle de lancement du site officiel https://retrosurvival.onli
 | X, Y | Priorité aux sorts instantanés ; les boutons libres accueillent les autres sorts |
 | Bouton de sort maintenu + stick droit | Viser les sorts qui demandent une direction, puis relâcher |
 | Start ou B | Pause / reprise |
-| Select / bouton ⚙ Thor | Paramètres des commandes et aide |
+| Select / bouton ⚙ APK | Paramètres des commandes et aide |
 
 Le tactile reste disponible. Version 1.7.0 : parcourir les boutons avec le stick gauche ou la croix ; R3 ou A valide le contour doré. Le stick droit retrouve le pointeur. Les attaques automatiques du mode Android restent gérées par le jeu. Version 1.3.0 : les sorts à viser reçoivent en priorité L1/R1/L2/R2 ; maintenir, viser au stick droit, relâcher. Les repères sur les sorts donnent leur affectation actuelle, qui peut changer après un déblocage. Six sorts maximum sur les boutons ; les autres restent accessibles au tactile/pointeur. L’évolution instantanée du Glyphe enflammé est prise en compte.
 
@@ -19,9 +19,9 @@ Version 1.5.0 : **Téléportation du Féca** et **Bond du Iop** ont une visée r
 
 Version 1.6.0 : les sorts à cibler ou à placer utilisent également le mode radial par défaut. Maintenir leur touche, régler la direction au stick droit et, pour les placements, la distance avec l’inclinaison du stick. Relâcher la touche pour lancer. La cible choisie suit le personnage et reste choisie lorsque le stick revient au centre. Les améliorations de portée sont prises en compte ; agrandir la zone d’un glyphe ne change pas sa portée de placement.
 
-Le pointeur est masqué pendant la visée radiale et retrouve sa position précédente ensuite. **Select / ⚙ Thor → Visée radiale des sorts à cibler** permet de retrouver la visée au pointeur pour ces sorts, tout en gardant le radial des téléportations. Dans **Sensibilité du curseur**, régler la vitesse du pointeur de 25 % à 250 % ; 100 % par défaut, réglages mémorisés.
+Le pointeur est masqué pendant la visée radiale et retrouve sa position précédente ensuite. **Select / ⚙ APK → Visée radiale des sorts à cibler** permet de retrouver la visée au pointeur pour ces sorts, tout en gardant le radial des téléportations. Dans **Sensibilité du curseur**, régler la vitesse du pointeur de 25 % à 250 % ; 100 % par défaut, réglages mémorisés.
 
-Depuis la version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ Thor → Personnage sur le second écran**.
+Depuis la version 1.2.0 : fiche de personnage sur l’écran du bas, avec PV, kamas, caractéristiques et équipement porté. Toucher un objet puis faire défiler la colonne pour lire ses effets. Le panneau se désactive dans **Select / ⚙ APK → Personnage sur le second écran**.
 
 Le joystick visuel est ancré en bas à gauche ; les étiquettes X/Y/L1/R1/L2/R2 sur les sorts actifs débloqués, leur affichage et leur opacité sont réglables dans les paramètres. Les réglages sont enregistrés. Voir également [README.md](README.md).
 
@@ -44,3 +44,5 @@ L’application charge le jeu en ligne ; les mises à jour du site peuvent néce
 Android 9 ou plus : manettes USB/Bluetooth reconnues après connexion dans Android, avec leur nom dans les paramètres. Aucun modèle AYN ni second écran exigé. La fiche utilise uniquement un second écran compatible détecté. Autres Android et manettes externes non encore essayés.
 
 Les indications, paramètres, aide et fiche suivent la langue du jeu : français, anglais ou espagnol. La fiche ne reconstruit plus l’équipement lors d’un simple changement de PV ; les lectures de repères sont mises en cache avec actualisation immédiate au lancement du sort.
+
+Version 1.8.0 : collection permanente des Dofawa et Dofus Cawotte dans une zone compacte du second écran. Lecture seule de la sauvegarde du jeu ; aucun déblocage ajouté. Les Dofus ne sont plus répétés dans l’équipement. Les équipements rayonnants de la partie ont un repère dans leur ligne. Le fichier distribué est désormais Retro-Survival-Android.apk ; installer par-dessus l’application existante pour garder les données.
