@@ -4,7 +4,7 @@
 
 Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/) avec une manette USB/Bluetooth ou les commandes intégrées d’une console Android comme l’AYN Thor, tout en conservant l’interface tactile du jeu.
 
-**[⬇ Télécharger l’APK Android](https://github.com/parthi1994/retro-survival-thor/releases/latest/download/Retro-Survival-Android.apk)** · [Nouveautés](CHANGELOG.md) · [Installation et commandes](#installation)
+**[⬇ Télécharger l’APK Android](https://github.com/empy94/retro-survival-thor/releases/latest/download/Retro-Survival-Android.apk)** · [Nouveautés](CHANGELOG.md) · [Installation et commandes](#installation)
 
 ## Jouer à ta manière
 
