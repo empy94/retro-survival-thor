@@ -3,8 +3,10 @@
  // sole authority for cooldowns, terrain, damage and valid placements.
  const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible'};
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
- function plan(s,spells,mapping){
-   if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0||!s.enemies.length)return null;
+ function plan(s,spells,mapping,mode='full'){
+   if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
+   if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:null;}
+   if(mode!=='full'||!s.enemies.length)return null;
    const p=s.player,enemies=s.enemies.filter(e=>[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
    const nearest=Math.min(...enemies.map(e=>distance(e,p)-e.r)),urgent=nearest<65;
    const candidates=[];
@@ -51,18 +53,18 @@
  }
  const api={plan};if(typeof module==='object')module.exports=api;
  if(!root?.document)return;
- let enabled=false,timer=null,lastAttempt=new Map(),casts=0,lastSpell=null,lastMs=0,badge=null;
+ let enabled=false,mode='off',timer=null,lastAttempt=new Map(),casts=0,lastSpell=null,lastMs=0,badge=null;
  function tick(){
    if(!enabled||root.document.hidden||!root.thorControls?.autoAvailable())return;
    const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return;
-   const start=performance.now(),now=Date.now(),s=root.thorDashboard?.combatState();
+   const start=performance.now(),now=Date.now(),s=root.thorDashboard?.combatState(mode!=='buffs');
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))],id=null;for(let i=0;f&&i<4;i++,f=f.return){if(f.key){id=f.key;break;}}return {el,id,ready:el.getAttribute('aria-disabled')!=='true'&&now-(lastAttempt.get(id)||0)>=800,aimed:root.thorSpellBindings.needsAim(id,s?.awakenings||{})};});
-   const chosen=plan(s,spells,root.thorSpellBindings);lastMs=performance.now()-start;if(!chosen)return;
-   const travel=root.thorDashboard.travelState();if(!travel)return;
+   const chosen=plan(s,spells,root.thorSpellBindings,mode);lastMs=performance.now()-start;if(!chosen)return;
+   const travel=chosen.target?root.thorDashboard.travelState():null;if(chosen.target&&!travel)return;
    const target=chosen.target?{x:travel.x+(chosen.target.x-s.player.x)*travel.scaleX,y:travel.y+(chosen.target.y-s.player.y)*travel.scaleY}:null;
    lastAttempt.set(chosen.spell.id,now);
    if(root.thorControls.autoCast(chosen.spell,target)){casts++;lastSpell=chosen.spell.id;}
  }
- root.thorAutoSpells={refreshLabel(){if(badge){badge.hidden=!enabled;const label=root.thorLocale?.text('Sorts auto')||'Sorts auto';if(badge.textContent!==label)badge.textContent=label;}},configure(value){enabled=value===true;if(!enabled){clearInterval(timer);timer=null;lastAttempt.clear();}else if(timer===null)timer=setInterval(tick,80);this.refreshLabel();},status(){return {enabled,attempts:casts,lastSpell,plannerMs:lastMs};}};
+ root.thorAutoSpells={refreshLabel(){if(badge){badge.hidden=!enabled;const key=mode==='buffs'?'Buffs auto':'Sorts auto',label=root.thorLocale?.text(key)||key;if(badge.textContent!==label)badge.textContent=label;}},configure(value){const next=value===true?'full':['full','buffs'].includes(value)?value:'off';if(mode!==next)lastAttempt.clear();mode=next;enabled=mode!=='off';if(!enabled){clearInterval(timer);timer=null;}else if(timer===null)timer=setInterval(tick,80);this.refreshLabel();},status(){return {enabled,mode,attempts:casts,lastSpell,plannerMs:lastMs};}};
  document.addEventListener('DOMContentLoaded',()=>{badge=document.createElement('span');badge.id='thor-auto-status';badge.style.cssText='position:fixed;top:45px;left:104px;z-index:2147483645;border:1px solid #bbce9780;border-radius:5px;padding:3px 7px;background:#17251ccc;color:#cce5aa;font:600 10px sans-serif;pointer-events:none';badge.hidden=true;document.body.append(badge);});
 })(typeof window==='object'?window:null);

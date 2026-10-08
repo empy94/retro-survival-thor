@@ -1,5 +1,12 @@
 # Versions
 
+## 1.11.0 — 9 octobre 2026
+
+- Trois choix exclusifs : désactivée, buffs auto uniquement, tous les sorts intelligents. Ancien réglage conservé lors de la mise à jour.
+- Buffs seuls : Bouclier, Vitesse, Science du Bâton, Puissance et Invisibilité dès disponibilité, même sans monstre. Aucun lancer offensif, placement ou déplacement ; effets actifs conservés.
+- Mode buffs plus léger : aucune liste de monstres ou de pièges à lire ni cible à rechercher. Priorité manuelle et suspension en pause/menus/arrière-plan conservées.
+- Sélecteur et indicateur FR/EN/ES. README raccourci, captures actuelles uniquement en présentation ; ancien contenu déplacé dans le guide détaillé.
+
 ## 1.10.0 — 9 octobre 2026
 
 - Lancement intelligent facultatif des sorts actifs : buffs, attaques dirigées, placement sur les groupes, repoussement et déplacements de secours évalués. Les sorts passifs déjà automatiques restent gérés par le jeu.

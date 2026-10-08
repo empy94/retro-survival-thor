@@ -27,9 +27,15 @@ Le joystick visuel est ancré en bas à gauche ; les étiquettes X/Y/L1/R1/L2/R2
 
 La sauvegarde locale de cette application est distincte de celle de Chrome. Les fichiers et sauvegardes Chrome existants ne sont pas modifiés. Pour conserver les données de cette application, la mettre à jour avec installation de remplacement plutôt que la désinstaller.
 
-## Assistance des sorts (1.10.0)
+## Assistance des sorts (1.11.0)
 
-**Select / ⚙ APK → Lancement intelligent des sorts** active une aide facultative, désactivée par défaut : buffs disponibles, attaques et zones sur les monstres, repoussement et déplacements de secours évalués. Tu gardes le déplacement et les choix. Les sorts déjà automatiques restent gérés par le jeu. Le stick droit, les sorts manuels et les actions tactiles sont prioritaires ; les lancers cessent dans les menus, en pause et hors de l’application. L’aide utilise les commandes du jeu et ne garantit pas la survie.
+Dans **Select / ⚙ APK → Assistance des sorts**, choisis un mode :
+
+- **Désactivée** : commandes manuelles, réglage par défaut.
+- **Buffs auto uniquement** : Bouclier, Vitesse, Science du Bâton, Puissance et Invisibilité dès disponibilité, même sans monstre. Aucun sort d’attaque, placement ou déplacement automatique ; les effets encore actifs sont conservés.
+- **Tous les sorts intelligents** : buffs, attaques dirigées, placements sur les groupes et déplacements de secours évalués.
+
+Tu gardes le déplacement et les choix. Tes actions manuelles sont prioritaires ; les lancers cessent pendant la pause, les menus et hors de l’application. Les sorts déjà automatiques du jeu continuent dans tous les modes. Aide facultative, sans garantie de survie.
 
 ## Vérification sur le Thor
 

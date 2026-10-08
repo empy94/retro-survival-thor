@@ -1,227 +1,54 @@
 # Retro Survival — Android & manettes
 
-**Garde le contrôle. Laisse les sorts t’épauler.**
+**Au tactile ou à la manette. À toi de choisir ton aide.**
 
-Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/) avec une manette USB/Bluetooth ou les commandes intégrées d’une console Android comme l’AYN Thor, tout en conservant l’interface tactile du jeu.
+Joue à [Retro Survival](https://retrosurvival.online/) sur téléphone, tablette ou console Android, dont l’**AYN Thor**.
 
-**[⬇ Télécharger l’APK Android](https://github.com/empy94/retro-survival-thor/releases/latest/download/Retro-Survival-Android.apk)** · [Nouveautés](CHANGELOG.md) · [Installation et commandes](#installation)
+### [⬇ Télécharger l’APK](https://github.com/empy94/retro-survival-thor/releases/latest/download/Retro-Survival-Android.apk)
 
-## Jouer à ta manière
+Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
-| Manette & tactile | Visée radiale | Sorts automatiques | Deuxième écran |
-|---|---|---|---|
-| Android 9+, USB/Bluetooth, commandes intégrées | Direction et distance au stick droit | Buffs, cibles et groupes, option facultative | Personnage, cœur de PV, kamas, équipement et collection |
+![Combat sur Android avec assistance des sorts](docs/screenshots/sorts-auto-combat.png)
 
-## Nouveauté · Assistance des sorts
+## Trois façons de jouer
 
-Active **Select / ⚙ APK → Lancement intelligent des sorts**, puis concentre-toi sur tes déplacements et tes choix. L’option est désactivée par défaut. Un discret repère « Sorts auto » indique son activation.
+Dans **⚙ APK / Select → Assistance des sorts** :
 
-- **Buffs prêts à temps** : bouclier, vitesse, Science du Bâton et Puissance, sans relancer un effet encore actif. Invisibilité réservée au danger.
-- **Zones et attaques dirigées** : cible les groupes accessibles, choisit une direction pour les attaques en ligne et évite de superposer les pièges au même endroit. La portée suit les améliorations.
-- **Survie** : repousse à proximité et propose une Téléportation/Bond seulement quand une destination évaluée paraît moins exposée. Évite un retour ou un échange avec le double plus dangereux.
-- **Tu gardes la main** : tes sorts, le stick droit et le tactile sont prioritaires. Aucun lancer pendant la pause, les paramètres, les choix ou hors de l’application.
-
-Les sorts déjà automatiques du jeu gardent leur fonctionnement. L’assistance concerne tous les sorts actifs affichés, même au-delà des six raccourcis de manette. Elle utilise les commandes tactiles originales : le jeu conserve ses règles, ses animations, ses cooldowns et ses validations de terrain. Le déplacement et les améliorations restent sous ton contrôle.
-
-C’est une aide fondée sur des priorités et des positions, pas une garantie de survie : obstacles, attaques à venir et toutes les synergies ne sont pas prédits. Les déplacements automatiques peuvent être corrigés par le terrain du jeu.
-
-| Assistance activée en combat | Option dans les paramètres |
+| Mode | Ce qu’il fait |
 |---|---|
-| ![Sorts automatiques en combat réel sur Thor](docs/screenshots/sorts-auto-combat.png) | ![Réglage de lancement intelligent, désactivable](docs/screenshots/sorts-auto-parametres.png) |
+| **Désactivée** | Tu lances tes sorts actifs toi-même. |
+| **Buffs auto uniquement** | Bonus du personnage (bouclier, vitesse…) dès disponibilité. Effets actifs conservés ; attaques et visée manuelles. |
+| **Tous les sorts intelligents** | Buffs, attaques dirigées, zones sur les groupes et déplacements de secours évalués. |
 
-Captures réelles de l’APK signée 1.10.0 : Glyphe d’Immobilisation et Science du Bâton en récupération, après leurs lancers automatiques. Le calcul est limité à une décision toutes les 80 ms, un lancer à la fois et un nombre borné de cibles ; aucun traitement d’image ni appel réseau pour la visée. [Essais et limites des mesures](VALIDATION.md).
+Les sorts déjà automatiques du jeu restent automatiques dans les trois modes. Tes commandes manuelles sont prioritaires ; l’aide s’arrête pendant les choix, la pause et hors de l’application. Elle ne garantit pas la survie.
 
-## Aperçu sur AYN Thor
+## Une manette, une visée simple
 
-**Le jeu en haut, le personnage en bas.**
+- **Stick gauche / croix** : déplacement et sélection dans les menus.
+- **Stick droit** : direction et distance de visée ; pointeur si nécessaire.
+- **L1 / R1 / L2 / R2** : maintenir un sort à viser, orienter, relâcher.
+- **X / Y** : sorts instantanés. **A / R3** : valider. **Start / B** : pause.
 
-![Gameplay animé sur AYN Thor : combat sur l’écran du haut et fiche de personnage actualisée sur l’écran du bas](docs/screenshots/thor-gameplay.gif)
+Le rayon suit le personnage et les améliorations de portée. Le curseur se masque quand il est inutile. Le tactile et les manettes USB/Bluetooth reconnues par Android restent disponibles.
 
-Aperçu historique (avant les sorts automatiques) : 10 secondes de gameplay réel capturé sur les deux écrans du Thor, intégré dans le visuel de la console. GIF en boucle, sans son, environ 2,1 Mo.
+## Un second écran utile, si tu en as un
 
-**Paramètres et détails d’équipement.**
+Sur un appareil compatible comme le Thor : cœur de PV, kamas, caractéristiques, équipement et collection permanente. Sur téléphone ou tablette, le jeu fonctionne sur un seul écran.
 
-![AYN Thor avec les paramètres sur l’écran supérieur et les effets de l’équipement sur l’écran inférieur](docs/screenshots/thor-settings.png)
-
-Le boîtier est un visuel de présentation généré à partir d’une référence du Thor. Les deux écrans du GIF montrent les enregistrements réels de l’application. Les captures originales sont disponibles dans la galerie ci-dessous. [Création des visuels et référence AYN](docs/visuels.md).
-
-## Viser directement dans le rayon du sort
-
-Maintenir la touche du sort, orienter le stick droit, puis relâcher. La cible suit le personnage ; pour les placements, l’inclinaison du stick règle aussi la distance.
-
-| Téléportation : choisir une direction | Glyphe : choisir direction et distance |
+| Paramètres de l’assistance | Fiche du second écran |
 |---|---|
-| ![Portée radiale de Téléportation autour du personnage](docs/screenshots/teleportation-radiale.png) | ![Rayon de placement d’un glyphe, visée au stick droit](docs/screenshots/placements-radiaux.png) |
+| ![Choix entre buffs et tous les sorts](docs/screenshots/sorts-auto-parametres.png) | ![Fiche compacte avec cœur, kamas et équipement](docs/screenshots/fiche-personnage-actuelle.png) |
 
-Captures réelles sur le Thor. Le cercle indique la portée de visée ; le jeu conserve ses règles de terrain et de placement. Les améliorations de portée sont prises en compte, tandis que la taille de la zone d’un glyphe reste distincte de sa portée de placement.
+Captures de l’APK **1.11.0** sur AYN Thor. Autres appareils et manettes externes : compatibles selon Android, non testés matériellement.
 
-## Collection permanente et équipements rares
+## Installer et jouer
 
-Le jeu actuel conserve le **Dofawa (Astrub)** et le **Dofus Cawotte (île Wabbit)** entre les parties. Le meilleur jet du Cawotte est sauvegardé. Les versions rayonnantes sont aussi reconnues. La fiche du second écran leur réserve une zone compacte, même à l’accueil ; elle lit la collection déjà sauvegardée par le jeu et ne débloque rien.
+1. Télécharge l’APK ci-dessus, installe-la et ouvre **Retro Survival**.
+2. Utilise le tactile ou connecte ta manette dans Android.
+3. Sur Thor / Cocoon : **Toutes les applis → Retro Survival → appui long → Ajouter au Menu Home**.
 
-| Fiche compacte : 13 caractéristiques visibles | Jets consultables en touchant la carte |
-|---|---|
-| ![Collection permanente réelle sur le second écran](docs/screenshots/collection-permanente.png) | ![Jets mini et maxi du Dofus Cawotte](docs/screenshots/collection-jets.png) |
+Pour une mise à jour, installe par-dessus l’application existante. Sa sauvegarde est distincte de Chrome.
 
-Aucun Dofus associé à Litneg n’a été trouvé dans le code actuel. D’autres équipements rares existent, notamment Kritter et Casque du Chafer dans les butins de Kruorre, mais ils ne sont pas conservés entre les parties : le démarrage d’une partie réinitialise l’équipement et reprend uniquement les Dofus collectés. [Vérification des règles et sources](docs/collection.md).
+[Guide complet](docs/guide.md) · [Nouveautés](CHANGELOG.md) · [Tests et limites](VALIDATION.md) · [Code et compilation](docs/guide.md#construire-lapplication)
 
-## Deux écrans, deux usages
-
-![Fiche actuelle : cœur de PV, symbole des kamas et collection permanente](docs/screenshots/fiche-personnage-actuelle.png)
-
-L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche une fiche de personnage, dans les couleurs et le style du menu de caractéristiques du jeu :
-
-- PV actuels et maximum, kamas de la partie, niveau et vague.
-- 13 caractéristiques calculées par le jeu, bonus d’équipement compris : dommages, critique, vitesse, esquive, récupération, prospection, etc.
-- Équipement de la partie : coiffe, cape, amulette, arme, bouclier, ceinture, bottes et anneaux. Les objets rayonnants sont signalés dans leur ligne. Les emplacements vides ne remplissent pas la fiche.
-- Collection permanente séparée : Dofawa et Dofus Cawotte, statut obtenu/à obtenir et bonus sauvegardé. Les Dofus ne sont pas répétés dans l’équipement.
-- Toucher un objet équipé pour lire ses effets ; pour Kritter et Casque du Chafer, les jets mini/maxi et rayonnants sont indiqués. Toucher une carte Dofus pour ses bornes et son jet conservé. Les détails se replient pour garder la fiche lisible.
-
-Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ APK → Personnage sur le second écran**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
-
-La fiche lit les informations disponibles dans le jeu, sans modifier la partie. Si le site change et que ces informations deviennent inaccessibles, elle indique qu’elles sont indisponibles plutôt que d’afficher des valeurs inventées.
-
-<details>
-<summary>Voir les captures originales sur le Thor</summary>
-
-Version 1.6.0 : placement radial d’un glyphe, direction et distance au stick droit.
-
-![Placement radial d’un glyphe sur le Thor](docs/screenshots/placements-radiaux.png)
-
-Version 1.5.0 : visée radiale de Téléportation, avec rayon centré sur le personnage et direction choisie au stick droit.
-
-![Visée radiale de Téléportation sur le Thor](docs/screenshots/teleportation-radiale.png)
-
-Version 1.4.0 :
-
-| Visée depuis le personnage en déplacement | Sensibilité du curseur |
-|---|---|
-| ![Glyphe : trajectoire depuis le personnage vers la cible](docs/screenshots/visee-personnage.png) | ![Sensibilité du curseur dans les paramètres du Thor](docs/screenshots/sensibilite.png) |
-
-Captures réelles de la version 1.2.0, avant mise en situation dans les visuels du Thor.
-
-| Fiche de personnage | Effets de l’équipement |
-|---|---|
-| ![PV, kamas et caractéristiques](docs/screenshots/personnage.png) | ![Effets du chapeau équipé](docs/screenshots/equipement-detail.png) |
-
-![Paramètres de la version 1.2.0](docs/screenshots/parametres-dual.png)
-
-Commandes et interface de la version 1.1.0 :
-
-| Accueil | Joystick en bas à gauche |
-|---|---|
-| ![Accueil du jeu](docs/screenshots/accueil.png) | ![Joystick visuel pendant le déplacement](docs/screenshots/joystick.png) |
-| **Touche X sur un sort débloqué** | **Réglage des repères** |
-| ![Repère X sur le sort](docs/screenshots/sorts.png) | ![Paramètres des repères](docs/screenshots/parametres.png) |
-
-</details>
-
-## Installation
-
-1. Télécharger `Retro-Survival-Android.apk` depuis la dernière version publiée.
-2. Installer l’APK sur votre appareil Android et ouvrir **Retro Survival**.
-3. Sur AYN Thor, dans Cocoon : **Toutes les applis → Retro Survival → appui long → Ajouter au Menu Home**.
-
-Une connexion Internet et Android 9 ou plus sont nécessaires. L’application a été testée sur AYN Thor avec Android 13. Elle ne contient pas le jeu : elle charge le site en ligne.
-
-## Combat et menus sans pointeur
-
-Depuis la **1.9.0**, le pointeur se masque automatiquement pendant les combats. Les choix et fenêtres commencent aussi sans pointeur : le contour doré suffit pour naviguer au pad. Utiliser le stick droit le fait apparaître dans les menus ; revenir au pad le masque aussitôt. Un changement de fenêtre efface le pointeur précédent.
-
-La visée radiale garde son cercle et sa cible. Si la visée au pointeur est choisie, le pointeur reste visible pendant le maintien du sort pour viser précisément. Le réglage **Masquer le curseur pendant les combats** permet de garder le pointeur visible en combat après utilisation du stick droit.
-
-Sur le second écran, la barre de PV est remplacée par un cœur dans le style du jeu : remplissage de bas en haut, PV actuels et maximum dans le cœur. Il libère de la place pour les caractéristiques. Le montant des kamas reprend l’icône officielle chargée depuis le jeu. **Alerte de PV faibles sur la fiche** colore discrètement la zone à 25 % de vie ou moins. Cette option est désactivable dans **⚙ APK / Select**. Aucun compteur d’ennemis n’est ajouté. L’aide lit les PV à 2 Hz, sans déclencher de sort ni de déplacement.
-
-| Choix au pad, sans curseur | Cœur de PV et symbole du jeu |
-|---|---|
-| ![Choix de sort sans curseur, sélection au pad](docs/screenshots/choix-sans-curseur.png) | ![Cœur de PV et kamas sur le second écran](docs/screenshots/coeur-pv.png) |
-
-Captures réelles de la version signée 1.9.0 sur le Thor.
-
-## Commandes
-
-Depuis la version **1.7.0**, parcourir les boutons des menus et choix au **stick gauche ou à la croix** : gauche/droite passe au bouton précédent/suivant, haut/bas change de ligne. Le contour doré indique la sélection ; **R3 ou A valide**. Les boutons désactivés sont ignorés. Le stick droit efface cette sélection et retrouve le pointeur.
-
-![Choix d’amélioration sélectionné à la manette](docs/screenshots/choix-manette.png)
-
-L’APK peut aussi être installé sur un téléphone, une tablette ou une console **Android 9 ou plus**, avec Android System WebView à jour. Aucune exigence de matériel AYN ni de second écran. Le tactile reste disponible sans manette.
-
-Connecter une manette USB ou l’appairer dans les paramètres Bluetooth d’Android : elle est ensuite reconnue automatiquement si Android expose ses commandes. Son nom apparaît dans les paramètres du jeu, avec actualisation lors d’une connexion ou déconnexion. Une déconnexion de la manette utilisée remet les commandes à zéro.
-
-Les noms des boutons suivent Android : A/B/X/Y, L1/R1/L2/R2, Start/Select et R3. Une manette Xbox ou Switch peut fonctionner si Android expose ces entrées ; les inscriptions Nintendo peuvent différer des noms Android. Le stick droit prend en charge les axes Z/RZ et RX/RY ; les gâchettes analogiques et zones mortes déclarées par la manette sont utilisées. [Documentation Android](https://developer.android.com/games/sdk/game-controller/controller-input).
-
-La fiche apparaît uniquement sur un second écran compatible détecté par Android ; l’ajout ou le retrait d’écran est surveillé. Les paramètres indiquent si cet écran existe. La fiche conserve ses PV, caractéristiques et équipements sans dupliquer les choix du jeu.
-
-Cette version a été essayée sur le Thor. Les manettes Xbox/Switch externes et autres appareils Android n’ont pas encore été testés matériellement. Voir [VALIDATION.md](VALIDATION.md).
-
-| Touche | Action |
-|---|---|
-| Stick gauche / croix | Déplacement en partie ; sélection dans les menus et choix |
-| Stick droit | Déplacement du pointeur doré |
-| R3 / A | Valider la sélection ; sinon clic au pointeur |
-| L1, R1, L2, R2 | Priorité aux sorts à viser |
-| X, Y | Priorité aux sorts instantanés |
-| Bouton de sort maintenu + stick droit | Viser, puis relâcher pour les sorts directionnels |
-| Start / B | Pause et reprise |
-| Select / bouton **⚙ APK** | Paramètres des commandes |
-
-Les menus et les choix de niveau se sélectionnent directement à la manette, ou au pointeur avec le stick droit et R3. Le tactile reste disponible. Les attaques automatiques du mode Android restent gérées par le jeu.
-
-En **visée au pointeur**, la trajectoire des sorts à viser part du personnage et suit ses déplacements pendant le maintien. Le point ciblé reste à l’endroit choisi à l’écran ; le stick droit permet de l’ajuster. La direction du lancement est recalculée au relâchement. La portée et les contraintes du sort restent celles du jeu.
-
-Depuis la version **1.5.0**, **Téléportation du Féca** et **Bond du Iop** utilisent une visée radiale : maintenir la touche du sort pour afficher sa portée autour du personnage. La destination est d’abord devant lui, dans la direction du stick gauche (ou son orientation à l’arrêt). Le **stick droit choisit directement la direction**, sans déplacer la souris ; cette direction reste choisie quand le stick revient au centre. Relâcher la touche du sort pour lancer à portée maximale. Le rayon et la destination suivent le personnage pendant son déplacement, en tenant compte des améliorations de portée. Le jeu décide de la position d’arrivée selon les limites du terrain et les obstacles.
-
-Le curseur habituel est masqué pendant cette visée et retrouve sa position précédente ensuite. L’évolution de Téléportation permettant un retour garde sa destination imposée et l’indique à l’écran.
-
-Depuis la version **1.6.0**, la visée radiale est également activée par défaut pour les **sorts à cibler ou à placer**. Maintenir la touche du sort, choisir la direction au stick droit, puis relâcher pour lancer. Pour les glyphes, pièges, invocations et attaques dont la distance est réglable, incliner légèrement le stick pour viser près et à fond pour viser loin. Direction et distance restent choisies quand le stick revient au centre, et la cible suit le personnage.
-
-Le rayon suit la portée actuelle du sort : améliorations et évolutions de portée de Téléportation, Bond, Retour du Bâton et Couper prises en compte. Les glyphes ont actuellement une portée de placement fixe de 200 unités du jeu ; agrandir leur zone d’effet ne permet pas de les poser plus loin. Les attaques purement directionnelles, comme Épée du Destin et Peur, montrent une direction sans annoncer un rayon de portée. Le Double du Sram se place dans son rayon d’invocation ; son évolution d’échange avec un Double existant indique ce point imposé.
-
-Pour retrouver la visée au pointeur sur les sorts ciblés, désactiver **Select / ⚙ APK → Visée radiale des sorts à cibler**. Téléportation et Bond conservent leur mode radial. Les sorts instantanés se lancent toujours par une simple pression.
-
-## Langue et performances
-
-Les indications de l’APK, paramètres Android, aide et fiche du personnage suivent **la langue sélectionnée dans le jeu : français, anglais ou espagnol**, y compris lorsque la langue change depuis le menu pause.
-
-La visée reste actualisée à chaque image. Les lectures pour les repères sont mises en cache pendant 250 ms, avec lecture immédiate lors d’un lancement de sort. Les décorations sont regroupées toutes les 120 ms ; la fiche reste actualisée deux fois par seconde et reconstruit ses statistiques ou son équipement seulement lorsqu’ils changent. La navigation ne mesure pas tous les boutons à chaque image quand le stick est au repos.
-
-Les mesures sur Thor et leurs limites sont dans [VALIDATION.md](VALIDATION.md) ; elles ne constituent pas une garantie d’absence de ralentissement dans toutes les scènes et sur tous les Android.
-
-## Affichage réglable
-
-- Le joystick visuel du stick gauche est fixé dans le coin inférieur gauche pendant le déplacement.
-- Les sorts actifs débloqués affichent leur bouton physique : **X, Y, L1, R1, L2, R2**.
-- Depuis la version **1.3.0**, les sorts à viser (glyphes, pièges, déplacements ciblés…) occupent d’abord **L1, R1, L2, R2**. Maintenir la touche, viser au stick droit, puis relâcher pour lancer. Les sorts instantanés occupent d’abord **X et Y**, puis les boutons encore libres. Lire les repères sur les sorts après un déblocage : les affectations peuvent changer.
-- L’évolution du Glyphe enflammé qui supprime la visée est reconnue comme un sort instantané. Six sorts au maximum sont associés aux boutons ; les autres restent accessibles au tactile ou avec le pointeur et R3.
-- Dans **⚙ APK** ou avec **Select**, afficher ou masquer ces étiquettes et régler leur opacité entre 15 % et 85 %.
-- Régler aussi la **sensibilité du curseur** de **25 %** (précis) à **250 %** (rapide), avec **100 %** par défaut. Ce réglage s’applique au déplacement du pointeur dans les menus et à la visée au pointeur. La visée radiale des téléportations utilise directement la direction du stick.
-- Le joystick visuel peut être masqué sans désactiver le déplacement.
-- Les préférences restent enregistrées après fermeture et mise à jour de l’application.
-
-La sauvegarde locale de cette application est distincte de celle de Chrome. Installer une mise à jour par-dessus l’application existante pour conserver ses données. Une version reconstruite avec une autre clé de signature ne peut pas remplacer directement l’APK publié.
-
-## Construire l’application
-
-Sous Windows, installer un JDK et les outils Android SDK : plateforme `android-35` et Build Tools `34.0.0`. Java 17 ou 19 est recommandé avec cette version de D8 ; la compilation avec Java 19 a été vérifiée.
-
-```powershell
-$env:ANDROID_SDK_ROOT = 'C:\Android\Sdk'
-$env:JAVA_HOME = 'C:\Java\jdk-19'
-.\build.ps1
-```
-
-Les chemins sont également configurables par les paramètres `-AndroidSdk` et `-JavaHome`. L’APK signé est produit dans `Retro-Survival-Android.apk`. La clé de signature personnelle est créée hors du dépôt, dans `%USERPROFILE%\.android\thor-retrosurvival`. Conserver cette clé pour les mises à jour et ne jamais la publier.
-
-Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé, uniquement pour les essais. L’APK publié n’active pas ce débogage.
-
-Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu. `node tests/spell-bindings.test.js` vérifie la priorité des sorts à viser, l’exception du Glyphe enflammé, la limite de six boutons, le relâchement du bon bouton et l’annulation de la visée.
-
-`node tests/aim-follow.test.js` vérifie une visée dont la cible reste fixe pendant le déplacement du personnage, le calcul au relâchement et l’annulation si sa position est indisponible. Le test de l’observateur vérifie aussi les coordonnées du personnage après mise à l’échelle du canvas et remplacement de la partie.
-
-`node tests/travel-aim.test.js` vérifie la direction initiale, le suivi du personnage, le choix direct au stick droit, la direction conservée au retour au centre, la portée améliorée, le retour imposé et la restauration du pointeur pour les autres sorts.
-
-## Projet indépendant
-
-Cette application est un lanceur et une adaptation des commandes. Elle n’est affiliée ni aux auteurs de Retro Survival ni à Ankama. Le jeu, ses illustrations et son contenu restent la propriété de leurs auteurs et ayants droit. Les captures ci-dessus montrent le jeu chargé depuis son site ; le dépôt ne contient pas ses scripts ni ses fichiers graphiques, hormis ces captures de présentation. Le site peut évoluer et nécessiter une mise à jour des commandes.
-
-Le code original de ce lanceur est distribué sous licence MIT.
+Lanceur indépendant : le jeu est chargé depuis son site officiel. Non affilié à Retro Survival ou Ankama. Code du lanceur sous licence MIT.

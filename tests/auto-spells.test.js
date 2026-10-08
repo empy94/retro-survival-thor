@@ -32,7 +32,7 @@ vm.runInNewContext(fs.readFileSync('assets/controls.js','utf8'),ctx);ctx.window.
 controls.configure({autoSpells:true});controls.setActive(false);assert.equal(controls.autoAvailable(),false);controls.setActive(true);const aimed={el,aimed:true};assert.equal(controls.autoCast(aimed,{x:480,y:250}),true);assert.equal(events.at(-1).type,'pointerdown');assert.equal(controls.autoCast(aimed,{x:450,y:200}),false);
 const advance=()=>{const list=[...frames.values()];frames.clear();list.forEach(f=>f());};advance();assert.equal(events.at(-1).type,'pointermove');player={x:370,y:225};advance();assert.equal(events.at(-1).type,'pointerup');assert.equal(events.at(-1).clientX,460);assert.equal(events.at(-1).clientY,245);
 controls.autoCast(aimed,{x:480,y:250});controls.configure({autoSpells:false});advance();assert.equal(events.at(-1).type,'pointercancel');
-controls.configure({autoSpells:true});controls.autoCast(aimed,{x:480,y:250});controls.rightStick(1,0);advance();assert.equal(events.at(-1).type,'pointercancel');assert.equal(controls.autoAvailable(),false);
+controls.configure({autoSpells:true,autoSpellMode:'full'});controls.autoCast(aimed,{x:480,y:250});controls.configure({autoSpellMode:'buffs'});advance();assert.equal(events.at(-1).type,'pointercancel','switch to buffs cannot release a queued attack');controls.configure({autoSpellMode:'full'});controls.autoCast(aimed,{x:480,y:250});controls.rightStick(1,0);advance();assert.equal(events.at(-1).type,'pointercancel');assert.equal(controls.autoAvailable(),false);
 console.log('Auto spells: buffs, clusters, range, escape, duplicate traps, pause, no writes, committed input and manual priority passed');
 
 // Scheduler is opt-in, bounded, skips manual/pause/background and throttles
@@ -45,3 +45,21 @@ const auto=runtimeWindow.thorAutoSpells;assert.equal(auto.status().enabled,false
 paused=true;timer();assert.equal(reads,0);paused=false;available=false;timer();assert.equal(reads,0);available=true;hidden=true;timer();assert.equal(reads,0);hidden=false;
 timer();assert.equal(attempts,1);clock+=79;timer();assert.equal(attempts,1);clock+=800;timer();assert.equal(attempts,2);disabled=true;clock+=1000;timer();assert.equal(attempts,2);auto.configure(false);assert.equal(timer,null);
 console.log('Auto scheduler: opt-in, inactive renderer, manual priority, modal pause, cooldown and rejected-cast backoff passed');
+
+// Buff-only mode has no enemy requirement and cannot attack, place a zone,
+// teleport or dismiss an invisibility buff that is still active.
+const buffPlan=(s,ids)=>plan(s,ids.map(spell),mapping,'buffs');
+const quiet={...base,enemies:[]};
+for(const id of ['shield','speed','staffScience','power','invisibility'])assert.equal(buffPlan(quiet,[id]).spell.id,id);
+assert.equal(buffPlan(quiet,['burningGlyph','dash','jump','massTrap','sramDouble','cut']),null);
+assert.equal(buffPlan({...quiet,player:{...quiet.player,shieldTimer:1,speedBoostTimer:1},buffs:{science:1,power:1,invisible:1}},['shield','speed','staffScience','power','invisibility']),null);
+assert.equal(buffPlan({...quiet,busy:true},['shield']),null);
+assert.equal(buffPlan({...quiet,phase:'dying'},['shield']),null);
+assert.equal(plan(quiet,[{...spell('shield'),ready:false}],mapping,'buffs'),null);
+assert.equal(plan(quiet,[spell('shield')],mapping,'off'),null);
+assert.equal(plan(quiet,[spell('shield')],mapping,'unknown'),null);
+assert.equal(choose(quiet,['shield']),null,'full mode still waits for enemies');
+let targetRead=null;runtimeWindow.thorDashboard.combatState=include=>{targetRead=include;return quiet;};disabled=false;auto.configure('buffs');assert.equal(auto.status().mode,'buffs');timer();assert.equal(targetRead,false);assert.equal(attempts,3);
+auto.configure('full');timer();assert.equal(targetRead,true);assert.equal(attempts,3);
+auto.configure('off');assert.equal(timer,null);
+console.log('Buff mode: cast when available without monsters, no attacks/travel, no active-buff cancellation, mode switches and no target reads passed');

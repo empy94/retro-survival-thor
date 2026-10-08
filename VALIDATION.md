@@ -2,6 +2,18 @@
 
 Vérifications effectuées les 8 et 9 octobre 2026 sur un AYN Thor connecté, Android 13.
 
+## Version 1.11.0
+
+- Huit suites Node et test Java réussis. Mode buffs testé sans monstre pour chacun des cinq buffs actifs : Bouclier, Vitesse, Science du Bâton, Puissance, Invisibilité. Attaques, zones, invocations et déplacements exclus ; buffs actifs conservés, invisibilité jamais annulée, attente de disponibilité et état de lancer/pause respectés. Mode intelligent garde son comportement d’attente des ennemis. Changer de mode annule un ciblage automatique encore en vol.
+- Planificateur : chemin buffs sans copie de monstres/pièges, sans choix de cible et sans lecture de portée pour un lancer instantané. Cadence 80 ms conservée. Tests du changement de mode, arrêt, temporisation des rejets et lecture des cibles seulement en mode intelligent réussis.
+- Sélecteur natif observé sur le Thor : trois radios exclusives, désactivée initialement ; passages buffs → tous les sorts → buffs reconnus par la WebView. Préférence `autoSpellMode=buffs` enregistrée ; sensibilité 200 %, opacité 45 %, radial, alerte et second écran conservés. Ancienne préférence booléenne utilisée si le nouveau réglage n’existe pas ; cas historique désactivé observé à la première installation de travail.
+- Sur la WebView réelle : Science du Bâton débloquée par un choix normal et lancée en mode buffs ; durée active 5,22 s et bouton indisponible observés. Aucun monstre requis dans les tests isolés. Libellés natifs anglais/espagnol et indicateur réel `Auto buffs` / `Mejoras auto` / `Buffs auto` vérifiés après les boutons de langue du jeu ; retour au français. Les quatre autres buffs sont couverts par les tests et l’audit, sans essai de chaque classe en partie.
+- APK signé 1.11.0 installé en remplacement : version 12, débogage désactivé, assets comparés exactement aux sources, même package/signature. Mode buffs resté sélectionné après l’installation finale ; trois radios exclusives observées sur l’APK signé et captures actualisées. SHA-256 : `1190f5f248eab4c7feec741d5b52984a0c5828dc34a2048a699718fa47e5598b`, 62 500 octets.
+- Sur l’APK signé : Bouclier Féca choisi dans une amélioration normale, lancé sans pression sur sa touche en mode buffs ; effet visuel et récupération observés et capturés. Trois captures de la 1.11.0 remplacent celles de la page principale : combat, sélecteur et fiche. Aucun état ou buff artificiellement écrit.
+- Après les essais, assistance remise désactivée et langue française conservée. Aucun média enregistré sur le Thor.
+- README simplifié, anciennes images et GIF retirés de la présentation principale. Guide séparé pour les détails des commandes, sauvegardes et compilation ; anciennes captures conservées dans le dépôt, sans les présenter comme la version courante.
+- Graphify update tenté : même limitation locale (`uv trampoline failed to canonicalize script path`), aucun graphe existant.
+
 ## Version 1.10.0
 
 - Huit suites Node réussies, plus le test Java de limitation des requêtes. Nouveau planificateur testé : buffs actifs, groupe plutôt que cible isolée, portée améliorée, attaque hors portée ignorée, téléportation de secours uniquement, retour dangereux refusé, pièges déjà présents, double conservé et aucune écriture d’état. Entrée ciblée sur deux images rendues, suivi du personnage au relâchement, annulation manuelle/désactivation, opt-in, pause, premier plan et temporisation des rejets vérifiés.

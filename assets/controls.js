@@ -111,7 +111,7 @@
    pad(){pointerUsed=false;refreshCursor();},
    rightStick(x,y){if(Math.hypot(x,y)>.16)manual();if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
    cancel(){manual();finish('pointercancel');window.thorMenu?.clear();},
-   configure(value){settings={...settings,...value};if(!settings.autoSpells)cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true);decorate();},
+   configure(value){const before=settings.autoSpellMode;settings={...settings,...value};if(!settings.autoSpells||before!==settings.autoSpellMode)cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off');decorate();},
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
    endPreferences(){if(document.querySelector('.pause-panel'))this.pause();},
    key(key,code,down){
