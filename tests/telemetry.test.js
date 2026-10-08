@@ -39,3 +39,7 @@ live.player.hp=2;assert.equal(sample().helper.lowHealth,false);live.player.hp=0;
 live.player.hp=NaN;assert.equal(sample().status,'unavailable');
 canvas=null;assert.equal(sample().status,'unavailable');
 console.log('Telemetry observer contract passed.');
+
+// Planner data stays detached from mutable game input/state.
+live.player.hp=3;live.enemies=[{x:1,y:2,r:10,hp:4,state:'chase'},{x:7,y:8,hp:0},{x:3,y:4,hp:2,invisibleTimer:1}];canvas={getBoundingClientRect:()=>({left:0,top:0,width:800,height:400}),__reactFiberTest:{return:root}};
+const combat=context.window.thorDashboard.combatState();assert.equal(combat.enemies.length,1);combat.player.x=999;combat.upgrades.dashRange=999;combat.enemies[0].hp=999;assert.notEqual(live.player.x,999);assert.notEqual(live.upgrades.dashRange,999);assert.equal(live.enemies[0].hp,4);

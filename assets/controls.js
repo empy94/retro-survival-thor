@@ -2,7 +2,7 @@
  'use strict';
  // Keep the site's original Android interface and drive its virtual controls.
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
- let px=0,py=0,aimFrame=null;
+ let px=0,py=0,aimFrame=null,autoPointer=null,manualUntil=0,foreground=true;const touches=new Set();
  let leftX=0,leftY=0;
  let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true,hideCombatCursor:true,combatHelper:true},pointerUsed=false,cursorPhase=null,cursorScope=null;
  function refreshCursor(){
@@ -27,6 +27,7 @@
  function decorate(){
    refreshCursor();
    window.thorLocale?.sync();
+   window.thorAutoSpells?.refreshLabel();
    document.querySelector('#thor-settings')?.setAttribute('aria-label',text('Paramètres de jeu et manette'));
    const slots=bindings();
    document.querySelectorAll('.touch-ability').forEach(el=>{
@@ -41,6 +42,9 @@
    const z=document.querySelector('.touch-joystick-zone');if(z)z.style.opacity=settings.showJoystick?'1':'0';
  }
  function event(el,type,id,x,y){el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===177,clientX:x,clientY:y,pageX:x,pageY:y,buttons:type==='pointerup'||type==='pointercancel'?0:1,button:0,bubbles:true,cancelable:true}));}
+ function cancelAuto(){const held=autoPointer;autoPointer=null;if(held)event(held.el,'pointercancel',182,held.x,held.y);}
+ function manual(){manualUntil=Date.now()+700;cancelAuto();}
+ function capture(el){if(el.__thorCapture)return;const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179&&id!==182)real(id);};el.__thorCapture=true;}
  function aimPoint(held){
    const player=window.thorDashboard?.playerPosition();if(!player)return null;
    let targetX=px,targetY=py,range=null,travel=null,showRange=true,fixed=null;
@@ -87,12 +91,27 @@
    const label=held.el.querySelector('.thor-button-label');if(label)label.style.background='#ffda83';
  }
  window.thorControls={
+   setActive(value){foreground=value===true;if(!foreground){touches.clear();cancelAuto();}},
+   autoAvailable(){return foreground&&!ability&&!autoPointer&&!touches.size&&Date.now()>=manualUntil;},
+   autoCast(spell,target){
+     if(!settings.autoSpells||!this.autoAvailable()||!spell.el.isConnected||spell.el.getAttribute('aria-disabled')==='true')return false;
+     const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return false;
+     const el=spell.el,r=el.getBoundingClientRect();
+     if(!spell.aimed){event(el,'pointerdown',181,r.left+r.width/2,r.top+r.height/2);event(el,'pointerup',181,r.left+r.width/2,r.top+r.height/2);return true;}
+     const player=window.thorDashboard.playerPosition(),travel=window.thorDashboard.travelState();if(!player||!travel||!target)return false;
+     const held={el,x:player.x,y:player.y,origin:player};autoPointer=held;capture(el);event(el,'pointerdown',182,held.x,held.y);
+     // React must commit the held touch before move and release. Only one cast
+     // is in flight; recheck menus/settings/manual input at both boundaries.
+     const valid=()=>autoPointer===held&&foreground&&el.isConnected&&settings.autoSpells&&!document.hidden&&main===document.querySelector('main')&&main.classList.contains('phase-playing')&&!main.classList.contains('modal-open')&&!document.querySelector('.pause-panel');
+     const point=()=>{const p=window.thorDashboard.playerPosition();if(!p)return false;held.x=held.origin.x+target.x-p.x;held.y=held.origin.y+target.y-p.y;return true;};
+     requestAnimationFrame(()=>{if(!valid()||!point()){if(autoPointer===held)cancelAuto();return;}event(el,'pointermove',182,held.x,held.y);requestAnimationFrame(()=>{if(!valid()||!point()){if(autoPointer===held)cancelAuto();return;}autoPointer=null;event(el,'pointerup',182,held.x,held.y);});});return true;
+   },
    bindings(){return bindings().map(s=>s?{button:s.button,id:s.id,name:s.name,aimed:s.aimed,travel:window.thorSpellBindings.isTravel(s.id)}:null);},
    helperEnabled(){return settings.combatHelper;},
    pad(){pointerUsed=false;refreshCursor();},
-   rightStick(x,y){if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
-   cancel(){finish('pointercancel');window.thorMenu?.clear();},
-   configure(value){settings={...settings,...value};decorate();},
+   rightStick(x,y){if(Math.hypot(x,y)>.16)manual();if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
+   cancel(){manual();finish('pointercancel');window.thorMenu?.clear();},
+   configure(value){settings={...settings,...value};if(!settings.autoSpells)cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true);decorate();},
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
    endPreferences(){if(document.querySelector('.pause-panel'))this.pause();},
    key(key,code,down){
@@ -112,10 +131,11 @@
      const n=Math.max(1,Math.hypot(x,y));lastX=origin.x+x/n*radius;lastY=origin.y+y/n*radius;
      event(zone,'pointermove',177,lastX,lastY);
    },
-   pause(){const el=document.querySelector('.pause-toggle');if(el){const r=el.getBoundingClientRect();event(el,'pointerdown',180,r.left+r.width/2,r.top+r.height/2);event(el,'pointerup',180,r.left+r.width/2,r.top+r.height/2);}},
+   pause(){manual();const el=document.querySelector('.pause-toggle');if(el){const r=el.getBoundingClientRect();event(el,'pointerdown',180,r.left+r.width/2,r.top+r.height/2);event(el,'pointerup',180,r.left+r.width/2,r.top+r.height/2);}},
    button(index,down){
      if(!down&&ability?.index===index){finish('pointerup');return;}
      if(!down)return;
+     manual();
      if(document.querySelector('main')?.classList.contains('modal-open'))return;
      const spell=bindings(true)[index];const el=spell?.el;if(!el||el.getAttribute('aria-disabled')==='true')return;
      const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
@@ -136,13 +156,16 @@
      }
      controls.classList.add('thor-aiming');
      const label=el.querySelector('.thor-button-label');if(label)label.style.background='#ffffff';
-     if(!el.__thorCapture){const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179)real(id)};el.__thorCapture=true;}
+     capture(el);
      event(el,'pointerdown',179,ability.x,ability.y);
      refreshCursor();
      aimFrame=requestAnimationFrame(aimTick);
    }
  };
  document.addEventListener('DOMContentLoaded',()=>{
+   document.addEventListener('pointerdown',e=>{if(e.isTrusted&&!e.target.closest?.('.touch-joystick-zone')){touches.add(e.pointerId);manual();}},true);
+   for(const type of ['pointerup','pointercancel'])document.addEventListener(type,e=>{if(e.isTrusted&&touches.has(e.pointerId)){touches.delete(e.pointerId);manual();}},true);
+   document.addEventListener('visibilitychange',()=>{if(document.hidden){touches.clear();cancelAuto();}});
    px=innerWidth/2;py=innerHeight/2;
    const aimStyle=document.createElement('style');aimStyle.textContent='.thor-aiming .touch-target-line{left:var(--thor-aim-x)!important;top:var(--thor-aim-y)!important;width:var(--thor-aim-distance)!important;transform:translateY(-50%) rotate(var(--thor-aim-angle))!important}.thor-aiming .touch-map-target{left:var(--thor-target-x)!important;top:var(--thor-target-y)!important}';document.head.append(aimStyle);
    const menu=document.createElement('button');menu.id='thor-settings';menu.type='button';menu.textContent='⚙ APK';menu.setAttribute('aria-label',text('Paramètres de jeu et manette'));

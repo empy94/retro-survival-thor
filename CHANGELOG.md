@@ -1,5 +1,12 @@
 # Versions
 
+## 1.10.0 — 9 octobre 2026
+
+- Lancement intelligent facultatif des sorts actifs : buffs, attaques dirigées, placement sur les groupes, repoussement et déplacements de secours évalués. Les sorts passifs déjà automatiques restent gérés par le jeu.
+- Respect des effets actifs et cooldowns ; tous les boutons de sort actifs accessibles, même après six raccourcis. Annulation lors d’une action manuelle, pause, menu, désactivation ou arrière-plan.
+- Planification bornée à 80 ms, un toucher à viser à la fois, relances rejetées temporisées. Aucun état du jeu écrit.
+- Réglage persistant et repère discret traduits FR/EN/ES ; présentation GitHub et captures actualisées.
+
 ## 1.9.0 — 9 octobre 2026
 
 - Pointeur masqué en combat et dans les choix/fenêtres parcourus au pad. Utiliser le stick droit révèle le pointeur dans les menus ; le pad et les changements de fenêtre le masquent. Exception pour la visée précise au pointeur ; le relâchement radial ne fait plus réapparaître le curseur en combat.

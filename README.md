@@ -1,8 +1,35 @@
 # Retro Survival — Android & manettes
 
+**Garde le contrôle. Laisse les sorts t’épauler.**
+
 Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/) avec une manette USB/Bluetooth ou les commandes intégrées d’une console Android comme l’AYN Thor, tout en conservant l’interface tactile du jeu.
 
-**[Télécharger l’APK](https://github.com/parthi1994/retro-survival-thor/releases/latest)**
+**[⬇ Télécharger l’APK Android](https://github.com/parthi1994/retro-survival-thor/releases/latest/download/Retro-Survival-Android.apk)** · [Nouveautés](CHANGELOG.md) · [Installation et commandes](#installation)
+
+## Jouer à ta manière
+
+| Manette & tactile | Visée radiale | Sorts automatiques | Deuxième écran |
+|---|---|---|---|
+| Android 9+, USB/Bluetooth, commandes intégrées | Direction et distance au stick droit | Buffs, cibles et groupes, option facultative | Personnage, cœur de PV, kamas, équipement et collection |
+
+## Nouveauté · Assistance des sorts
+
+Active **Select / ⚙ APK → Lancement intelligent des sorts**, puis concentre-toi sur tes déplacements et tes choix. L’option est désactivée par défaut. Un discret repère « Sorts auto » indique son activation.
+
+- **Buffs prêts à temps** : bouclier, vitesse, Science du Bâton et Puissance, sans relancer un effet encore actif. Invisibilité réservée au danger.
+- **Zones et attaques dirigées** : cible les groupes accessibles, choisit une direction pour les attaques en ligne et évite de superposer les pièges au même endroit. La portée suit les améliorations.
+- **Survie** : repousse à proximité et propose une Téléportation/Bond seulement quand une destination évaluée paraît moins exposée. Évite un retour ou un échange avec le double plus dangereux.
+- **Tu gardes la main** : tes sorts, le stick droit et le tactile sont prioritaires. Aucun lancer pendant la pause, les paramètres, les choix ou hors de l’application.
+
+Les sorts déjà automatiques du jeu gardent leur fonctionnement. L’assistance concerne tous les sorts actifs affichés, même au-delà des six raccourcis de manette. Elle utilise les commandes tactiles originales : le jeu conserve ses règles, ses animations, ses cooldowns et ses validations de terrain. Le déplacement et les améliorations restent sous ton contrôle.
+
+C’est une aide fondée sur des priorités et des positions, pas une garantie de survie : obstacles, attaques à venir et toutes les synergies ne sont pas prédits. Les déplacements automatiques peuvent être corrigés par le terrain du jeu.
+
+| Assistance activée en combat | Option dans les paramètres |
+|---|---|
+| ![Sorts automatiques en combat réel sur Thor](docs/screenshots/sorts-auto-combat.png) | ![Réglage de lancement intelligent, désactivable](docs/screenshots/sorts-auto-parametres.png) |
+
+Captures réelles de l’APK signée 1.10.0 : Glyphe d’Immobilisation et Science du Bâton en récupération, après leurs lancers automatiques. Le calcul est limité à une décision toutes les 80 ms, un lancer à la fois et un nombre borné de cibles ; aucun traitement d’image ni appel réseau pour la visée. [Essais et limites des mesures](VALIDATION.md).
 
 ## Aperçu sur AYN Thor
 
@@ -10,7 +37,7 @@ Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/)
 
 ![Gameplay animé sur AYN Thor : combat sur l’écran du haut et fiche de personnage actualisée sur l’écran du bas](docs/screenshots/thor-gameplay.gif)
 
-10 secondes de gameplay réel capturé sur les deux écrans du Thor, intégré dans le visuel de la console. GIF en boucle, sans son, environ 2,1 Mo.
+Aperçu historique (avant les sorts automatiques) : 10 secondes de gameplay réel capturé sur les deux écrans du Thor, intégré dans le visuel de la console. GIF en boucle, sans son, environ 2,1 Mo.
 
 **Paramètres et détails d’équipement.**
 
@@ -39,6 +66,8 @@ Le jeu actuel conserve le **Dofawa (Astrub)** et le **Dofus Cawotte (île Wabbit
 Aucun Dofus associé à Litneg n’a été trouvé dans le code actuel. D’autres équipements rares existent, notamment Kritter et Casque du Chafer dans les butins de Kruorre, mais ils ne sont pas conservés entre les parties : le démarrage d’une partie réinitialise l’équipement et reprend uniquement les Dofus collectés. [Vérification des règles et sources](docs/collection.md).
 
 ## Deux écrans, deux usages
+
+![Fiche actuelle : cœur de PV, symbole des kamas et collection permanente](docs/screenshots/fiche-personnage-actuelle.png)
 
 L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche une fiche de personnage, dans les couleurs et le style du menu de caractéristiques du jeu :
 

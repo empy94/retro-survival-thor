@@ -27,6 +27,10 @@ Le joystick visuel est ancré en bas à gauche ; les étiquettes X/Y/L1/R1/L2/R2
 
 La sauvegarde locale de cette application est distincte de celle de Chrome. Les fichiers et sauvegardes Chrome existants ne sont pas modifiés. Pour conserver les données de cette application, la mettre à jour avec installation de remplacement plutôt que la désinstaller.
 
+## Assistance des sorts (1.10.0)
+
+**Select / ⚙ APK → Lancement intelligent des sorts** active une aide facultative, désactivée par défaut : buffs disponibles, attaques et zones sur les monstres, repoussement et déplacements de secours évalués. Tu gardes le déplacement et les choix. Les sorts déjà automatiques restent gérés par le jeu. Le stick droit, les sorts manuels et les actions tactiles sont prioritaires ; les lancers cessent dans les menus, en pause et hors de l’application. L’aide utilise les commandes du jeu et ne garantit pas la survie.
+
 ## Vérification sur le Thor
 
 - Appareil identifié en direct : AYN_Thor, Android 13.

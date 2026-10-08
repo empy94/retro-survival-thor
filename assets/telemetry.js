@@ -22,6 +22,18 @@
    return {live,hud};
  }
  window.thorDashboard={
+ combatState(){
+   if(!this.playerPosition())return null;
+   const s=liveRef.current,p=s.player;
+   const copy=(o,keys)=>Object.fromEntries(keys.map(k=>[k,Number(o?.[k])||0]));
+   return {phase:s.phase,width:s.width,height:s.height,player:copy(p,['x','y','hp','maxHp','rollTimer','hurtTimer','shieldTimer','speedBoostTimer','teleportReturnTimer','teleportReturnX','teleportReturnY']),
+     busy:!!s.wabbitTravel||(s.wabbitPlayerArrival||0)>0||[s.characterCastTimer,s.glyphCastTimer,s.shieldCastTimer,s.speedCastTimer,s.feca?.scienceCastTimer,s.feca?.glyphCastTimer,p.rollTimer,p.hurtTimer].some(v=>v>0),
+     upgrades:copy(s.upgrades,['dashRange','jumpRange','staffRange','cutRange','liberationRadius']),awakenings:{...s.awakenings},
+     buffs:{science:s.feca?.scienceTimer||0,power:s.powerTimer||0,invisible:s.sram?.invisible||0},
+     double:s.sram?.double?.hp>0&&s.sram.double.life>0?copy(s.sram.double,['x','y','swapCooldown']):null,
+     traps:(s.sram?.traps||[]).filter(t=>t.life>0).slice(0,72).map(t=>copy(t,['x','y'])),
+     enemies:(s.enemies||[]).filter(e=>e.hp>0&&e.state!=='dead'&&!(e.invisibleTimer>0)&&!(e.arrival>0)).slice(0,128).map(e=>copy(e,['x','y','r','hp']))};
+ },
  travelState(){
    const position=this.playerPosition();if(!position)return null;
    const live=liveRef.current,rect=liveCanvas.getBoundingClientRect(),scaleX=rect.width/live.width,scaleY=rect.height/live.height;
