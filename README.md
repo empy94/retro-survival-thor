@@ -8,7 +8,9 @@ Joue à [Retro Survival](https://retrosurvival.online/) sur téléphone, tablett
 
 Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
-![Combat sur Android avec assistance des sorts](docs/screenshots/sorts-auto-combat.png)
+![Gameplay réel sur les deux écrans du Thor : combat et visée radiale](docs/screenshots/thor-gameplay.gif)
+
+10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
 ## Trois façons de jouer
 
@@ -42,6 +44,10 @@ Exemples du mode radial sur Thor, capturés avec l’interface des versions 1.5/
 ## Un second écran utile, si tu en as un
 
 Sur un appareil compatible comme le Thor : cœur de PV, kamas, caractéristiques, équipement et collection permanente. Sur téléphone ou tablette, le jeu fonctionne sur un seul écran.
+
+| Combat en haut, fiche en bas | Visée radiale au stick droit |
+|---|---|
+| ![AYN Thor avec gameplay et fiche du personnage sur ses deux écrans](docs/screenshots/thor-dual-combat.png) | ![AYN Thor avec visée radiale et fiche du personnage sur ses deux écrans](docs/screenshots/thor-dual-radial.png) |
 
 | Paramètres de l’assistance | Fiche du second écran |
 |---|---|

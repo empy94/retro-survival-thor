@@ -1,16 +1,18 @@
 # Visuels de présentation
 
-Les deux mises en situation du README ont été composées avec l’outil intégré **ImageGen**, à partir de captures réelles de l’application et d’une référence du boîtier noir issue de la [fiche officielle AYN Thor](https://www.ayntec.com/products/ayn-thor). Ce sont des illustrations de présentation ; les captures originales restent accessibles séparément dans le README.
+Le README utilise désormais deux images et un GIF issus d’une partie réelle enregistrée le 9 octobre 2026 sur l’APK **1.11.0**. Les vidéos des deux écrans sont intégrées avec FFmpeg dans les ouvertures d’un visuel du Thor. Le gameplay et la fiche du personnage sont ceux de l’appareil, sans régénération par IA.
 
-Fichiers : [Thor en partie](screenshots/thor-gameplay.png), [Thor avec paramètres et détail d’équipement](screenshots/thor-settings.png).
+Fichiers actuels : [Combat et fiche](screenshots/thor-dual-combat.png), [Visée radiale et fiche](screenshots/thor-dual-radial.png), [Gameplay animé](screenshots/thor-gameplay.gif).
+
+Le boîtier de présentation provient du montage initial réalisé avec **ImageGen**, à partir de la [fiche officielle AYN Thor](https://www.ayntec.com/products/ayn-thor). Il s’agit d’une mise en situation, pas d’une photographie de l’appareil. Les anciens visuels [Thor en partie](screenshots/thor-gameplay.png) et [Thor avec paramètres](screenshots/thor-settings.png) sont conservés comme sources, mais ne sont plus affichés dans le README.
 
 Les illustrations du jeu restent la propriété de leurs auteurs et ayants droit ; la référence du matériel provient d’AYN.
 
 ## GIF de gameplay
 
-[Présentation animée](screenshots/thor-gameplay.gif) : 10 secondes, 960 × 640 pixels, 10 images par seconde, boucle infinie, sans son, environ 2,1 Mo.
+[Présentation animée](screenshots/thor-gameplay.gif) : 10 secondes, 960 × 640 pixels, 10 images par seconde, boucle infinie, sans son, environ 2,3 Mo.
 
-Les deux écrans physiques du Thor ont été enregistrés simultanément pendant 20 secondes, alors que l’utilisateur jouait. Le montage conserve un passage de 10 secondes et place les vidéos réelles dans les deux ouvertures du visuel du Thor, avec correction de perspective et masques. Le montage et la conversion en GIF ont été réalisés avec FFmpeg ; le contenu des vidéos n’a pas été régénéré par IA.
+Les deux écrans physiques du Thor ont été enregistrés simultanément pendant 20 secondes, alors que l’utilisateur jouait. Le montage conserve les secondes 8 à 18 : combat, maintien de téléportation avec visée radiale et déplacements. Il place les vidéos réelles dans les deux ouvertures du visuel du Thor, avec correction de perspective et masques. Le montage et la conversion en GIF ont été réalisés avec FFmpeg ; les deux images fixes sont extraites de ce même montage.
 
 Les deux fichiers vidéo temporaires ont été transférés sur le PC, puis supprimés du Thor. Leur absence sur l’appareil a été vérifiée. Le dépôt contient uniquement le GIF de présentation, pas les vidéos sources.
 
