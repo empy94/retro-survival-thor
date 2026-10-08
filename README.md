@@ -6,11 +6,15 @@ Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/)
 
 ## Aperçu sur AYN Thor
 
-Captures réelles de l’application sur AYN Thor.
+**Le jeu en haut, le personnage en bas.**
 
-**Version 1.2.0 : fiche de personnage sur l’écran du bas**
+![Retro Survival dans les deux écrans d’un AYN Thor : partie en haut, PV, kamas et équipement en bas](docs/screenshots/thor-gameplay.png)
 
-![PV, kamas, caractéristiques et équipement sur l’écran inférieur du Thor](docs/screenshots/personnage.png)
+**Paramètres et détails d’équipement.**
+
+![AYN Thor avec les paramètres sur l’écran supérieur et les effets de l’équipement sur l’écran inférieur](docs/screenshots/thor-settings.png)
+
+Visuels de présentation générés à partir des captures de l’application et d’une référence du Thor. Les captures originales sont disponibles dans la galerie ci-dessous. [Création des visuels et référence AYN](docs/visuels.md).
 
 ## Deux écrans, deux usages
 
@@ -21,33 +25,30 @@ L’écran du haut conserve le jeu et ses commandes. L’écran du bas affiche u
 - Équipement porté : coiffe, cape, amulette, arme, bouclier, ceinture, bottes, anneaux et Dofus.
 - Toucher un objet équipé pour lire ses effets ; faire défiler la colonne si nécessaire.
 
-![Effets du chapeau équipé consultés au toucher sur l’écran inférieur](docs/screenshots/equipement-detail.png)
-
 Les informations s’actualisent deux fois par seconde. Aucun bouton de commande n’est dupliqué sur l’écran inférieur. La fiche se désactive dans **Select / ⚙ Thor → Personnage sur l’écran du bas**. Sur un appareil sans écran secondaire compatible, le jeu fonctionne avec un seul écran.
 
 La fiche lit les informations disponibles dans le jeu, sans modifier la partie. Si le site change et que ces informations deviennent inaccessibles, elle indique qu’elles sont indisponibles plutôt que d’afficher des valeurs inventées.
 
-**Paramètres de la version 1.2.0**
+<details>
+<summary>Voir les captures originales sur le Thor</summary>
 
-![Paramètres avec activation de la fiche sur l’écran du bas](docs/screenshots/parametres-dual.png)
+Captures réelles de la version 1.2.0, avant mise en situation dans les visuels du Thor.
 
-Les captures suivantes présentent les commandes et l’interface de la version 1.1.0.
+| Fiche de personnage | Effets de l’équipement |
+|---|---|
+| ![PV, kamas et caractéristiques](docs/screenshots/personnage.png) | ![Effets du chapeau équipé](docs/screenshots/equipement-detail.png) |
 
-**Accueil du jeu avec accès aux paramètres Thor**
+![Paramètres de la version 1.2.0](docs/screenshots/parametres-dual.png)
 
-![Accueil de Retro Survival sur AYN Thor](docs/screenshots/accueil.png)
+Commandes et interface de la version 1.1.0 :
 
-**Déplacement : joystick visuel dans le coin inférieur gauche**
+| Accueil | Joystick en bas à gauche |
+|---|---|
+| ![Accueil du jeu](docs/screenshots/accueil.png) | ![Joystick visuel pendant le déplacement](docs/screenshots/joystick.png) |
+| **Touche X sur un sort débloqué** | **Réglage des repères** |
+| ![Repère X sur le sort](docs/screenshots/sorts.png) | ![Paramètres des repères](docs/screenshots/parametres.png) |
 
-![Partie avec le joystick visuel en bas à gauche](docs/screenshots/joystick.png)
-
-**Sort actif débloqué avec le repère X et pointeur doré**
-
-![Sort actif avec son bouton X en transparence](docs/screenshots/sorts.png)
-
-**Paramètres : affichage des touches, opacité et joystick visuel**
-
-![Menu des paramètres AYN Thor](docs/screenshots/parametres.png)
+</details>
 
 ## Installation
 
