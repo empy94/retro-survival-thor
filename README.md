@@ -8,13 +8,15 @@ Un lanceur Android pour jouer à [Retro Survival](https://retrosurvival.online/)
 
 **Le jeu en haut, le personnage en bas.**
 
-![Retro Survival dans les deux écrans d’un AYN Thor : partie en haut, PV, kamas et équipement en bas](docs/screenshots/thor-gameplay.png)
+![Gameplay animé sur AYN Thor : combat sur l’écran du haut et fiche de personnage actualisée sur l’écran du bas](docs/screenshots/thor-gameplay.gif)
+
+10 secondes de gameplay réel capturé sur les deux écrans du Thor, intégré dans le visuel de la console. GIF en boucle, sans son, environ 2,1 Mo.
 
 **Paramètres et détails d’équipement.**
 
 ![AYN Thor avec les paramètres sur l’écran supérieur et les effets de l’équipement sur l’écran inférieur](docs/screenshots/thor-settings.png)
 
-Visuels de présentation générés à partir des captures de l’application et d’une référence du Thor. Les captures originales sont disponibles dans la galerie ci-dessous. [Création des visuels et référence AYN](docs/visuels.md).
+Le boîtier est un visuel de présentation généré à partir d’une référence du Thor. Les deux écrans du GIF montrent les enregistrements réels de l’application. Les captures originales sont disponibles dans la galerie ci-dessous. [Création des visuels et référence AYN](docs/visuels.md).
 
 ## Deux écrans, deux usages
 

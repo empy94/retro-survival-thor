@@ -6,6 +6,14 @@ Fichiers : [Thor en partie](screenshots/thor-gameplay.png), [Thor avec paramètr
 
 Les illustrations du jeu restent la propriété de leurs auteurs et ayants droit ; la référence du matériel provient d’AYN.
 
+## GIF de gameplay
+
+[Présentation animée](screenshots/thor-gameplay.gif) : 10 secondes, 960 × 640 pixels, 10 images par seconde, boucle infinie, sans son, environ 2,1 Mo.
+
+Les deux écrans physiques du Thor ont été enregistrés simultanément pendant 20 secondes, alors que l’utilisateur jouait. Le montage conserve un passage de 10 secondes et place les vidéos réelles dans les deux ouvertures du visuel du Thor, avec correction de perspective et masques. Le montage et la conversion en GIF ont été réalisés avec FFmpeg ; le contenu des vidéos n’a pas été régénéré par IA.
+
+Les deux fichiers vidéo temporaires ont été transférés sur le PC, puis supprimés du Thor. Leur absence sur l’appareil a été vérifiée. Le dépôt contient uniquement le GIF de présentation, pas les vidéos sources.
+
 ## Prompt du visuel en partie
 
 Create ONE polished product mockup image for the GitHub README of Retro Survival on AYN Thor. Reference 1 is the actual black AYN Thor hardware: preserve its real clamshell construction, hinge, top widescreen, smaller centered bottom display, left upper stick and lower D-pad, right upper XYAB buttons and lower stick, speaker slits. Show just ONE open black Thor, centered and large, near straight-on front view with only a very slight elevated angle so BOTH screens are fully visible, minimally foreshortened and legible. Reference 2 is the REAL gameplay screenshot: inset this screenshot precisely inside the top display, retaining its full framing, game illustration and HUD. Reference 3 is the REAL character dashboard screenshot: inset this exact screenshot inside the bottom display, retaining its parchment layout, French typography, 4/5 PV, 100 kamas, +30% attack speed and yellow Piou hat. Treat the supplied screenshot contents as locked screen textures, not as content to redesign or invent. Correct screen placement is the whole purpose: gameplay above, character sheet below, with physical controls surrounding the lower screen. No detached screenshots, no duplicate handheld, no outside labels, no new UI elements, no text added outside the device, no Nintendo marks. Dark forest green studio background with subtle soft olive ambient light, refined warm gold rim lighting on the device, realistic matte black plastic, clean professional product lighting and soft shadow. Composition landscape 3:2 with the full device visible and narrow breathing room, device filling most of the canvas. Preserve the original aspect ratios of both screen textures and all important text. This is a clearly staged product visualization, not a photograph of the user's real device.
