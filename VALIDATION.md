@@ -1,3 +1,12 @@
+# Version 1.18.0 — 9 octobre 2026
+
+- Révision officielle `page-2MA4kA44.js`, SHA-256 `fbe576762c5685fcd399a879391b29a8b5b62106fac1664ab16bacc2246fe677`. Les symboles ont été renommés ; les adaptations de cette révision sont désormais distinctes de celles des trois révisions antérieures.
+- Bug Brokle : le tactile natif traite Brokle comme un lancement au relâchement, y compris sans Saut Dirigé. Le lanceur émettait alors pointerdown/pointerup comme pour un sort instantané, sans laisser React établir la visée. Correction du routage et de l’assistance ; portée zéro pour un impact sur place, 220 pour Saut Dirigé.
+- Treize suites JavaScript et cinq tests Java réussis. Modes de lancement comparés au tableau natif cO pour les 51 sorts × quatre états d’évolution ; exception du Glyphe Enflammé correctement conservée. Tests du maintien/relâchement de Brokle, sélection des modules, vente et capture du contexte de la nouvelle révision.
+- Dans la WebView réelle du Thor, build de vérification : partie Iop, Brokle débloqué par son choix natif. Circuit JavaScript de la manette controller(R1, true/false) : effet natif de Brokle créé (compteur 4 → 5), incantation 0,7828 s, puis récupération observée à 4,9991 s. Test effectué via la même entrée que les commandes Android, pas par un appui physique de l’utilisateur.
+- Extension reconnue avec 14 caractéristiques natives dans le nouveau moteur. APK finale signée 1.18.0 / code 26 installée par-dessus l’existante, débogage désactivé ; SHA-256 `c697821cf2bdb03cc84e1c204a062c4d52c6b829c575036949f2a8525207fcc9`. Extension 1.2.0 installée également.
+- Limites : modes de lancement de tous les sorts contrôlés par tests ; pas de partie complète avec chaque évolution ni d’essai physique de toutes les touches/manettes. Aucun autre écart de mode de lancement détecté dans le tableau actuel.
+
 # Version 1.17.2 — 9 octobre 2026
 
 - Une nouvelle révision officielle est apparue pendant l’installation de la 1.17.1 : `page-BNONV-CU.js`, SHA-256 `4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca`. Les 67 fonctions des adaptations sont textuellement identiques aux versions auditées. Changements hors adaptation : Mutilation, pause/abandon et composant Nk.

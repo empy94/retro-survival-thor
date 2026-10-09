@@ -29,7 +29,7 @@ assert.equal(new Set(slots.filter(Boolean).map(s=>s.button)).size,20);
 // Exercise real input routing: another button release must not launch a held glyph.
 const received=[];
 const surface={append(){},getBoundingClientRect:()=>({left:0,top:0}),classList:{add(){},remove(){}},style:{setProperty(){}}};
-const buttons=['shield','burningGlyph','immobilizationGlyph'].map(id=>({
+const buttons=['shield','burningGlyph','immobilizationGlyph','brokle'].map(id=>({
  isConnected:true,closest:()=>surface,
  __reactFiberTest:{key:id},setPointerCapture(){},
  getAttribute(name){return name==='aria-label'?id:null;},
@@ -50,3 +50,14 @@ controls.button(2,false);assert.deepEqual(received.at(-1),['burningGlyph','point
 controls.button(2,true);controls.cancel();controls.button(2,false);
 assert.deepEqual(received.at(-1),['burningGlyph','pointercancel',179]);
 console.log('Spell mapping and held-input ownership: passed');
+
+for(const evolution of [null,1,2,3])assert(mapping.needsAim('brokle',{brokle:evolution}));
+assert.equal(mapping.radialSpec('brokle',{},{}).distance,0);
+assert.equal(mapping.radialSpec('brokle',{},{brokle:1}).distance,220);
+controls.button(4,true);assert.deepEqual(received.at(-1),['brokle','pointerdown',179]);
+const beforeRelease=received.length;controls.button(4,false);assert.equal(received.length,beforeRelease+1);assert.deepEqual(received.at(-1),['brokle','pointerup',179]);
+const nativeAimed=['dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','celestialSword','iopSword','brokle','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear','arnaque'];
+const policy=require('../assets/spell-policy.js');
+for(const id of Object.keys(policy.catalog.spells))for(const evolution of [null,1,2,3]){
+ assert.equal(mapping.needsAim(id,{[id]:evolution}),nativeAimed.includes(id)&&!(id==='burningGlyph'&&evolution===2),'Native touch contract: '+id+' evolution '+evolution);
+}

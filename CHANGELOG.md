@@ -1,3 +1,10 @@
+## 1.18.0 — Brokle à la manette
+
+- Brokle utilise désormais le lancement natif au relâchement pour toutes ses évolutions. Sans Saut Dirigé, il reste centré sur le personnage ; avec Saut Dirigé, la visée conserve la portée de 220.
+- Même correction pour l’assistance automatique ; indication « Relâcher pour lancer » lorsque Brokle frappe sur place.
+- Contrôle des modes de lancement des 51 sorts et de leurs évolutions, dont le Glyphe Enflammé instantané après son évolution.
+- Prise en charge de la nouvelle révision officielle et adaptation séparée de ses symboles, avec conservation des trois révisions précédentes auditées.
+
 ## 1.17.2 — dernière révision officielle
 
 - Prise en charge de `page-BNONV-CU.js`, révision supplémentaire publiée pendant l’installation. Les 67 fonctions des adaptations sont toujours identiques.

@@ -5,6 +5,7 @@ public class GameModuleVersionsTest {
   if(!GameModuleVersions.supported("4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca")||!GameModuleVersions.supported(old)||!GameModuleVersions.supported(current)||GameModuleVersions.supported("unknown"))throw new AssertionError("audited builds");
   if(!GameModuleVersions.companionSupports(old+"\n"+current,current)||!GameModuleVersions.companionSupports(old,old))throw new AssertionError("companion compatibility");
   if(GameModuleVersions.companionSupports(old,current)||GameModuleVersions.companionSupports("prefix"+current,current)||GameModuleVersions.companionSupports("unknown","unknown")||GameModuleVersions.companionSupports(null,current))throw new AssertionError("exact-match guard");
+  String latest="fbe576762c5685fcd399a879391b29a8b5b62106fac1664ab16bacc2246fe677";if(!GameModuleVersions.current(latest)||!GameModuleVersions.supported(latest)||!GameModuleVersions.companionSupports(old+"\n"+latest,latest)||GameModuleVersions.current(old))throw new AssertionError("current hook selection");
   System.out.println("Audited game versions and companion compatibility passed");
  }
 }

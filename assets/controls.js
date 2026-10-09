@@ -36,7 +36,7 @@
      if(!spell){label?.remove();return;}
      if(!label){label=document.createElement('span');label.className='thor-button-label';label.setAttribute('aria-hidden','true');label.style.cssText='position:absolute;right:3px;top:3px;z-index:3;border:1px solid #ffe4a0;border-radius:5px;padding:2px 4px;background:#ffda83;color:#18221b;font:900 11px/1.15 sans-serif;pointer-events:none;box-shadow:0 1px 3px #0008';if(getComputedStyle(el).position==='static')el.style.position='relative';el.append(label);}
      if(label.textContent!==spell.button)label.textContent=spell.button;
-     label.title=spell.aimed?text('Maintenir, viser au stick droit, relâcher'):text('Appuyer pour lancer');
+     label.title=spell.id==='brokle'&&window.thorDashboard?.abilities().awakenings?.brokle!==1?text('Relâcher pour lancer'):spell.aimed?text('Maintenir, viser au stick droit, relâcher'):text('Appuyer pour lancer');
      label.style.display=settings.showLabels?'':'none';label.style.opacity=String(settings.labelOpacity);
    });
    const z=document.querySelector('.touch-joystick-zone');if(z)z.style.opacity=settings.showJoystick?'1':'0';
@@ -79,7 +79,7 @@
    style.setProperty('--thor-aim-x',(p.player.x-p.rect.left)+'px');style.setProperty('--thor-aim-y',(p.player.y-p.rect.top)+'px');
    style.setProperty('--thor-aim-distance',Math.hypot(p.dx,p.dy)+'px');style.setProperty('--thor-aim-angle',Math.atan2(p.dy,p.dx)+'rad');
    style.setProperty('--thor-target-x',(p.targetX-p.rect.left)+'px');style.setProperty('--thor-target-y',(p.targetY-p.rect.top)+'px');
-   if(ability.radius){const ring=ability.radius.style;ring.left=(p.player.x-p.rect.left)+'px';ring.top=(p.player.y-p.rect.top)+'px';ring.width=p.range*p.travel.scaleX*2+'px';ring.height=p.range*p.travel.scaleY*2+'px';ring.display=p.range&&p.showRange?'':'none';const caption=p.fixed||(ability.variable?text('Stick droit : direction et distance'):text('Stick droit : direction'));if(ability.caption.textContent!==caption)ability.caption.textContent=caption;ability.caption.style.left=(p.player.x-p.rect.left)+'px';ability.caption.style.top=(p.player.y-p.rect.top+20)+'px';}
+   if(ability.radius){const ring=ability.radius.style;ring.left=(p.player.x-p.rect.left)+'px';ring.top=(p.player.y-p.rect.top)+'px';ring.width=p.range*p.travel.scaleX*2+'px';ring.height=p.range*p.travel.scaleY*2+'px';ring.display=p.range&&p.showRange?'':'none';const caption=p.fixed||(p.range===0?text('Relâcher pour lancer'):ability.variable?text('Stick droit : direction et distance'):text('Stick droit : direction'));if(ability.caption.textContent!==caption)ability.caption.textContent=caption;ability.caption.style.left=(p.player.x-p.rect.left)+'px';ability.caption.style.top=(p.player.y-p.rect.top+20)+'px';}
  }
  function aimTick(){aimFrame=null;updateAim();if(ability)aimFrame=requestAnimationFrame(aimTick);}
  function finish(type){

@@ -25,9 +25,9 @@
        if(best)add(spell,best,900);continue;
      }
      if(id==='sramDouble'&&s.double)continue;
-     if(id==='liberation'||id==='intimidation'||id==='brokle'&&!spell.aimed||id==='burningGlyph'&&!spell.aimed){
+     if(id==='liberation'||id==='intimidation'||id==='brokle'&&s.awakenings.brokle!==1||id==='burningGlyph'&&!spell.aimed){
        const range=id==='liberation'?150*(1+(s.upgrades.liberationRadius||0)*.15):id==='intimidation'?125:110;
-       if(nearest<=range)add(spell,null,id==='liberation'&&urgent?850:120);continue;
+       if(nearest<=range)add(spell,id==='brokle'?{x:p.x,y:p.y}:null,id==='liberation'&&urgent?850:120);continue;
      }
      if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&s.character==='enutrof'&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;

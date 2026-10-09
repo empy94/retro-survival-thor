@@ -161,7 +161,7 @@ public class MainActivity extends Activity {
      HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setConnectTimeout(15000);connection.setReadTimeout(20000);String source;try(InputStream in=connection.getInputStream()){source=read(in);}finally{connection.disconnect();}if(source.length()>4000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
      if(!GameModuleVersions.supported(hash.toString()))return null;
-     try(InputStream hook=getAssets().open("native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(companion.supportsGameModule(hash.toString())?companion.get("moduleHook"):"");adaptedUrl=url;}
+     try(InputStream hook=getAssets().open(GameModuleVersions.current(hash.toString())?"native-module-hook-current.js":"native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(companion.supportsGameModule(hash.toString())?companion.get(GameModuleVersions.current(hash.toString())?"moduleHookCurrent":"moduleHook"):"");adaptedUrl=url;}
    }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));}catch(Exception ex){android.util.Log.w("ThorRetro","Game adapter unavailable",ex);return null;}
  }
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}

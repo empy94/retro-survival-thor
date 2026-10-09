@@ -17,7 +17,7 @@ final class CompanionModule {
    ProviderInfo provider=manager.resolveContentProvider(authority,0);if(provider==null||!provider.packageName.equals(service.packageName))continue;
    Bundle result=context.getContentResolver().call(Uri.parse("content://"+authority),"load",null,null);
    if(result==null||result.getInt("protocol")!=1||!result.getBoolean("enabled"))continue;
-   for(String key:new String[]{"bootstrap","panelScript","panelStyle","moduleHook","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
+   for(String key:new String[]{"bootstrap","panelScript","panelStyle","moduleHook","moduleHookCurrent","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
    data=result;break;
   }catch(Exception ignored){}
  }
