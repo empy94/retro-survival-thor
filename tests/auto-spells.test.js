@@ -63,3 +63,5 @@ let targetRead=null;runtimeWindow.thorDashboard.combatState=include=>{targetRead
 auto.configure('full');timer();assert.equal(targetRead,true);assert.equal(attempts,3);
 auto.configure('off');assert.equal(timer,null);
 console.log('Buff mode: cast when available without monsters, no attacks/travel, no active-buff cancellation, mode switches and no target reads passed');
+
+assert.equal(choose({...base,character:'enutrof'},['shovelJudgment']).spell.id,'shovelJudgment');assert.equal(choose({...base,character:'enutrof',summons:{chest:true}},['animatedChest']),null);assert.equal(choose({...base,buffs:{acceleration:3}},['acceleration']),null);assert.equal(choose(base,['brokle']).target,null);assert.equal(choose({...base,busy:true,character:'enutrof'},['corruption']),null);

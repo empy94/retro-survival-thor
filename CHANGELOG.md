@@ -1,3 +1,11 @@
+## 1.17.0 — contenu du 9 octobre 2026
+
+- Adaptation au nouveau moteur officiel, avec contrôle de version partagé entre l’application et l’extension.
+- Enutrof/Sufokia, 51 sorts, 186 équipements et quatre Dofus dans les listes et l’écran secondaire.
+- Nouveaux sorts Iop/Sram, sorts devenant passifs après évolution, visée d’Arnaque/Brokle et portées natives de Bond/Téléportation.
+- Accents français corrigés dans les noms, effets et collection ; contrôle d’encodage ajouté aux tests.
+- Icônes des exemplaires d’équipement distinguées par leurs jets. La vente facultative conserve les règles natives de la nouvelle version.
+
 ## 1.16.0 — équipement et alertes de mise à jour
 
 - Icônes, noms et effets d’équipement lus à partir de l’identité réelle des objets dans le HUD, indépendamment du nom des images. Titre de colonne conservé pendant le défilement.

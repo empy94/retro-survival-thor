@@ -12,6 +12,8 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
+**Mise à jour 1.17.0 :** nouveau contenu Enutrof, Iop et Sram, 186 équipements, quatre Dofus et accents français corrigés.
+
 ## Trois façons de jouer
 
 Dans **⚙ APK / Select → Assistance des sorts** :
@@ -75,7 +77,7 @@ Sorts et raccourcis capturés sur l’APK **1.13.0** signée ; Options sur **1.1
 
 Pour une mise à jour, installe par-dessus l’application existante. Sa sauvegarde est distincte de Chrome. **⚙ APK → Exporter / Restaurer la progression** permet de garder une copie des cartes débloquées, records et objets permanents.
 
-**Android 16 : utilise la version 1.13.2 ou plus récente.** La cible Android a été actualisée pour corriger l’alerte « ancienne version d’Android ». Play Protect peut encore proposer une analyse de cette APK distribuée hors Play Store : laisse cette protection activée. L’application demande uniquement l’accès Internet. [Explication Google](https://developers.google.com/android/play-protect/warning-dev-guidance).
+**Android 16 : utilise la version 1.13.2 ou plus récente.** La cible Android a été actualisée pour corriger l’alerte « ancienne version d’Android ». Play Protect peut encore proposer une analyse de cette APK distribuée hors Play Store : laisse cette protection activée. L’application utilise Internet et peut afficher une notification de mise à jour si tu actives cette option. [Explication Google](https://developers.google.com/android/play-protect/warning-dev-guidance).
 
 [Guide complet](docs/guide.md) · [Nouveautés](CHANGELOG.md) · [Tests et limites](VALIDATION.md) · [Code et compilation](docs/guide.md#construire-lapplication)
 

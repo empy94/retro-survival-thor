@@ -1,7 +1,7 @@
 (function(root){'use strict';
  // Heuristic planner in game coordinates. Original touch handlers remain the
  // sole authority for cooldowns, terrain, damage and valid placements.
- const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible'};
+ const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration'};
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
  function plan(s,spells,mapping,mode='full'){
    if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
@@ -25,13 +25,13 @@
        if(best)add(spell,best,900);continue;
      }
      if(id==='sramDouble'&&s.double)continue;
-     if(id==='liberation'||id==='intimidation'||id==='burningGlyph'&&!spell.aimed){
+     if(id==='liberation'||id==='intimidation'||id==='brokle'&&!spell.aimed||id==='burningGlyph'&&!spell.aimed){
        const range=id==='liberation'?150*(1+(s.upgrades.liberationRadius||0)*.15):id==='intimidation'?125:110;
        if(nearest<=range)add(spell,null,id==='liberation'&&urgent?850:120);continue;
      }
-     if(!spec)continue;
+     if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&s.character==='enutrof'&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
-     const directional=['staffBoomerang','cut','swordOfFate','fear'].includes(id);
+     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque'].includes(id);
      const radius=id==='massTrap'?57.5:id==='celestialSword'?105:id==='lethalAttack'?80:id==='immobilizationGlyph'||id==='burningGlyph'?100:60;
      let best=null,bestScore=0;
      // Limit quadratic cluster work: 24 nearest candidate centers, up to 128
@@ -59,7 +59,7 @@
    const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return;
    const start=performance.now(),now=Date.now(),s=root.thorDashboard?.combatState(mode!=='buffs');
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))],id=null;for(let i=0;f&&i<4;i++,f=f.return){if(f.key){id=f.key;break;}}return {el,id,ready:el.getAttribute('aria-disabled')!=='true'&&now-(lastAttempt.get(id)||0)>=800,aimed:root.thorSpellBindings.needsAim(id,s?.awakenings||{})};});
-   const eligible=root.thorSpellPolicy?spells.filter(spell=>root.thorSpellPolicy.allowed(spell.id,s?.character,mode,manual)):spells;
+   const eligible=root.thorSpellPolicy?spells.filter(spell=>root.thorSpellPolicy.allowed(spell.id,s?.character,mode,manual,s?.awakenings)):spells;
    const chosen=plan(s,eligible,root.thorSpellBindings,mode);lastMs=performance.now()-start;if(!chosen)return;
    const travel=chosen.target?root.thorDashboard.travelState():null;if(chosen.target&&!travel)return;
    const target=chosen.target?{x:travel.x+(chosen.target.x-s.player.x)*travel.scaleX,y:travel.y+(chosen.target.y-s.player.y)*travel.scaleY}:null;

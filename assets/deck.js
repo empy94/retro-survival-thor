@@ -17,18 +17,18 @@
 (function(){'use strict';
  const el=id=>document.getElementById(id),text=value=>window.thorLocale?.text(value)||value;
  let page=0,character='feca',chosenClass=false,data={},signature='',optionsSignature='',start=null,skipClick=false;
- const classes={feca:'Féca',iop:'Iop',sram:'Sram'};
+ const classes={feca:'Féca',iop:'Iop',sram:'Sram',enutrof:'Enutrof'};
  function showPage(next){window.thorDeckChoice.close();const pages=[...document.querySelectorAll('.deck-page')];page=Math.max(0,Math.min(pages.length-1,next));pages.forEach((node,i)=>node.hidden=i!==page);document.querySelectorAll('[data-page]').forEach(n=>n.setAttribute('aria-pressed',String(Number(n.dataset.page)===page)));}
  function card(tag,value){const n=document.createElement(tag);n.textContent=value;return n;}
  function saveOption(name,value){window.ThorDeck?.setOption(name,String(value));}
  function renderSpells(){
   const policy=window.thorSpellPolicy;if(!policy)return;
   const controls=data.controls||{},catalog=policy.catalog,manual=controls.manual?.[character]||[];
-  const next=JSON.stringify([character,data.locale,data.character,data.unlocked,data.spellBindings,controls.mode,manual,controls.shortcuts]);if(next===signature)return;signature=next;
+  const next=JSON.stringify([character,data.locale,data.character,data.unlocked,data.spellBindings,controls.mode,manual,controls.shortcuts,data.awakenings]);if(next===signature)return;signature=next;
   document.querySelectorAll('[data-class]').forEach(n=>n.setAttribute('aria-pressed',String(n.dataset.class===character)));
   el('spell-hint').textContent=text('Touche une icône pour choisir Auto ou Manuel. Auto suit le mode global ; tes exceptions sont sauvegardées par classe.');
   const nodes=catalog.classes[character].map(id=>{
-   const meta=catalog.spells[id],passive=catalog.passive.includes(id),isManual=manual.includes(id),active=policy.allowed(id,character,controls.mode,controls.manual);
+   const meta=catalog.spells[id],passive=policy.isPassive(id,data.character===character?data.awakenings:{}),isManual=manual.includes(id),active=policy.allowed(id,character,controls.mode,controls.manual,data.character===character?data.awakenings:{});
    const b=card('button','');b.type='button';b.className='spell-card'+(isManual?' manual':'');b.disabled=passive;b.dataset.spell=id;b.setAttribute('aria-pressed',String(isManual));
    const img=document.createElement('img');img.src=meta.icon;img.alt='';b.append(img);
    const info=card('span','');info.append(card('strong',text(meta.name)),card('b',text(passive?'Auto du jeu':isManual?'Manuel':active?'Auto':'Auto · en attente')));

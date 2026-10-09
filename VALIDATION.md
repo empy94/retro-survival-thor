@@ -1,3 +1,13 @@
+# Version 1.17.0 — 9 octobre 2026
+
+- Module officiel vérifié en ligne : `page-BhF3JBN0.js`, SHA-256 `67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2`. Catalogue extrait des règles : quatre classes, 51 sorts distincts, 186 objets, quatre Dofus. Le jeu reste chargé depuis le site, sans copie de son moteur dans l’APK.
+- Treize suites JavaScript et quatre tests Java réussis, dont encodage UTF-8, passifs conditionnels, nouvelles visées, portées et conservation du chemin de butin natif.
+- Sur AYN Thor Android 13 avec build de vérification : chargement du nouveau module et de l’extension, parties Astrub et Litneg, fiche et image de Gelocoiffe sur le second écran, collection 2/4, accents français corrects. Les 237 images uniques des sorts/objets se décodent dans la WebView sans échec.
+- Extension : soin, recharge, invincibilité, bonus, caractéristique, ajout/équipement et amélioration native d’Armure Venteuse essayés. Huit choix de boss invoqués, dont les trois Bandits de Cania et quatre Gelées Royales. Sauvegarde/reprise sur Astrub avec rechargement des sprites et retour aux kamas sauvegardés ; ancien emplacement restauré après essai.
+- Sur des copies isolées d’état dans la WebView réelle : 159 choix d’amélioration, 159 évolutions et 558 fabrications d’objets (186 × trois jets) acceptés par les fonctions officielles. Ces contrôles ne constituent pas une partie jouée avec chaque sort/classe.
+- APK finale signée 1.17.0 / code 23 installée par-dessus l’existante sur Thor : 95678 octets, SHA-256 `20e453a3aa04ed64948bbdbfd3183bf892040048ba92eed8b69ed4dc149dcb3e`, débogage désactivé. Démarrage et second écran vérifiés sur cette APK, accents et collection présents.
+- Limites : pas de campagne complète ni de progression jouée jusqu’à Sufokia/Cania ; pas de mesure exhaustive des FPS, de partie sur téléphone ni d’essai Android 16. Les sauvegardes de combat de l’ancien moteur sont conservées et refusées, sans effacement. La progression permanente reste chargée par le normaliseur officiel.
+
 # Vérifications
 
 ## Version 1.15.2

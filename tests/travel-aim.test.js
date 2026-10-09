@@ -35,7 +35,7 @@ id='burningGlyph';c.configure({radialAim:false});c.button(2,true);assert.equal(c
 // Iop range, including awakening, and screen-space diagonal on nonuniform scale.
 id='jump';travel.upgrades={jumpRange:3};travel.awakenings={jump:1};c.button(2,true);c.rightStick(1,1);frame();
 const t=target(),dx=(t.x-player.x)/.5,dy=(t.y-player.y)/.25;
-assert.ok(Math.abs(Math.hypot(dx,dy)-1080)<1e-9);assert.ok(Math.abs(t.x-player.x-(t.y-player.y))<1e-9);c.cancel();
+assert.ok(Math.abs(Math.hypot(dx,dy)-540)<1e-9);assert.ok(Math.abs(t.x-player.x-(t.y-player.y))<1e-9);c.cancel();
 // The game's fixed return teleport must not imply a selectable destination.
 id='dash';travel.returnTarget={x:100,y:120};c.button(2,true);c.rightStick(1,0);frame();
 assert.deepEqual(target(),{x:100,y:120});c.cancel();assert.equal(frames.size,0);

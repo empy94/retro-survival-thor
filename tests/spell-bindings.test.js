@@ -15,7 +15,7 @@ assert.equal(mapping.isTravel('dash'),true);assert.equal(mapping.isTravel('jump'
 for(const id of ['sramDouble','repulsiveTrap','burningGlyph','lethalAttack','fear'])assert.equal(mapping.isTravel(id),false);
 assert.equal(mapping.travelRange('dash'),150);
 assert.equal(mapping.travelRange('dash',{dashRange:2},{dash:1}),500);
-assert.equal(mapping.travelRange('jump',{jumpRange:3},{jump:1}),1080);
+assert.equal(mapping.travelRange('jump',{jumpRange:3},{jump:1}),540);
 slots=mapping.assign(spells(['shield','dash','burningGlyph','jump','cut','fear','speed','power']));
 assert.equal(new Set(slots.filter(Boolean).map(s=>s.id)).size,8);
 assert.deepEqual(slots.slice(2,6).map(s=>s.id),['dash','burningGlyph','jump','cut']);

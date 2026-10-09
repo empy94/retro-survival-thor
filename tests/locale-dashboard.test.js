@@ -26,3 +26,5 @@ render({...data,hp:1,helper:{lowHealth:true}});assert.equal(ids.get('run').class
 assert.equal(ids.get('health').style.height,'20%');render({...data,hp:0,helper:null});assert.equal(ids.get('health').style.height,'0%');render({...data,hp:5,helper:null});assert.equal(ids.get('health').style.height,'100%');
 render({...data,helper:null});assert.equal(ids.get('run').className,'');assert.equal(ids.get('phase').children.length,1,'disabled helper leaves no extra line');
 console.log('Locale and dashboard: FR/EN/ES, initial synchronization, invalid locale and incremental updates passed');
+
+for(const folder of ['assets','src','res']){for(const file of fs.readdirSync(folder,{recursive:true})){const path=folder+'/'+file;if(!/\.(js|json|html|java|xml|css)$/.test(path))continue;const text=fs.readFileSync(path,'utf8');assert(!/[\u00c3][\u00a0-\u00bf]|\u00c2\u00a0|\u00e2\u20ac|\ufffd/.test(text),'Invalid French encoding: '+path);}}
