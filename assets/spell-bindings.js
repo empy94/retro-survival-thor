@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  // IDs used by the official game's touch controls (checked 2026-10-09).
- const aimed=new Set(['dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','celestialSword','iopSword','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear','arnaque','brokle']);
+ const aimed=new Set(['dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','celestialSword','iopSword','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear','arnaque','brokle','shovelJudgment','slaughteringShovel','shovelKiss','mound','animatedChest','shovelThrow','corruption']);
  const names=['X','Y','L1','R1','L2','R2','A','B',...['L1','R1','L2','R2'].flatMap(m=>['X','Y','A','B'].map(b=>m+' + '+b))];
  const travel=new Set(['dash','jump']);
  function isTravel(id){return travel.has(id);}
@@ -16,6 +16,12 @@
    if(!needsAim(id,awakenings))return null;
    if(isTravel(id))return {distance:travelRange(id,upgrades,awakenings),variable:false,showRange:true};
    const upgrade=key=>Number.isFinite(upgrades[key])?Math.max(0,upgrades[key]):0;
+   const enutrofRange=Number(upgrades.enutrofSpell?.[id]?.range)||0;
+   if(id==='shovelJudgment')return {distance:350,variable:true,showRange:true};
+   if(['slaughteringShovel','mound','corruption'].includes(id))return {distance:470,variable:true,showRange:true};
+   if(id==='shovelKiss')return {distance:470*(1+enutrofRange*.1)*(awakenings.shovelKiss===1?1.5:1),variable:true,showRange:true};
+   if(id==='shovelThrow')return {distance:500*(1+enutrofRange*.1),variable:true,showRange:true};
+   if(id==='animatedChest')return {distance:220*(1+enutrofRange*.1),variable:true,showRange:true};
    if(id==='staffBoomerang')return {distance:310*(1+upgrade('staffRange')*.2),variable:false,showRange:true};
    if(id==='cut')return {distance:350*(1+upgrade('cutRange')*.2)*(awakenings.cut===1?1.65:1),variable:true,showRange:true};
    if(id==='brokle'&&awakenings.brokle!==1)return {distance:0,variable:false,showRange:false};

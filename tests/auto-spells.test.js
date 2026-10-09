@@ -65,3 +65,10 @@ auto.configure('off');assert.equal(timer,null);
 console.log('Buff mode: cast when available without monsters, no attacks/travel, no active-buff cancellation, mode switches and no target reads passed');
 
 assert.equal(choose({...base,character:'enutrof'},['shovelJudgment']).spell.id,'shovelJudgment');assert.equal(choose({...base,character:'enutrof',summons:{chest:true}},['animatedChest']),null);assert.equal(choose({...base,buffs:{acceleration:3}},['acceleration']),null);assert.deepEqual(choose(base,['brokle']).target,{x:base.player.x,y:base.player.y});assert.equal(choose({...base,busy:true,character:'enutrof'},['corruption']),null);
+
+for(const id of ['shovelJudgment','slaughteringShovel','shovelKiss','mound','animatedChest','shovelThrow','corruption']){
+ const action=choose({...base,character:'enutrof'},[id]);assert(action?.target,'Enutrof needs an enemy target: '+id);assert.equal(action.target.x,430);assert.equal(action.target.y,220);
+}
+assert.equal(choose({...base,character:'enutrof',enemies:[{x:1000,y:220,r:12}]},['shovelThrow']),null);
+assert.equal(choose({...base,character:'enutrof',summons:{chest:true}},['animatedChest']),null);
+assert(choose({...base,character:'enutrof',enemies:[{x:930,y:220,r:12}],upgrades:{enutrofSpell:{shovelThrow:{range:2}}}},['shovelThrow'])?.target);

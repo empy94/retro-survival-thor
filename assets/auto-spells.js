@@ -13,6 +13,7 @@
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
    for(const spell of spells){if(!spell.ready)continue;const id=spell.id;
+     if(id==='animatedChest'&&s.summons?.chest)continue;
      if(id in buffs){const timer=p[buffs[id]]??s.buffs[buffs[id]];
        if(timer>0)continue;if(id==='invisibility'&&!urgent&&p.hp/p.maxHp>.5)continue;
        add(spell,null,(id==='shield'||id==='invisibility'?urgent?1000:300:250));continue;}
@@ -31,8 +32,9 @@
      }
      if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&s.character==='enutrof'&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
-     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque'].includes(id);
-     const radius=id==='massTrap'?57.5:id==='celestialSword'?105:id==='lethalAttack'?80:id==='immobilizationGlyph'||id==='burningGlyph'?100:60;
+     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow'].includes(id);
+     const enutrofRadius={shovelJudgment:85,slaughteringShovel:100,shovelKiss:50,mound:195,corruption:100};
+     const radius=id in enutrofRadius?enutrofRadius[id]*(1+(Number(s.upgrades.enutrofSpell?.[id]?.radius)||0)*.1)*(id==='mound'&&s.awakenings.mound===1?1.5:1):id==='massTrap'?57.5:id==='celestialSword'?105:id==='lethalAttack'?80:id==='immobilizationGlyph'||id==='burningGlyph'?100:60;
      let best=null,bestScore=0;
      // Limit quadratic cluster work: 24 nearest candidate centers, up to 128
      // monsters. No canvas/image analysis, networking, or React tree traversal.

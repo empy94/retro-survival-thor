@@ -90,3 +90,11 @@ Correction du gel à l’apparition de l’Arakne sur le Thor, avec le module of
 Vérification réelle sur Thor : le profil avant correction attribuait 4186 des 5598 échantillons au constructeur du catalogue, plus 1310 au ramasse-miettes. Sur la partie gelée avec une Arakne, le correctif en mémoire a fait avancer le temps du jeu de 3,603 à 5,625 secondes en environ deux secondes réelles. Les tests couvrent la conservation des descripteurs et un seul calcul par carte. Ce contrôle ne prouve pas la stabilité de toutes les vagues.
 
 L’erreur réseau constatée ensuite est distincte : le lanceur Android a forcé l’arrêt du jeu et de NordVPN à 22:10:52. Aucun bannissement de compte ni filtrage serveur causé par cette boucle n’a été établi.
+
+## Version 1.19.3 : révision suivante et visée Enutrof
+
+Prise en charge de `page-DfOhw_qp.js` (SHA-256 `9b75f2de166e5940fa13c107b46b505f31ac0f1f75174345108b9789a4006106`). La version 1.19.2 ne reconnaissait pas cette révision arrivée pendant les essais ; son correctif ne s’appliquait donc pas à ce nouveau module. L’adaptation précédente et son correctif sont conservés séparément.
+
+Les sept sorts ciblés de l’Enutrof suivent désormais le transport tactile maintenir/viser/relâcher, dans le moteur natif comme dans les commandes du Thor. Le planificateur automatique choisit une cible ennemie, suit les portées et améliorations, et évite de redemander un Coffre Animé déjà présent. Les sorts passifs et personnels gardent leur fonctionnement normal.
+
+Vérification : Sufokia a atteint la vague 3 et le choix du niveau 5 après environ 47 secondes de jeu sur le Thor. Le relevé de 90 secondes (incluant cette pause de choix) n’a capturé aucune erreur JavaScript ; médiane des intervalles d’affichage 16,667 ms. Visée contrôlée sur une instance PC isolée du moteur réel : un Lancer de Pelle demandé en (850 ; 605,82) est placé dans la file native à ces mêmes coordonnées, contre (1070 ; 545,82) avant correction. Tests de cibles, portées améliorées, registres et compatibilité des modules réussis. Toutes les vagues n’ont pas été parcourues.

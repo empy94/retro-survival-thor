@@ -36,7 +36,7 @@
    const copy=(o,keys)=>Object.fromEntries(keys.map(k=>[k,Number(o?.[k])||0]));
    return {character:window.thorSpellPolicy?.classFor(s.levelId),phase:s.phase,width:s.width,height:s.height,player:copy(p,['x','y','hp','maxHp','rollTimer','hurtTimer','shieldTimer','speedBoostTimer','teleportReturnTimer','teleportReturnX','teleportReturnY']),
      busy:!!s.enutrof?.travel||!!s.enutrof?.arrivalTravel||(s.enutrof?.arrival||0)>0||(s.enutrof?.scaraDescent||0)>0||!!s.wabbitTravel||(s.wabbitPlayerArrival||0)>0||[s.characterCastTimer,s.glyphCastTimer,s.shieldCastTimer,s.speedCastTimer,s.feca?.scienceCastTimer,s.feca?.glyphCastTimer,p.rollTimer,p.hurtTimer].some(v=>v>0),
-     upgrades:copy(s.upgrades,['dashRange','jumpRange','staffRange','cutRange','liberationRadius']),awakenings:{...s.awakenings},
+     upgrades:{...copy(s.upgrades,['dashRange','jumpRange','staffRange','cutRange','liberationRadius']),enutrofSpell:Object.fromEntries(Object.entries(s.upgrades?.enutrofSpell||{}).map(([id,value])=>[id,copy(value,['range','radius'])]))},awakenings:{...s.awakenings},
      buffs:{science:s.feca?.scienceTimer||0,power:s.powerTimer||0,invisible:s.sram?.invisible||0,vitality:s.iop?.vitalityStacks?.length||0,mutilation:s.iop?.mutilationStacks||0,amplification:s.iop?.amplificationCharges||0,acceleration:s.enutrof?.acceleration||0},summons:{chest:!!s.enutrof?.chest},
      double:s.sram?.double?.hp>0&&s.sram.double.life>0?copy(s.sram.double,['x','y','swapCooldown']):null,
      traps:includeTargets?(s.sram?.traps||[]).filter(t=>t.life>0).slice(0,72).map(t=>copy(t,['x','y'])):[],
@@ -48,8 +48,8 @@
    const p=live.player,returning=live.awakenings?.dash===3&&p.teleportReturnTimer>0;
    const returnTarget=returning&&[p.teleportReturnX,p.teleportReturnY].every(Number.isFinite)?{x:rect.left+p.teleportReturnX*scaleX,y:rect.top+p.teleportReturnY*scaleY}:null;
    return {...position,scaleX,scaleY,angle:Number.isFinite(p.angle)?p.angle:0,
-     upgrades:{dashRange:live.upgrades?.dashRange,jumpRange:live.upgrades?.jumpRange,staffRange:live.upgrades?.staffRange,cutRange:live.upgrades?.cutRange},
-     awakenings:{dash:live.awakenings?.dash,jump:live.awakenings?.jump,cut:live.awakenings?.cut,burningGlyph:live.awakenings?.burningGlyph,brokle:live.awakenings?.brokle},returnTarget,
+     upgrades:{dashRange:live.upgrades?.dashRange,jumpRange:live.upgrades?.jumpRange,staffRange:live.upgrades?.staffRange,cutRange:live.upgrades?.cutRange,enutrofSpell:Object.fromEntries(Object.entries(live.upgrades?.enutrofSpell||{}).map(([id,value])=>[id,{range:Number(value?.range)||0}]))},
+     awakenings:{dash:live.awakenings?.dash,jump:live.awakenings?.jump,cut:live.awakenings?.cut,burningGlyph:live.awakenings?.burningGlyph,brokle:live.awakenings?.brokle,shovelKiss:live.awakenings?.shovelKiss},returnTarget,
      doubleTarget:live.awakenings?.sramDouble===2&&live.sram?.double?.hp>0&&live.sram.double.life>0&&[live.sram.double.x,live.sram.double.y].every(Number.isFinite)?{x:rect.left+live.sram.double.x*scaleX,y:rect.top+live.sram.double.y*scaleY}:null};
  },
  playerPosition(refresh=false){
