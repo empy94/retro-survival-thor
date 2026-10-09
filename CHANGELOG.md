@@ -1,3 +1,9 @@
+## 1.17.1 — rétablissement de l’extension Cheats
+
+- Reconnaissance de la révision officielle `page-CMqUxGM4.js`, publiée après la 1.17.0. Les 67 fonctions nécessaires aux adaptations sont identiques à la version précédente.
+- Acceptation des deux révisions auditées et de leur déclaration de compatibilité par l’extension, pour rétablir notamment les améliorations de statistiques +1/+5.
+- Compatibilité des sauvegardes de combat entre ces deux révisions conservée, sans effacement.
+
 ## 1.17.0 — contenu du 9 octobre 2026
 
 - Adaptation au nouveau moteur officiel, avec contrôle de version partagé entre l’application et l’extension.

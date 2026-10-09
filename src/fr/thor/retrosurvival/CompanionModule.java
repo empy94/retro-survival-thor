@@ -21,6 +21,7 @@ final class CompanionModule {
    data=result;break;
   }catch(Exception ignored){}
  }
+ boolean supportsGameModule(String hash){return GameModuleVersions.companionSupports(get("gameModuleSha256"),hash);}
  boolean enabled(){return data.getBoolean("enabled",false);}
  String get(String key){return data.getString(key,"");}
  boolean localSession(){return enabled()&&data.getBoolean("localSession",false);}

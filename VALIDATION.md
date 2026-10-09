@@ -1,3 +1,10 @@
+# Version 1.17.1 — 9 octobre 2026
+
+- Régression observée sur le Thor : onglet Cheats présent mais commandes grisées et améliorations absentes. Nouvelle révision officielle `page-CMqUxGM4.js`, SHA-256 `5a385b4cf6390e0b0713dab4effab3c322d177a148776472743fd38546a4d6a6`, non reconnue par la 1.17.0.
+- Comparaison AST : seuls le garde de Mutilation et les composants d’abandon/pause ont changé ; les 67 symboles utilisés par les adaptations sont textuellement identiques. Identifiants, valeurs et fabrique des améliorations inchangés.
+- Treize suites JavaScript et test Java de compatibilité des modules réussis. Refus des révisions inconnues, des déclarations partielles et des extensions incompatibles conservé. Génération de sauvegarde de combat inchangée pour ces deux moteurs compatibles.
+- APK signée 1.17.1 / code 24 construite. Validation sur Thor à compléter après accord de relance, car une partie était ouverte au diagnostic.
+
 # Version 1.17.0 — 9 octobre 2026
 
 - Module officiel vérifié en ligne : `page-BhF3JBN0.js`, SHA-256 `67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2`. Catalogue extrait des règles : quatre classes, 51 sorts distincts, 186 objets, quatre Dofus. Le jeu reste chargé depuis le site, sans copie de son moteur dans l’APK.
