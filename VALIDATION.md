@@ -1,5 +1,11 @@
 # Vérifications
 
+## Version 1.15.2
+
+- Filtrage réseau : progression, récupération, classement, création de session et validation du build autorisés ; test Java réussi.
+- Sur Thor Android 13 : lecture du classement HTTP 200 et création native de session HTTP 201. Partie d’essai mise en pause ; aucun score artificiel envoyé. La présence finale d’un score au classement reste soumise au serveur et n’a pas été validée par une partie terminée lors de cet essai.
+- APK finale signée installée : version 21 / 1.15.2, débogage désactivé. SHA-256 : `d09c6e3d3be35510f4fe3ce0c3a3e5c68eec7943406e264fa272d914a0b6e268`.
+
 ## Version 1.15.1
 
 - APK finale signée 1.15.1 / version 20 installée, débogage désactivé. Test du nuage répété sur l’APK finale par toucher Android : statut EN LIGNE et affichage du code avec sa note de confidentialité. SHA-256 : `6ce076a7bf2bac2d2e7d29bd6e213f9d38ee526feedbee9fad7bc3a4a25251a2`.

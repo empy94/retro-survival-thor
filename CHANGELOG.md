@@ -1,5 +1,9 @@
 # Versions
 
+## 1.15.2 — 9 octobre 2026
+
+- Classement : accès, démarrage des sessions et envoi des résultats rétablis, avec leurs validations originales côté serveur.
+
 ## 1.15.1 — 9 octobre 2026
 
 - Sauvegarde en ligne : correction du filtrage réseau qui pouvait empêcher la synchronisation et la génération du code de récupération dans le menu nuage.
