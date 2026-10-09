@@ -2,6 +2,8 @@
 
 ## Version 1.15.0
 
+- APK finale signée installée sur le Thor : version 19 / 1.15.0, cible API 35, débogage désactivé ; 87486 octets. SHA-256 : `ead4e5d9c58eacf044b452406d42bcd5b4122a895ce18e2c598d3e8d260d2b45`. Assets empaquetés vérifiés.
+
 - Treize suites JavaScript, plus les deux tests Java de limitation des évaluations et de maintien des gâchettes. Vente testée : même identité, chaque effet inférieur/égal, protection d’un meilleur effet même avec un G global inférieur, nouveaux/rayonnants/permanents, chemin original conservé si désactivée.
 - Sur la WebView réelle du Thor Android 13 : dialogue original de doublon inférieur fermé par la vente, kamas crédités ; réglage activé dans les paramètres Android et conservé après redémarrage. Le cas de comparaison a été préparé pour le test ; pas d’essai prolongé de toutes les tables de butin.
 - Export effectué via le vrai sélecteur Android dans Téléchargements/Retro-Survival-progression.json ; import du même fichier effectué, cartes/records/collection inchangés. Pas d’autorisation de stockage étendue.
