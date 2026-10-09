@@ -2,7 +2,7 @@
  'use strict';
  // Keep the site's original Android interface and drive its virtual controls.
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
- let px=0,py=0,aimFrame=null,autoPointer=null,manualUntil=0,foreground=true;const touches=new Set();
+ let px=0,py=0,aimFrame=null,autoPointer=null,manualUntil=0,foreground=true;const touches=new Set(),padHeld=new Set(),padRoutes=new Map();
  let leftX=0,leftY=0;
  let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true,hideCombatCursor:true,combatHelper:true},pointerUsed=false,cursorPhase=null,cursorScope=null;
  function refreshCursor(){
@@ -22,7 +22,7 @@
      let id=null;for(let i=0;f&&i<4;i++,f=f.return){if(f.key){id=f.key;break;}}
      return {el,id,name:el.getAttribute('aria-label')||''};
    });
-   return window.thorSpellBindings.assign(spells,window.thorDashboard?.abilities(refresh).awakenings||{});
+   return window.thorSpellBindings.assign(spells,window.thorDashboard?.abilities(refresh).awakenings||{},settings.spellShortcuts?.[window.thorDashboard?.character?.()]);
  }
  function decorate(){
    refreshCursor();
@@ -92,7 +92,7 @@
  }
  window.thorControls={
    setActive(value){foreground=value===true;if(!foreground){touches.clear();cancelAuto();}},
-   autoAvailable(){return foreground&&!ability&&!autoPointer&&!touches.size&&Date.now()>=manualUntil;},
+   autoAvailable(){return foreground&&!ability&&!autoPointer&&!touches.size&&!padRoutes.size&&Date.now()>=manualUntil;},
    autoCast(spell,target){
      if(!settings.autoSpells||!this.autoAvailable()||!spell.el.isConnected||spell.el.getAttribute('aria-disabled')==='true')return false;
      const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return false;
@@ -110,8 +110,8 @@
    helperEnabled(){return settings.combatHelper;},
    pad(){pointerUsed=false;refreshCursor();},
    rightStick(x,y){if(Math.hypot(x,y)>.16)manual();if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
-   cancel(){manual();finish('pointercancel');window.thorMenu?.clear();},
-   configure(value){const before=settings.autoSpellMode;settings={...settings,...value};if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
+   cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();window.thorMenu?.clear();},
+   configure(value){if(Object.prototype.hasOwnProperty.call(value,'spellShortcuts')&&JSON.stringify(value.spellShortcuts)!==JSON.stringify(settings.spellShortcuts)){finish('pointercancel');padHeld.clear();padRoutes.clear();}const before=settings.autoSpellMode;settings={...settings,...value};if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
    endPreferences(){if(document.querySelector('.pause-panel'))this.pause();},
    key(key,code,down){
@@ -132,6 +132,20 @@
      event(zone,'pointermove',177,lastX,lastY);
    },
    pause(){manual();const el=document.querySelector('.pause-toggle');if(el){const r=el.getBoundingClientRect();event(el,'pointerdown',180,r.left+r.width/2,r.top+r.height/2);event(el,'pointerup',180,r.left+r.width/2,r.top+r.height/2);}},
+   controller(button,down){
+     // Routes are captured at press time: releasing a modifier or changing a
+     // spell list must not release a different spell than the one being held.
+     if(!down){padHeld.delete(button);const route=padRoutes.get(button);padRoutes.delete(button);if(!route)return true;if(!route.suppressed){if(route.pending)this.button(route.index,true);this.button(route.index,false);}return true;}
+     if(padHeld.has(button))return true;
+     if(window.thorMenu?.active()){if(button==='A')return window.thorMenu.activate();if(button==='B'){this.pause();return true;}return true;}
+     manual();const slots=bindings(true),modifiers=['L1','R1','L2','R2'];
+     padHeld.add(button);
+     const chord=['X','Y','A','B'].includes(button)?modifiers.map(m=>padHeld.has(m)?slots.find(s=>s?.button===m+' + '+button):null).find(Boolean):null;
+     if(chord){for(const m of modifiers){const route=padRoutes.get(m);if(route&&!route.suppressed){route.suppressed=true;if(ability?.index===route.index)finish('pointercancel');}}padRoutes.set(button,{index:chord.index});this.button(chord.index,true);return true;}
+     const spell=slots.find(s=>s?.button===button);
+     if(!spell){if(button==='B'){this.pause();return true;}return button!=='A';}
+     const pending=modifiers.includes(button)&&!spell.aimed;padRoutes.set(button,{index:spell.index,pending});if(!pending)this.button(spell.index,true);return true;
+   },
    button(index,down){
      if(!down&&ability?.index===index){finish('pointerup');return;}
      if(!down)return;

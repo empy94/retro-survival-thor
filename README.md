@@ -31,7 +31,9 @@ Les sorts déjà automatiques du jeu restent automatiques dans les trois modes. 
 - **Stick gauche / croix** : déplacement et sélection dans les menus.
 - **Stick droit** : direction et distance de visée ; pointeur si nécessaire.
 - **L1 / R1 / L2 / R2** : maintenir un sort à viser, orienter, relâcher.
-- **X / Y** : sorts instantanés. **A / R3** : valider. **Start / B** : pause.
+- **X / Y puis A / B** : sorts en combat. **A / R3** : valider dans les menus. **Start** : pause.
+
+**Tes raccourcis, par classe :** choisis une touche ou une combinaison comme **L1 + Y**, sous chaque icône dans **Sorts** ou **⚙ APK → Raccourcis des sorts**. Disponible aussi sur téléphone ; sauvegarde automatique.
 
 Le rayon suit le personnage et les améliorations de portée. Le curseur se masque quand il est inutile. Le tactile et les manettes USB/Bluetooth reconnues par Android restent disponibles.
 
@@ -53,9 +55,9 @@ Sur un appareil compatible comme le Thor : cœur de PV, kamas, caractéristiques
 |---|---|
 | ![AYN Thor avec les icônes par classe et un sort réglé en manuel](docs/screenshots/thor-dual-sorts.png) | ![AYN Thor avec la page Options interactive](docs/screenshots/thor-dual-options.png) |
 
-[Voir les sorts en grand](docs/screenshots/second-ecran-sorts.png) · [Voir les options en grand](docs/screenshots/second-ecran-options.png)
+[Voir les sorts en grand](docs/screenshots/second-ecran-sorts.png) · [Éditeur sur un seul écran](docs/screenshots/shortcuts-settings.png) · [Voir les options en grand](docs/screenshots/second-ecran-options.png)
 
-Pages capturées sur l’APK **1.12.0** signée, intégrées dans un visuel du Thor. Autres appareils et manettes externes : compatibles selon Android, non testés matériellement.
+Sorts et raccourcis capturés sur l’APK **1.13.0** signée ; Options sur **1.12.0**, intégrées dans un visuel du Thor. Autres appareils et manettes externes : compatibles selon Android, non testés matériellement.
 
 ## Installer et jouer
 

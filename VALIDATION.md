@@ -171,3 +171,13 @@ Ces vérifications ne remplacent pas un test manuel complet des boutons physique
 - Pas de capture vidéo ni fichiers de test ajoutés à l’appareil. Images de présentation et résultats gardés sur PC. Montages du Thor avec les captures réelles des deux écrans, boîtier de présentation réutilisé.
 - Coût borné : scheduler toujours à 80 ms, filtrage d’une petite liste avant calcul des cibles, lecture des monstres toujours évitée en buffs ; classe ajoutée à la télémétrie existante. Listes et options du bas reconstruites seulement si classe/langue/déblocages/préférences changent, transmission conservée à 500 ms. Aucune promesse de FPS issue de ces contrôles.
 - SHA-256 de l’APK finale : `aa0a140d9bd36cd0cfa5a44ddbeb7725849f78f372cf183574dd343e40255220`.
+
+## 1.13.0 — butin, boutique et raccourcis (9 octobre 2026)
+
+- Dix suites JavaScript passent, dont les comparaisons de butin avec panneau équipé sans boutons, la sélection après inspection et le retour de dialogue imbriqué. Ces cas utilisent des reproductions DOM des composants observés dans le code du jeu ; aucun nouveau drop de comparaison ni boutique réelle reproduits dans cette session.
+- Affectation de sept sorts, dont Libération sur A, et de vingt futurs sorts couverte. Combinaisons testées : annulation de la visée du modificateur sans lancer, sort instantané différé, relâchement propriétaire, annulation du maintien et priorité manuelle sur l’assistance. Les deux suites Java de maintien et limitation des lectures passent.
+- Sur le Thor réel : paramètres natifs et page Sorts, enregistrement d’une combinaison Libération L1 + Y et d’une affectation Bouclier A via le pont de l’éditeur. La liste s’actualise et le raccourci Bouclier apparaît dans les affectations du jeu. Pressions A injectées via Android reçues ; le Bouclier était en récupération, donc aucun lancer réussi avec A validé pendant cet essai. Sept sorts et toutes les combinaisons physiques restent à essayer en partie.
+- Nouvelle fenêtre de raccourcis sur l’écran principal : hauteur de contenu corrigée après contrôle visuel. APK signée finale installée, fenêtre lisible et captures réalisées. Version 1.13.0 / code 15, signature v3, DEBUGGABLE absent. Réglages de test retirés ; mode full et exceptions manuelles Téléportation/Libération conservés.
+- Une nouvelle partie a été lancée normalement et laissée en pause avec Start, niveau 2 / vague 1. L’ancienne partie a été interrompue avec accord explicite.
+- Fiche toujours à 2 Hz et rendu des sorts uniquement quand les informations changent ; aucune nouvelle boucle permanente. Pas de mesure de FPS ni de test prolongé de performance pour cette version.
+- SHA-256 APK finale : `397429aaabf8dd7529141a0fe27eb07d810576ec0a4b1346940e05b3c0cdbf92`.

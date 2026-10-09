@@ -1,5 +1,13 @@
 # Versions
 
+## 1.13.0 — 9 octobre 2026
+
+- Croix/stick dans les comparaisons de butin : actions du dialogue externe, sans blocage dans la carte de l’objet déjà équipé.
+- Boutique : offre consultée conservée après A ; directions depuis sa position, retour conservé après un dialogue de confirmation.
+- Huit touches directes, puis seize combinaisons : les sorts supplémentaires, dont Libération, gardent un accès manette. A/B lancent les sorts en combat ; A valide les menus et Start garde la pause.
+- Raccourcis personnalisables et sauvegardés par classe depuis les paramètres ou chaque icône du second écran. FR/EN/ES.
+- Combinaisons : annulation de la visée du modificateur, aucun double lancer, relâchement du sort propriétaire ; assistance suspendue pendant une commande maintenue.
+
 ## 1.12.0 — 9 octobre 2026
 
 - Second écran interactif : pages Personnage, Sorts et Options, par glissement horizontal ou onglets. Défilement vertical conservé pour les listes longues.

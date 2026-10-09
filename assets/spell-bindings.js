@@ -2,7 +2,7 @@
  'use strict';
  // IDs used by the official game's touch controls (checked 2026-10-08).
  const aimed=new Set(['dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','celestialSword','iopSword','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear']);
- const names=['X','Y','L1','R1','L2','R2'];
+ const names=['X','Y','L1','R1','L2','R2','A','B',...['L1','R1','L2','R2'].flatMap(m=>['X','Y','A','B'].map(b=>m+' + '+b))];
  const travel=new Set(['dash','jump']);
  function isTravel(id){return travel.has(id);}
  function travelRange(id,upgrades={},awakenings={}){
@@ -25,11 +25,12 @@
    if(id==='swordOfFate'||id==='fear')return {distance:150,variable:false,showRange:false};
    return null;
  }
- function assign(spells,awakenings={}){
-   const slots=Array(6).fill(null);
+ function assign(spells,awakenings={},custom={}){
+   const slots=Array(names.length).fill(null);
    const entries=spells.map(spell=>({...spell,aimed:needsAim(spell.id,awakenings)}));
-   for(const group of [true,false])for(const spell of entries.filter(s=>s.aimed===group)){
-     const order=group?[2,3,4,5,0,1]:[0,1,2,3,4,5];
+   for(const spell of entries){const index=names.indexOf(custom[spell.id]);if(index>=0&&!slots[index])slots[index]={...spell,button:names[index],index};}
+   for(const group of [true,false])for(const spell of entries.filter(s=>s.aimed===group&&!slots.some(entry=>entry?.id===s.id))){
+     const order=group?[2,3,4,5,0,1,6,7]:[0,1,2,3,4,5,6,7];order.push(...names.map((_,i)=>i).slice(8));
      const index=order.find(i=>slots[i]===null);
      if(index!==undefined)slots[index]={...spell,button:names[index],index};
    }

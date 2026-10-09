@@ -1,0 +1,25 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),mapping=require('../assets/spell-bindings.js');
+let ids=['burningGlyph','immobilizationGlyph','staffBoomerang','dash','shield','speed','liberation'],inMenu=false,confirmed=0;
+const events=[],surface={append(){},getBoundingClientRect:()=>({left:0,top:0}),classList:{add(){},remove(){}},style:{setProperty(){}}};
+const buttons=()=>ids.map(id=>({__reactFiberTest:{key:id},isConnected:true,closest:()=>surface,setPointerCapture(){},getAttribute:()=>null,getBoundingClientRect:()=>({left:10,top:10,width:40,height:40}),querySelector:()=>({style:{}}),dispatchEvent:e=>events.push([id,e.type])}));
+let elements=buttons();
+const main={className:'phase-playing',classList:{contains:k=>k==='phase-playing'}};
+const window={thorSpellBindings:mapping,thorMenu:{active:()=>inMenu,activate:()=>{confirmed++;return true},clear(){}},thorDashboard:{character:()=> 'feca',abilities:()=>({awakenings:{}}),playerPosition:()=>({x:50,y:60}),travelState:()=>({scaleX:1,scaleY:1,angle:0})}};
+const context={window,document:{querySelector:s=>s==='main'?main:null,querySelectorAll:()=>elements,addEventListener(){},createElement:()=>({style:{},remove(){}})},getComputedStyle:()=>({position:'relative'}),requestAnimationFrame:()=>1,cancelAnimationFrame(){},PointerEvent:function(type,props){this.type=type;Object.assign(this,props);}};
+const clock={value:1000};context.Date={now:()=>clock.value};
+vm.runInNewContext(fs.readFileSync('assets/controls.js','utf8'),context);const controls=window.thorControls;
+assert.equal(controls.controller('A',true),true);controls.controller('A',false);
+assert.deepEqual(events,[['liberation','pointerdown'],['liberation','pointerup']],'seventh spell assigned A');
+inMenu=true;controls.controller('A',true);controls.controller('A',false);assert.equal(confirmed,1);assert.equal(events.length,2,'A confirms instead of casting in menus');inMenu=false;
+controls.configure({spellShortcuts:{feca:{staffBoomerang:'L1 + Y'}}});events.length=0;
+controls.controller('L1',true);controls.controller('Y',true);
+assert.deepEqual(events.slice(0,3),[['burningGlyph','pointerdown'],['burningGlyph','pointercancel'],['staffBoomerang','pointerdown']]);
+controls.controller('L1',false);assert.equal(events.at(-1)[1],'pointerdown','modifier release cannot cast the chord');
+controls.controller('Y',false);assert.deepEqual(events.at(-1),['staffBoomerang','pointerup']);const count=events.length;controls.controller('Y',false);assert.equal(events.length,count);
+// A non-aimed modifier must not execute its standalone spell while forming a chord.
+controls.configure({spellShortcuts:{feca:{shield:'L1',liberation:'L1 + Y'}}});events.length=0;
+controls.controller('L1',true);assert.equal(events.length,0);clock.value+=1000;assert.equal(controls.autoAvailable(),false,'pending modifier blocks automation after manual delay');controls.controller('Y',true);controls.controller('Y',false);controls.controller('L1',false);
+assert.deepEqual(events,[['liberation','pointerdown'],['liberation','pointerup']]);
+controls.controller('L1',true);controls.controller('L1',false);assert.deepEqual(events.slice(-2),[['shield','pointerdown'],['shield','pointerup']]);
+controls.configure({spellShortcuts:{feca:{staffBoomerang:'A'}}});controls.controller('A',true);controls.cancel();const cancelled=events.length;controls.controller('A',false);assert.equal(events.length,cancelled,'cancelled route cannot cast on later release');
+console.log('Controller shortcuts: seventh spell, contextual A, aimed/instant chords, release ownership, modifier deferral and cancellation passed');

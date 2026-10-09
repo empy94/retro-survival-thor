@@ -10,7 +10,7 @@ Dans **Sorts**, choisis Féca, Iop ou Sram, puis touche une icône active pour b
 
 **Auto** suit le réglage global : désactivé ne lance rien, buffs seuls ne lance que les buffs, tous les sorts utilise le planificateur complet. **Auto · en attente** indique qu’un sort n’est pas automatisé dans le mode global actuel. **Manuel** l’exclut de l’assistance de l’APK et annule un éventuel ciblage automatique en préparation ; sa commande manuelle reste disponible. Les sorts **Auto du jeu** sont gérés par le jeu original et ne peuvent pas être désactivés par cette page.
 
-Les pages interactives nécessitent un second écran Android compatible. Sur un seul écran, les options globales restent accessibles dans **⚙ APK / Select**.
+Les pages interactives nécessitent un second écran Android compatible. Sur un seul écran, les options et les réglages par classe sont accessibles dans **⚙ APK / Select → Raccourcis des sorts**.
 
 ## Appareils et manettes
 
@@ -36,17 +36,20 @@ Le mode Buffs ne lit pas les listes de monstres/pièges. Les deux modes utilisen
 |---|---|
 | Stick gauche / croix | Déplacement ; sélection dans les menus |
 | Stick droit | Visée radiale ou pointeur |
-| A / R3 | Valider la sélection ; sinon clic au pointeur |
+| A / R3 | Valider dans les menus ; R3 sert aussi de clic au pointeur |
 | L1 / R1 / L2 / R2 | Priorité aux sorts à viser |
-| X / Y | Priorité aux sorts instantanés |
-| Start / B | Pause / reprendre |
+| X / Y puis A / B | Sorts en combat, priorité aux sorts instantanés |
+| Start | Pause / reprendre ; B aussi si aucun sort ne lui est affecté |
+| L1/R1/L2/R2 + X/Y/A/B | Combinaisons : maintenir le modificateur, puis appuyer sur la touche du sort |
 | Select / ⚙ APK | Paramètres |
 
 Maintiens la touche du sort, règle la direction au stick droit, puis relâche. Pour les placements, l’inclinaison règle la distance. Téléportation et Bond utilisent leur portée maximale. La cible suit le personnage et les améliorations de portée ; le terrain reste géré par le jeu.
 
 Le rayon de placement et la taille de l’effet sont distincts. Les glyphes ont actuellement une portée de placement de 200 unités. Les attaques purement directionnelles n’annoncent pas un rayon de portée. Le retour de Téléportation et l’échange avec un Double gardent leur destination imposée.
 
-Six raccourcis manette maximum ; les sorts supplémentaires restent au tactile/pointeur et le mode intelligent peut les utiliser. Les affectations peuvent changer après un déblocage : consulte les repères sur les sorts.
+Huit touches directes et seize combinaisons sont disponibles. Les sorts supplémentaires sont affectés aux touches libres, puis aux combinaisons. Sous chaque icône de **Sorts**, choisis **Automatique** ou un raccourci personnalisé : sauvegarde par classe, indépendante du mode Auto/Manuel. Une touche déjà choisie est libérée sur l’autre sort, qui retrouve une affectation automatique. Les affectations automatiques peuvent changer après un déblocage : consulte les repères.
+
+Pour une combinaison, relâcher la touche du sort termine la visée ; relâcher seulement le modificateur ne lance pas le sort. Un sort instantané sur un modificateur se lance au relâchement s’il n’a pas servi à une combinaison. Dans la boutique, la sélection reste sur l’offre consultée après A. Les comparaisons de butin permettent de parcourir les actions équiper/vendre.
 
 ## Réglages et second écran
 
@@ -74,7 +77,7 @@ Les chemins sont également configurables par les paramètres `-AndroidSdk` et `
 
 Le paramètre `-Debug` produit un APK séparé avec le débogage WebView activé, uniquement pour les essais. L’APK publié n’active pas ce débogage.
 
-Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu. `node tests/spell-bindings.test.js` vérifie la priorité des sorts à viser, l’exception du Glyphe enflammé, la limite de six boutons, le relâchement du bon bouton et l’annulation de la visée.
+Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des informations du personnage, dont les données indisponibles, les totaux et l’absence de modification du jeu. `node tests/spell-bindings.test.js` vérifie la priorité des sorts à viser, l’exception du Glyphe enflammé, les huit touches, les combinaisons et les affectations personnalisées, le relâchement du bon bouton et l’annulation de la visée.
 
 `node tests/aim-follow.test.js` vérifie une visée dont la cible reste fixe pendant le déplacement du personnage, le calcul au relâchement et l’annulation si sa position est indisponible. Le test de l’observateur vérifie aussi les coordonnées du personnage après mise à l’échelle du canvas et remplacement de la partie.
 
@@ -82,3 +85,5 @@ Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des 
 
 
 `node tests/auto-spells.test.js` vérifie les priorités du mode intelligent, les buffs seuls sans monstre, le respect des effets actifs, les changements de mode et la suspension des lancers.
+
+`node tests/controller-shortcuts.test.js` couvre le septième sort sur A, la validation contextuelle et les combinaisons sans double lancer. `node tests/menu-navigation.test.js` couvre les comparaisons de butin et le retour à une offre de boutique.
