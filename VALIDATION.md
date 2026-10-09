@@ -1,5 +1,13 @@
 # Vérifications
 
+## Version 1.15.1
+
+- APK finale signée 1.15.1 / version 20 installée, débogage désactivé. Test du nuage répété sur l’APK finale par toucher Android : statut EN LIGNE et affichage du code avec sa note de confidentialité. SHA-256 : `6ce076a7bf2bac2d2e7d29bd6e213f9d38ee526feedbee9fad7bc3a4a25251a2`.
+
+- Test Java du filtrage réseau réussi : progression, récupération et profil autorisés pour toutes les sessions ; règles existantes sur les autres chemins conservées. Test de visée radiale réussi, dont changement de portée pendant maintien. Formule comparée au module officiel : Téléportation `(150 + dashRange × 50)`, doublée par son évolution de portée.
+- Sur Thor Android 13 en build de travail 1.15.1 : menu nuage « EN LIGNE », clic du bouton original « OBTENIR MON CODE », code de 24 caractères créé. Code secret non publié. Test d’un chemin de classement isolé : refus local 403 conservé.
+
+
 ## Version 1.15.0
 
 - APK finale signée installée sur le Thor : version 19 / 1.15.0, cible API 35, débogage désactivé ; 87486 octets. SHA-256 : `ead4e5d9c58eacf044b452406d42bcd5b4122a895ce18e2c598d3e8d260d2b45`. Assets empaquetés vérifiés.

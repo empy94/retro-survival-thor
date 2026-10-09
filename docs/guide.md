@@ -65,6 +65,8 @@ Active **Vendre les doublons identiques moins bons** dans **Options** ou **⚙ A
 
 ## Mises à jour et sauvegardes
 
+Le **nuage du menu principal** permet de générer le code de récupération du jeu. La synchronisation en ligne et ce bouton fonctionnent dans la version **1.15.1+**. Garde ce code secret.
+
 Installe la nouvelle APK par-dessus l’ancienne. La sauvegarde de cette application est distincte de Chrome. La désinstallation peut effacer les données de l’application ; une autre clé de signature ne peut pas remplacer l’APK publié.
 
 **⚙ APK → Exporter la progression** crée un fichier JSON à l’endroit choisi. **Restaurer la progression** recharge ce fichier et redémarre le jeu. Il contient les cartes débloquées, records et collection permanente. Il ne contient pas une partie en cours. Conserve une copie avant de désinstaller. Les fichiers d’une autre application ou d’un format inconnu sont refusés.

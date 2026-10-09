@@ -1,5 +1,10 @@
 # Versions
 
+## 1.15.1 — 9 octobre 2026
+
+- Sauvegarde en ligne : correction du filtrage réseau qui pouvait empêcher la synchronisation et la génération du code de récupération dans le menu nuage.
+- Portée de Téléportation vérifiée : cercle et destination recalculés avec les améliorations, y compris pendant le maintien de la touche.
+
 ## 1.15.0 — 9 octobre 2026
 
 - Vente automatique sécurisée, facultative : même objet équipé, tous les effets égaux ou inférieurs. Nouveaux objets, meilleur effet, rayonnants et objets permanents protégés.

@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
      }
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
-       if(official&&companion.localSession()&&!"GET".equals(r.getMethod())&&route!=null&&(route.startsWith("/api/leaderboard")||route.startsWith("/api/progress")||route.equals("/api/run-build")||route.equals("/api/share")))return new WebResourceResponse("application/json","UTF-8",403,"Local session",Collections.singletonMap("Cache-Control","no-store"),new ByteArrayInputStream("{\"error\":\"Local session\"}".getBytes(StandardCharsets.UTF_8)));
+       if(official&&SessionNetworkPolicy.blocks(companion.localSession(),r.getMethod(),route))return new WebResourceResponse("application/json","UTF-8",403,"Local session",Collections.singletonMap("Cache-Control","no-store"),new ByteArrayInputStream("{\"error\":\"Local session\"}".getBytes(StandardCharsets.UTF_8)));
        if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
 
        if(!r.isForMainFrame()||!"GET".equals(r.getMethod())||!"retrosurvival.online".equals(r.getUrl().getHost())||!"/".equals(r.getUrl().getPath()))return null;
