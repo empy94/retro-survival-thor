@@ -1,3 +1,9 @@
+# Version 1.17.2 — 9 octobre 2026
+
+- Une nouvelle révision officielle est apparue pendant l’installation de la 1.17.1 : `page-BNONV-CU.js`, SHA-256 `4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca`. Les 67 fonctions des adaptations sont textuellement identiques aux versions auditées. Changements hors adaptation : Mutilation, pause/abandon et composant Nk.
+- Test Java de compatibilité actualisé réussi. APK finale signée 1.17.2 / code 25 installée, SHA-256 `4f7b6d9b6ed4e084cdcf209fe827bd3edca1a3a2e12f27ebc42792a94e28c393`.
+- Sur Thor avec APK finale : nouvelle partie Astrub, page Cheats active ; boutons soins/recharge/invincibilité et bonus actifs, catalogue d’équipement ouvert. La nouvelle table de reconnaissance permet de charger les règles de statistiques natives déjà vérifiées. Aucun essai de campagne complète supplémentaire.
+
 # Version 1.17.1 — 9 octobre 2026
 
 - Régression observée sur le Thor : onglet Cheats présent mais commandes grisées et améliorations absentes. Nouvelle révision officielle `page-CMqUxGM4.js`, SHA-256 `5a385b4cf6390e0b0713dab4effab3c322d177a148776472743fd38546a4d6a6`, non reconnue par la 1.17.0.

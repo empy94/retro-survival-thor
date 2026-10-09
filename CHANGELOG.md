@@ -1,3 +1,8 @@
+## 1.17.2 — dernière révision officielle
+
+- Prise en charge de `page-BNONV-CU.js`, révision supplémentaire publiée pendant l’installation. Les 67 fonctions des adaptations sont toujours identiques.
+- APK finale installée sur Thor avec extension 1.1.2 ; commandes Cheats actives sur la révision actuelle.
+
 ## 1.17.1 — rétablissement de l’extension Cheats
 
 - Reconnaissance de la révision officielle `page-CMqUxGM4.js`, publiée après la 1.17.0. Les 67 fonctions nécessaires aux adaptations sont identiques à la version précédente.
