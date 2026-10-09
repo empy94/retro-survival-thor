@@ -19,6 +19,7 @@ import java.util.*;
 
 public class MainActivity extends Activity {
  private WebView web,shortcutPanel;
+ private FrameLayout gameSurface;private LinearLayout loadPanel;private long loadGeneration;private boolean loadFailed;
  private CompanionModule companion;
  private boolean updateStarted;
  private String pendingBackup;
@@ -111,7 +112,7 @@ public class MainActivity extends Activity {
    bootstrap+="\n"+companion.get("bootstrap");
    inputs=getSystemService(InputManager.class);inputs.registerInputDeviceListener(inputListener,handler);
    displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
-   web=new WebView(this);setContentView(web);fitModernWindow(getWindow(),web);
+   web=new WebView(this);gameSurface=new FrameLayout(this);gameSurface.addView(web,new FrameLayout.LayoutParams(-1,-1));setContentView(gameSurface);fitModernWindow(getWindow(),gameSurface);
    web.addJavascriptInterface(new Object(){@JavascriptInterface public void setLanguage(String code){if(!Arrays.asList("fr","en","es").contains(code))return;runOnUiThread(()->{gameLanguage=code;getPreferences(0).edit().putString("gameLanguage",code).apply();});}@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&web.getUrl().startsWith("https://retrosurvival.online/"))settings();});}},"ThorPreferences");
    WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(false);
    s.setSupportZoom(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);
@@ -141,13 +142,31 @@ public class MainActivity extends Activity {
          return new WebResourceResponse("text/html","UTF-8",new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
        }catch(Exception ex){android.util.Log.e("ThorRetro","Loading controls",ex);return null;}
      }
-     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){ready=false;controlGate.invalidate();dashboardGate.invalidate();directions.clear();held.clear();triggerHold.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
+     public void onPageStarted(WebView v,String url,android.graphics.Bitmap favicon){loadFailed=false;showLoadingPanel();final long generation=++loadGeneration;handler.postDelayed(()->{if(generation==loadGeneration&&!ready&&!loadFailed)showLoadFailure("Le chargement du site prend trop de temps. Vérifie l’accès à Retro Survival depuis ton réseau, puis réessaie.");},30000);ready=false;controlGate.invalidate();dashboardGate.invalidate();directions.clear();held.clear();triggerHold.clear();characterData="{\"status\":\"unavailable\"}";if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
+     public void onReceivedError(WebView v,WebResourceRequest request,WebResourceError error){if(request.isForMainFrame())showLoadFailure("Impossible de joindre le site du jeu. Ta progression sauvegardée est conservée. Vérifie le réseau ou réessaie plus tard.");}
+     public void onReceivedHttpError(WebView v,WebResourceRequest request,WebResourceResponse response){if(request.isForMainFrame())showLoadFailure("Le site du jeu a refusé le chargement ("+response.getStatusCode()+"). Réessaie plus tard ou depuis un autre réseau.");}
      public void onPageFinished(WebView v,String url){
-       web.evaluateJavascript("!!(window.thorControls&&window.thorControls.move)",result->{ready="true".equals(result);android.util.Log.i("ThorRetro","controlsReady="+ready);if(ready)applySettings();else Toast.makeText(MainActivity.this,ui("Commandes indisponibles. Ferme puis rouvre le jeu."),Toast.LENGTH_LONG).show();});
+       final long generation=loadGeneration;
+       web.evaluateJavascript("!!(window.thorControls&&window.thorControls.move)",result->{if(generation!=loadGeneration||isDestroyed())return;ready="true".equals(result);android.util.Log.i("ThorRetro","controlsReady="+ready);if(ready){hideLoadPanel();applySettings();}else if(!loadFailed)showLoadFailure("Le jeu ou ses commandes n’ont pas pu démarrer. Réessaie le chargement. Ta progression sauvegardée est conservée.");});
        if(!getPreferences(0).getBoolean("helpSeen",false)){getPreferences(0).edit().putBoolean("helpSeen",true).apply();help();}
      }
    });
    web.loadUrl("https://retrosurvival.online/");web.requestFocus();
+ }
+ private void showLoadingPanel(){
+  hideLoadPanel();loadPanel=new LinearLayout(this);loadPanel.setOrientation(1);loadPanel.setGravity(Gravity.CENTER);loadPanel.setBackgroundColor(0xff17251c);
+  TextView label=new TextView(this);label.setText(ui("Chargement de Retro Survival…"));label.setTextColor(0xffffe4a0);label.setTextSize(24);label.setPadding(24,24,24,24);loadPanel.addView(label);loadPanel.addView(new ProgressBar(this));gameSurface.addView(loadPanel,new FrameLayout.LayoutParams(-1,-1));
+ }
+ private void hideLoadPanel(){if(loadPanel!=null){gameSurface.removeView(loadPanel);loadPanel=null;}}
+ private void retryGame(){++loadGeneration;loadFailed=false;hideLoadPanel();adaptedModule=null;adaptedUrl=null;web.stopLoading();web.loadUrl("https://retrosurvival.online/");}
+ private void showLoadFailure(String reason){
+  if(isFinishing()||isDestroyed())return;loadFailed=true;ready=false;reset();hideLoadPanel();
+  loadPanel=new LinearLayout(this);loadPanel.setOrientation(1);loadPanel.setGravity(Gravity.CENTER);loadPanel.setPadding(48,32,48,32);loadPanel.setBackgroundColor(0xff17251c);
+  TextView title=new TextView(this);title.setText(ui("Le jeu ne peut pas se charger"));title.setTextColor(0xffffe4a0);title.setTextSize(26);title.setGravity(Gravity.CENTER);loadPanel.addView(title);
+  TextView explanation=new TextView(this);explanation.setText(ui(reason));explanation.setTextColor(0xffeeeeee);explanation.setTextSize(18);explanation.setGravity(Gravity.CENTER);explanation.setPadding(0,24,0,24);loadPanel.addView(explanation);
+  Button retry=new Button(this);retry.setText(ui("Réessayer"));retry.setOnClickListener(v->retryGame());loadPanel.addView(retry);
+  Button network=new Button(this);network.setText(ui("Réglages Wi-Fi"));network.setOnClickListener(v->{try{startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));}catch(Exception ignored){Toast.makeText(this,ui("Ouvre les réglages réseau d’Android."),Toast.LENGTH_LONG).show();}});loadPanel.addView(network);
+  gameSurface.addView(loadPanel,new FrameLayout.LayoutParams(-1,-1));
  }
  private static void fitModernWindow(Window window,View content){
    if(Build.VERSION.SDK_INT<35)return;
@@ -164,7 +183,7 @@ public class MainActivity extends Activity {
       adaptedModule=source+"\n"+companion.localMainHook()+"\n"+companion.localRulesHook();adaptedUrl=url;
      }else{
      if(!GameModuleVersions.supported(hash.toString()))return null;
-     try(InputStream hook=getAssets().open(GameModuleVersions.current(hash.toString())?"native-module-hook-current.js":GameModuleVersions.previous(hash.toString())?"native-module-hook-previous.js":"native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(companion.supportsGameModule(hash.toString())?companion.get(GameModuleVersions.current(hash.toString())?"moduleHookCurrent":GameModuleVersions.previous(hash.toString())?"moduleHookPrevious":"moduleHook"):"");adaptedUrl=url;}
+     try(InputStream hook=getAssets().open(GameModuleVersions.current(hash.toString())?"native-module-hook-current.js":GameModuleVersions.previous2(hash.toString())?"native-module-hook-previous2.js":GameModuleVersions.previous(hash.toString())?"native-module-hook-previous.js":"native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(companion.supportsGameModule(hash.toString())?companion.get(GameModuleVersions.current(hash.toString())?"moduleHookCurrent":GameModuleVersions.previous2(hash.toString())?"moduleHookPrevious2":GameModuleVersions.previous(hash.toString())?"moduleHookPrevious":"moduleHook"):"");adaptedUrl=url;}
      }
    }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));}catch(Exception ex){android.util.Log.w("ThorRetro","Game adapter unavailable",ex);return null;}
  }

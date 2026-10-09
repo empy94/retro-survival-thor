@@ -1,3 +1,9 @@
+## 1.19.1 — dernière révision et écran de connexion
+
+- Compatibilité avec `page-CMBWUFaS.js`, adaptations de statistiques, équipement et vente actualisées ; révisions précédentes conservées.
+- Écran de chargement visible dès l’ouverture. Connexion expirée, réponse HTTP refusée ou moteur indisponible : explication, bouton Réessayer et accès aux réglages Wi-Fi au lieu d’un écran blanc.
+- La progression reste intacte lors des réessais.
+
 ## 1.19.0 — mises à jour locales des modules
 
 - Prise en charge des fichiers de compatibilité importés par une extension de même signature : signature du fichier contrôlée également par l’application principale, scripts bornés et adaptation limitée au SHA-256 exact du module officiel.

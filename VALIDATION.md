@@ -1,3 +1,11 @@
+# Version 1.19.1 — 9 octobre 2026
+
+- Nouvelle révision officielle `page-CMBWUFaS.js`, SHA-256 `fb819a5e5509d0ab0a03f1f250a1794bd054a9fb2864e6bc1bdbf4f7aad158a9`, récupérée via le VPN temporaire du PC. Connexion directe au serveur expirée depuis le PC et le Thor.
+- Treize suites JavaScript publiques, test Java de compatibilité, suite privée, validation syntaxique de toutes les générations de scripts et tests du fichier local signé réussis. La création de fichier local vérifie désormais la syntaxe JavaScript avant signature.
+- Navigateur Edge isolé sur PC via VPN, avec HTML et module officiel audités interceptés pour ajouter exactement les scripts embarqués : jeu démarré, 14 statistiques, catalogue de 186 équipements, amélioration des dégâts 0 → 10 et génération d’un équipement parfait vérifiées. Apparition native du Bouftou Royal vérifiée. Il s’agit d’un test du moteur navigateur sur PC, pas d’une partie sur Thor.
+- Sur le Thor sans VPN : délai de connexion reproduit ; interface native d’erreur et boutons Réessayer / Réglages Wi-Fi visibles. Les APK finales 1.19.1 (code 29) et extension 1.3.1 (code 10) sont installées sans débogage, par-dessus les précédentes.
+- Limite : la mise à jour ne lève pas le problème d’accès du réseau local au serveur. Aucun jeu en ligne sur Thor ni campagne complète validé pendant cette session. L’écran blanc ne sert plus d’état d’erreur silencieux.
+
 # Version 1.19.0 — import local — 9 octobre 2026
 
 - Treize suites JavaScript publiques, cinq tests Java existants, suite privée et tests des fichiers signés réussis. Vérificateur partagé identique dans les deux APK.
