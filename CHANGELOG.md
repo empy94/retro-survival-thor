@@ -1,3 +1,9 @@
+## 1.18.1 — compatibilité avec la dernière mise à jour
+
+- Adaptations actualisées pour `page-CsVXhSaF.js`, statistiques et commandes privées incluses.
+- Conservation des quatre révisions précédentes avec leurs propres adaptations.
+- Vente automatique : conservation du nouveau placement natif des objets sur le terrain.
+
 ## 1.18.0 — Brokle à la manette
 
 - Brokle utilise désormais le lancement natif au relâchement pour toutes ses évolutions. Sans Saut Dirigé, il reste centré sur le personnage ; avec Saut Dirigé, la visée conserve la portée de 220.

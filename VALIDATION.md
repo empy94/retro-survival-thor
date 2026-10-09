@@ -1,3 +1,11 @@
+# Version 1.18.1 — 9 octobre 2026
+
+- Révision officielle `page-CsVXhSaF.js`, SHA-256 `a14150ba87429dbc69ff354a7de00274f356148304deb74d54d6760e780a63e7`. Nouvelle correspondance des fonctions internes et HUD extrait du moteur actuel.
+- Treize suites JavaScript publiques, suite privée et test Java de compatibilité réussis ; deux APK compilées et signées.
+- WebView réelle sur Thor : règles reconnues, 14 statistiques et 186 équipements ; amélioration native des dégâts 0 → 10 et rafraîchissement HUD exécutés sans erreur. Page Cheats présente.
+- Limites : pas de campagne complète, pas de nouvel essai physique de toutes les touches ni de Brokle dans cette révision. Correction Brokle conservée, tests de routage réussis.
+- Mise à jour locale de l’extension : installation de l’APK par-dessus la précédente puis redémarrage du jeu. Aucun import de scripts ni mise à jour autonome de l’extension ajouté.
+
 # Version 1.18.0 — 9 octobre 2026
 
 - Révision officielle `page-2MA4kA44.js`, SHA-256 `fbe576762c5685fcd399a879391b29a8b5b62106fac1664ab16bacc2246fe677`. Les symboles ont été renommés ; les adaptations de cette révision sont désormais distinctes de celles des trois révisions antérieures.
