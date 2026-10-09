@@ -18,6 +18,11 @@ let value=sample();assert.equal(value.hp,3);assert.equal(value.kamas,42);assert.
 assert.equal(value.stats.find(s=>s.name==='Critique').value,'+21 %');
 assert.equal(value.stats.find(s=>s.name==='Vitesse').value,null);
 assert.equal(JSON.stringify({live,hud}),original);
+// Current item icons no longer encode the item ID in their filenames.
+const itemCard=(id,name,icon,effects)=>({__reactFiberTest:{child:{memoizedProps:{item:{id}}}},querySelector(selector){return selector==='img'?{src:icon}:selector==='.equipment-tooltip strong'?{textContent:name}:selector==='.equipment-tooltip'?{textContent:name+' '+effects}:null;}});
+document.querySelectorAll=()=>[itemCard('second-ring','Anneau second','https://retrosurvival.online/assets/icon-987.webp','+4 %'),itemCard('test-ring','Anneau test','https://retrosurvival.online/assets/icon-123.webp','+7 %')];
+value=sample();assert.equal(value.items[0].name,'Anneau test');assert.equal(value.items[0].icon,'https://retrosurvival.online/assets/icon-123.webp');assert.equal(value.items[0].effects,'+7 %');assert.equal(value.items[1].name,'Anneau second');assert.equal(JSON.stringify({live,hud}),original);
+document.querySelectorAll=()=>[];
 const position=()=>JSON.parse(JSON.stringify(context.window.thorDashboard.playerPosition()));
 assert.deepEqual(position(),{x:120,y:80});
 live.player.x=300;assert.deepEqual(position(),{x:170,y:80});

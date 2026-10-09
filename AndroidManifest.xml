@@ -1,12 +1,15 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fr.thor.retrosurvival" android:versionCode="21" android:versionName="1.15.2">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fr.thor.retrosurvival" android:versionCode="22" android:versionName="1.16.0">
   <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="35"/>
   <permission android:name="fr.thor.retrosurvival.COMPANION_ACCESS" android:protectionLevel="signature"/>
   <uses-permission android:name="fr.thor.retrosurvival.COMPANION_ACCESS"/>
   <queries><intent><action android:name="fr.thor.retrosurvival.COMPANION"/></intent></queries>
   <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-feature android:name="android.hardware.touchscreen" android:required="false"/>
   <uses-feature android:name="android.hardware.gamepad" android:required="false"/>
   <application android:label="Retro Survival" android:icon="@drawable/icon" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="false" android:allowBackup="true" android:hardwareAccelerated="true">
+    <service android:name=".UpdateJob" android:permission="android.permission.BIND_JOB_SERVICE" android:exported="false"/>
     <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="landscape" android:configChanges="orientation|screenSize|keyboardHidden">
       <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
     </activity>

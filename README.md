@@ -26,6 +26,12 @@ Les sorts déjà automatiques du jeu restent automatiques dans les trois modes. 
 
 **Auto avec tes exceptions :** sur le second écran, touche une icône dans **Sorts → Féca / Iop / Sram** pour garder ce sort manuel. Tes choix sont sauvegardés par classe ; les autres sorts suivent le mode global.
 
+## Mises à jour de l’application
+
+L’APK vérifie la dernière version stable publiée sur GitHub au lancement et environ une fois par jour en arrière-plan, selon les restrictions d’Android. Dans **⚙ APK / Select**, utilise **Vérifier les mises à jour APK** ou active **Notifications de nouvelles APK**. Android 13+ demande l’autorisation d’envoyer des notifications. Un refus laisse la vérification manuelle disponible.
+
+L’alerte ouvre le téléchargement de l’APK officielle ; Android te demande ensuite de confirmer son installation. Installe-la par-dessus l’application avec la même signature pour conserver les données. Cette fonction nécessite **1.16.0 ou plus** : les anciennes APK doivent être mises à jour une première fois manuellement. Une publication GitHub avec l’asset `Retro-Survival-Android.apk` et un tag stable supérieur déclenche la détection ; une APK seulement reconstruite sur le PC ne la déclenche pas.
+
 ## Une manette, une visée simple
 
 - **Stick gauche / croix** : déplacement et sélection dans les menus.

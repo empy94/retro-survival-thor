@@ -1,3 +1,9 @@
+## 1.16.0 — équipement et alertes de mise à jour
+
+- Icônes, noms et effets d’équipement lus à partir de l’identité réelle des objets dans le HUD, indépendamment du nom des images. Titre de colonne conservé pendant le défilement.
+- B réservé aux sorts, sans pause automatique lorsqu’il est libre ou dans les menus. Start conserve la pause.
+- Vérification de la dernière APK stable au lancement, bouton manuel et contrôle quotidien Android. Notifications activables, téléchargement volontaire et installation confirmée par Android.
+
 # Versions
 
 ## 1.15.2 — 9 octobre 2026

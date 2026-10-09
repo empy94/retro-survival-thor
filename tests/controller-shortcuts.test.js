@@ -8,6 +8,10 @@ const window={thorSpellBindings:mapping,thorMenu:{active:()=>inMenu,activate:()=
 const context={window,document:{querySelector:s=>s==='main'?main:null,querySelectorAll:()=>elements,addEventListener(){},createElement:()=>({style:{},remove(){}})},getComputedStyle:()=>({position:'relative'}),requestAnimationFrame:()=>1,cancelAnimationFrame(){},PointerEvent:function(type,props){this.type=type;Object.assign(this,props);}};
 const clock={value:1000};context.Date={now:()=>clock.value};
 vm.runInNewContext(fs.readFileSync('assets/controls.js','utf8'),context);const controls=window.thorControls;
+let pauses=0;controls.pause=()=>pauses++;
+controls.controller('B',true);controls.controller('B',false);assert.equal(pauses,0,'unassigned B never pauses');
+inMenu=true;controls.controller('B',true);controls.controller('B',false);assert.equal(pauses,0,'B never resumes or pauses menus');inMenu=false;
+controls.configure({spellShortcuts:{feca:{shield:'B'}}});controls.controller('B',true);controls.controller('B',false);assert.deepEqual(events,[['shield','pointerdown'],['shield','pointerup']]);assert.equal(pauses,0,'B casts an instant spell without pausing');events.length=0;controls.configure({spellShortcuts:{}});
 assert.equal(controls.controller('A',true),true);controls.controller('A',false);
 assert.deepEqual(events,[['liberation','pointerdown'],['liberation','pointerup']],'seventh spell assigned A');
 inMenu=true;controls.controller('A',true);controls.controller('A',false);assert.equal(confirmed,1);assert.equal(events.length,2,'A confirms instead of casting in menus');inMenu=false;

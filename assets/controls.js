@@ -137,13 +137,13 @@
      // spell list must not release a different spell than the one being held.
      if(!down){padHeld.delete(button);const route=padRoutes.get(button);padRoutes.delete(button);if(!route)return true;if(!route.suppressed){if(route.pending)this.button(route.index,true);this.button(route.index,false);}return true;}
      if(padHeld.has(button))return true;
-     if(window.thorMenu?.active()){if(button==='A')return window.thorMenu.activate();if(button==='B'){this.pause();return true;}return true;}
+     if(window.thorMenu?.active()){if(button==='A')return window.thorMenu.activate();return true;}
      manual();const slots=bindings(true),modifiers=['L1','R1','L2','R2'];
      padHeld.add(button);
      const chord=['X','Y','A','B'].includes(button)?modifiers.map(m=>padHeld.has(m)?slots.find(s=>s?.button===m+' + '+button):null).find(Boolean):null;
      if(chord){for(const m of modifiers){const route=padRoutes.get(m);if(route&&!route.suppressed){route.suppressed=true;if(ability?.index===route.index)finish('pointercancel');}}padRoutes.set(button,{index:chord.index});this.button(chord.index,true);return true;}
      const spell=slots.find(s=>s?.button===button);
-     if(!spell){if(button==='B'){this.pause();return true;}return button!=='A';}
+     if(!spell)return button!=='A';
      const pending=modifiers.includes(button)&&!spell.aimed;padRoutes.set(button,{index:spell.index,pending});if(!pending)this.button(spell.index,true);return true;
    },
    button(index,down){

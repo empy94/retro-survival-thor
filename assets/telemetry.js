@@ -4,6 +4,12 @@
  const slots={hat:'Coiffe',cape:'Cape',amulet:'Amulette',weapon:'Arme',shield:'Bouclier',belt:'Ceinture',boots:'Bottes',ring:'Anneaux',dofus:'Dofus'};
  let liveRef=null,liveCanvas=null,abilityCache=null,abilityAt=0;
  const text=value=>window.thorLocale?.text(value)||value;
+ function cardItem(card){
+   const fiber=card[Object.keys(card).find(k=>k.startsWith('__reactFiber'))];
+   const stack=fiber?[fiber]:[];let count=0;
+   while(stack.length&&count++<80){const f=stack.pop();const item=f.memoizedProps?.item;if(item?.id)return item;if(f.child)stack.push(f.child);if(f!==fiber&&f.sibling)stack.push(f.sibling);}
+   return null;
+ }
  // Read the mounted React tree, including the current side of double buffering.
  // No game state, score, inventory or input is written by this observer.
  function state(){
@@ -60,8 +66,9 @@
    const {live,hud}=state();
    if(!live||!hud||![live.player.hp,live.player.maxHp,live.kamas,live.level,live.wave].every(Number.isFinite)||live.player.maxHp<=0)return {status:'unavailable',locale,collection};
    const cards=[...document.querySelectorAll('.hud-inventory .filled')];
+   const equippedCards=new Map(cards.map(card=>[cardItem(card)?.id,card]));
    const items=Object.entries(live.equipment).flatMap(([slot,value])=>(Array.isArray(value)?value:value?[value]:[]).map(item=>{
-     const card=cards.find(el=>el.querySelector('img')?.getAttribute('src')?.includes('item-'+item.id+'.'));
+     const card=equippedCards.get(item.id);
      const img=card?.querySelector('img');
      const name=card?.querySelector('.equipment-tooltip strong')?.textContent||item.id;
      const effects=card?.querySelector('.equipment-tooltip')?.textContent?.slice(name.length).trim()||'';

@@ -218,3 +218,16 @@ Ces vérifications ne remplacent pas un test manuel complet des boutons physique
 - Le journal du Thor contient un arrêt fatal de Chromium/JNI lors des ouvertures de listes sur le second écran. Les listes natives HTML select sont remplacées par des boutons ouvrant une liste dans le document, sans demander une fenêtre Android.
 - Test isolé : ouverture, sélection, rappel de sauvegarde, fermeture sans changement, fermeture au changement de page et absence de création de select natif.
 - Sur le Thor : toucher du bouton Automatique dans Sorts, affichage des 25 choix dans la WebView réelle, processus conservé. Les menus de raccourcis et d’assistance utilisent le même sélecteur.
+
+
+## 1.16.0 — équipement et mises à jour (9 octobre 2026)
+
+- Défaut reproduit sur la version 1.15.2 réelle : images vides et identifiants internes, avec colonne équipement défilée et titre coupé. La télémétrie cherchait un ancien nom de fichier `item-<id>.`.
+- Correspondance corrigée par `memoizedProps.item.id` dans les composants React du HUD. Recherche bornée par carte, aucune écriture de l’état du jeu. Régression testée avec cartes désordonnées et icônes indépendantes de l’identifiant : noms, images et effets corrects.
+- Toutes les 13 suites JavaScript passent, dont B non assigné / menu / sort instantané. Comparaison Java de versions stable testée : égalité, versions inférieures, ordre numérique, préversions et tags invalides rejetés.
+- Nouvelle APK 1.16.0 / code 22 construite et signature v3 vérifiée. Compilation avec la bibliothèque Android API 33 disponible, cible Android 35 conservée.
+- Contrôle de mises à jour : API GitHub publique, réponse bornée à 256 Kio, délais de connexion/lecture, vérifications espacées de six heures, asset officiel attendu, refus des brouillons/préversions. Notification optionnelle et contrôle quotidien JobScheduler persistant ; aucune installation silencieuse.
+- Installation de diagnostic autorisée par l’utilisateur. Nouvelle partie lancée normalement : les deux objets permanents du HUD sont retrouvés par leur identité réelle, avec noms traduits, effets et URLs corrects ; l’icône Cawotte ne contient pas l’ID de l’objet dans son nom de fichier. Images de collection chargées dans la WebView du second écran. Aucun équipement Wabbit ordinaire récupéré pendant cet essai : leur correction est couverte par le test de régression et la correspondance générique, pas par un nouveau drop réel.
+- Start injecté par Android ouvre la pause ; B injecté laisse la pause ouverte. Aucun changement de l’état du jeu écrit directement pendant ces contrôles.
+- Vérification réseau GitHub effective sur Thor : dernière version v1.15.2 récupérée et correctement non proposée comme plus récente que 1.16.0. Tâche Android 16001 / UpdateJob réellement enregistrée. Notification d’une future version et confirmation d’installation depuis une notification non testées de bout en bout.
+- APK finale signée 1.16.0 installée par-dessus l’existante après le diagnostic, sans effacement des données ; version/code vérifiés et flag DEBUGGABLE absent. Publication GitHub autorisée. SHA-256 : 6807a43b64af56d3564e9ff7ac3ee494aa7ac0e22448d61cbfdb31757db82825.
