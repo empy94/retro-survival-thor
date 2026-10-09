@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
    try(InputStream policy=getAssets().open("spell-policy.js");InputStream catalog=getAssets().open("spell-catalog.json")){bootstrap=read(policy)+"\n"+bootstrap;spellCatalog=new JSONObject(read(catalog));}catch(Exception ex){throw new RuntimeException(ex);}
    inputs=getSystemService(InputManager.class);inputs.registerInputDeviceListener(inputListener,handler);
    displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
-   web=new WebView(this);setContentView(web);
+   web=new WebView(this);setContentView(web);fitModernWindow(getWindow(),web);
    web.addJavascriptInterface(new Object(){@JavascriptInterface public void setLanguage(String code){if(!Arrays.asList("fr","en","es").contains(code))return;runOnUiThread(()->{gameLanguage=code;getPreferences(0).edit().putString("gameLanguage",code).apply();});}@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&web.getUrl().startsWith("https://retrosurvival.online/"))settings();});}},"ThorPreferences");
    WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(false);
    s.setSupportZoom(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);
@@ -134,6 +134,12 @@ public class MainActivity extends Activity {
    });
    web.loadUrl("https://retrosurvival.online/");web.requestFocus();
  }
+ private static void fitModernWindow(Window window,View content){
+   if(Build.VERSION.SDK_INT<35)return;
+   window.setDecorFitsSystemWindows(false);
+   content.setOnApplyWindowInsetsListener((view,insets)->{android.graphics.Insets safe=insets.getInsets(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());view.setPadding(safe.left,safe.top,safe.right,safe.bottom);return insets;});
+   content.requestApplyInsets();
+ }
  private void immersive(){getWindow().getDecorView().setSystemUiVisibility(5894);}
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}
  private void syncActive(){if(ready&&web!=null)web.evaluateJavascript("window.thorControls.setActive("+(active&&hasWindowFocus())+")",null);}
@@ -156,7 +162,7 @@ public class MainActivity extends Activity {
    protected void onCreate(Bundle state){super.onCreate(state);
      getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
      getWindow().getDecorView().setSystemUiVisibility(5894);
-     panel=new WebView(getContext());setContentView(panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
+     panel=new WebView(getContext());setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
      panel.addJavascriptInterface(new Object(){@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
      panel.setWebViewClient(new WebViewClient(){public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
      try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}panel.loadDataWithBaseURL("https://retrosurvival.online/",html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}

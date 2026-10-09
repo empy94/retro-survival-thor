@@ -1,5 +1,11 @@
 # Versions
 
+## 1.13.2 — 9 octobre 2026
+
+- Cible Android 15 (API 35) : correction de la cause de l’alerte Play Protect « ancienne version d’Android » sur Android 16.
+- Nouvelle icône : bouclier, épée et flamme, palette verte, parchemin et or.
+- Marges adaptées aux barres système et encoches sur Android 15+.
+
 ## 1.13.1 — 9 octobre 2026
 
 - Fermeture sur le second écran corrigée : les listes de raccourcis et d’assistance s’ouvrent directement dans la page, sans fenêtre native Android. Choix, fermeture et sauvegarde conservés.

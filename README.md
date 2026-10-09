@@ -67,6 +67,8 @@ Sorts et raccourcis capturés sur l’APK **1.13.0** signée ; Options sur **1.1
 
 Pour une mise à jour, installe par-dessus l’application existante. Sa sauvegarde est distincte de Chrome.
 
+**Android 16 : utilise la version 1.13.2 ou plus récente.** La cible Android a été actualisée pour corriger l’alerte « ancienne version d’Android ». Play Protect peut encore proposer une analyse de cette APK distribuée hors Play Store : laisse cette protection activée. L’application demande uniquement l’accès Internet. [Explication Google](https://developers.google.com/android/play-protect/warning-dev-guidance).
+
 [Guide complet](docs/guide.md) · [Nouveautés](CHANGELOG.md) · [Tests et limites](VALIDATION.md) · [Code et compilation](docs/guide.md#construire-lapplication)
 
 Lanceur indépendant : le jeu est chargé depuis son site officiel. Non affilié à Retro Survival ou Ankama. Code du lanceur sous licence MIT.

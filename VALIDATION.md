@@ -1,5 +1,11 @@
 # Vérifications
 
+## Version 1.13.2
+
+- APK signées reconstruites : cible API 35, minimum API 28, version 17. Permission INTERNET uniquement, débogage désactivé. Onze suites JavaScript réussies.
+- Adaptation des marges Android 15+ compilée ; aucun Samsung Android 16 / One UI 8.5 disponible pour une validation réelle de Play Protect ou de l’affichage.
+- Selon Google, l’alerte de compatibilité apparaît quand la cible est plus de deux API derrière le système : API 33 sur Android 16/API 36 explique les captures. API 35 supprime cette cause ; les analyses d’APK inconnues restent possibles. https://developers.google.com/android/play-protect/warning-dev-guidance
+
 Vérifications effectuées les 8 et 9 octobre 2026 sur un AYN Thor connecté, Android 13.
 
 ## Version 1.11.0
