@@ -59,9 +59,15 @@ La fiche utilise le style du jeu : cœur de PV, kamas, caractéristiques et équ
 
 Les paramètres et la fiche suivent la langue du jeu : français, anglais ou espagnol. Une seule lecture en attente par boucle ; fiche actualisée à 2 Hz, éléments inchangés conservés.
 
+## Vendre les doublons
+
+Active **Vendre les doublons identiques moins bons** dans **Options** ou **⚙ APK**. La comparaison utilise chaque effet, pas seulement le jet global G. Un meilleur effet suffit à conserver le choix. L’option est désactivée initialement ; elle remplace le filtrage automatique du jeu lorsqu’elle est active. Les objets de même catégorie mais de noms différents restent proposés.
+
 ## Mises à jour et sauvegardes
 
 Installe la nouvelle APK par-dessus l’ancienne. La sauvegarde de cette application est distincte de Chrome. La désinstallation peut effacer les données de l’application ; une autre clé de signature ne peut pas remplacer l’APK publié.
+
+**⚙ APK → Exporter la progression** crée un fichier JSON à l’endroit choisi. **Restaurer la progression** recharge ce fichier et redémarre le jeu. Il contient les cartes débloquées, records et collection permanente. Il ne contient pas une partie en cours. Conserve une copie avant de désinstaller. Les fichiers d’une autre application ou d’un format inconnu sont refusés.
 
 ## Construire l’application
 

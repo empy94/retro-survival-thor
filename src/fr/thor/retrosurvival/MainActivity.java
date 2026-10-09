@@ -19,6 +19,12 @@ import java.util.*;
 
 public class MainActivity extends Activity {
  private WebView web,shortcutPanel;
+ private CompanionModule companion;
+ private String pendingBackup;
+ private static final int EXPORT_PROGRESS=410,IMPORT_PROGRESS=411;
+ private String adaptedModule,adaptedUrl;
+ private void companionCall(String json){if(companion==null||!companion.enabled()||characterScreen==null||!ready||!active||json==null||json.length()>2048)return;try{JSONObject request=new JSONObject(json);web.evaluateJavascript(companion.command(request.toString()),null);}catch(Exception ignored){}}
+
  private String gameLanguage="fr";
  private JSONObject languageTable=new JSONObject(),spellCatalog=new JSONObject();
  private String ui(String value){return languageTable.optJSONObject(gameLanguage)==null?value:languageTable.optJSONObject(gameLanguage).optString(value,value);}
@@ -44,7 +50,7 @@ public class MainActivity extends Activity {
  private final EvaluationGate controlGate=new EvaluationGate(),dashboardGate=new EvaluationGate();
  private final Runnable characterTick=new Runnable(){public void run(){
    if(!active)return;
-   if(ready&&(characterScreen!=null||shortcutPanel!=null)){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript("window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'}",result->{
+   if(ready&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript(companion.snapshot("(window.thorSalePolicy?.tick(),window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'})"),result->{
      if(!dashboardGate.complete(request)||!active||!ready)return;
      try{if(result.length()>65536)return;String next=new JSONObject(result).toString();if(!next.equals(characterData)){characterData=next;if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}}catch(Exception ignored){}
    });}
@@ -76,7 +82,7 @@ public class MainActivity extends Activity {
      if(held.contains(KeyEvent.KEYCODE_DPAD_UP))my=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_DOWN))my=1;
      final float rightX=rx,rightY=ry,elapsed=dt;
      boolean digital=held.contains(KeyEvent.KEYCODE_DPAD_LEFT)||held.contains(KeyEvent.KEYCODE_DPAD_RIGHT)||held.contains(KeyEvent.KEYCODE_DPAD_UP)||held.contains(KeyEvent.KEYCODE_DPAD_DOWN);
-     web.evaluateJavascript("window.thorControls.stick("+mx+","+my+","+digital+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
+     web.evaluateJavascript((companion==null?"":companion.get("frame"))+"window.thorControls.stick("+mx+","+my+","+digital+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
      if(!controlGate.complete(request))return;
      if(!active||!ready)return;
      if(!"true".equals(radial)&&(Math.abs(rightX)>.16f||Math.abs(rightY)>.16f)){
@@ -92,12 +98,16 @@ public class MainActivity extends Activity {
  private float curve(float v){return Math.abs(v)<=.16f?0:Math.copySign((Math.abs(v)-.16f)/.84f,v);}
  public void onCreate(Bundle state){
    super.onCreate(state);
+   companion=new CompanionModule(this);
+   if(state!=null)pendingBackup=state.getString("pendingProgressBackup");
    gameLanguage=getPreferences(0).getString("gameLanguage","fr");try(InputStream in=getAssets().open("locale.json")){languageTable=new JSONObject(read(in));}catch(Exception ignored){}
    cursorSensitivity=Math.max(25,Math.min(250,getPreferences(0).getInt("cursorSensitivity",100)))/100f;
    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
    immersive();
    try(InputStream mapping=getAssets().open("spell-bindings.js");InputStream in=getAssets().open("controls.js");InputStream telemetry=getAssets().open("telemetry.js")){try(InputStream menu=getAssets().open("menu-navigation.js")){try(InputStream locale=getAssets().open("locale.js")){try(InputStream collection=getAssets().open("collection.js")){bootstrap=read(collection)+"\n"+read(locale)+"\n"+read(menu)+"\n"+read(mapping)+"\n"+read(in)+"\n"+read(telemetry);try(InputStream auto=getAssets().open("auto-spells.js")){bootstrap+="\n"+read(auto);}}}}}catch(Exception ex){throw new RuntimeException(ex);}
    try(InputStream policy=getAssets().open("spell-policy.js");InputStream catalog=getAssets().open("spell-catalog.json")){bootstrap=read(policy)+"\n"+bootstrap;spellCatalog=new JSONObject(read(catalog));}catch(Exception ex){throw new RuntimeException(ex);}
+   try(InputStream sale=getAssets().open("safe-sales.js");InputStream backup=getAssets().open("progress-backup.js")){bootstrap+="\n"+read(sale)+"\n"+read(backup);}catch(Exception ex){throw new RuntimeException(ex);}
+   bootstrap+="\n"+companion.get("bootstrap");
    inputs=getSystemService(InputManager.class);inputs.registerInputDeviceListener(inputListener,handler);
    displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
    web=new WebView(this);setContentView(web);fitModernWindow(getWindow(),web);
@@ -112,6 +122,10 @@ public class MainActivity extends Activity {
        try{startActivity(new Intent(Intent.ACTION_VIEW,r.getUrl()));}catch(Exception ignored){}return true;
      }
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
+       String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
+       if(official&&companion.localSession()&&!"GET".equals(r.getMethod())&&route!=null&&(route.startsWith("/api/leaderboard")||route.startsWith("/api/progress")||route.equals("/api/run-build")||route.equals("/api/share")))return new WebResourceResponse("application/json","UTF-8",403,"Local session",Collections.singletonMap("Cache-Control","no-store"),new ByteArrayInputStream("{\"error\":\"Local session\"}".getBytes(StandardCharsets.UTF_8)));
+       if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
+
        if(!r.isForMainFrame()||!"GET".equals(r.getMethod())||!"retrosurvival.online".equals(r.getUrl().getHost())||!"/".equals(r.getUrl().getPath()))return null;
        try{
          HttpURLConnection c=(HttpURLConnection)new URL(r.getUrl().toString()).openConnection();
@@ -141,6 +155,14 @@ public class MainActivity extends Activity {
    content.requestApplyInsets();
  }
  private void immersive(){getWindow().getDecorView().setSystemUiVisibility(5894);}
+ private synchronized WebResourceResponse adaptModule(WebResourceRequest request){
+   try{String url=request.getUrl().toString();if(adaptedModule==null||!url.equals(adaptedUrl)){
+     HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setConnectTimeout(15000);connection.setReadTimeout(20000);String source;try(InputStream in=connection.getInputStream()){source=read(in);}finally{connection.disconnect();}if(source.length()>4000000)return null;
+     byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+     if(!"1c093e705dd623f8d0ddcaf0f9ed1101db7a42f41a3475efee691421a29e638d".equals(hash.toString()))return null;
+     try(InputStream hook=getAssets().open("native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+companion.get("moduleHook");adaptedUrl=url;}
+   }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));}catch(Exception ex){android.util.Log.w("ThorRetro","Game adapter unavailable",ex);return null;}
+ }
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}
  private void syncActive(){if(ready&&web!=null)web.evaluateJavascript("window.thorControls.setActive("+(active&&hasWindowFocus())+")",null);}
  public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)immersive();else reset();syncActive();}
@@ -163,11 +185,11 @@ public class MainActivity extends Activity {
      getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
      getWindow().getDecorView().setSystemUiVisibility(5894);
      panel=new WebView(getContext());setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
-     panel.addJavascriptInterface(new Object(){@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
+     panel.addJavascriptInterface(new Object(){@JavascriptInterface public void companionCall(String json){runOnUiThread(()->MainActivity.this.companionCall(json));}@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
      panel.setWebViewClient(new WebViewClient(){public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
-     try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}panel.loadDataWithBaseURL("https://retrosurvival.online/",html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
+     try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}html=html.replace("</head>","<style>"+companion.get("panelStyle")+"</style></head>").replace("</body>","<script>"+companion.get("panelScript")+"</script></body>");panel.loadDataWithBaseURL("https://retrosurvival.online/",html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
    }
-   void update(String json){if(loaded&&panel!=null)try{JSONObject data=new JSONObject(json);data.put("controls",panelOptions());panel.evaluateJavascript("window.renderThorDashboard("+data.toString()+")",null);}catch(Exception ignored){}}
+   void update(String json){if(loaded&&panel!=null)try{JSONObject data=new JSONObject(json);data.put("controls",panelOptions());panel.evaluateJavascript("window.renderThorDashboard("+data.toString()+");window.thorCompanionPanel?.render("+data.opt("companion")+")",null);}catch(Exception ignored){}}
    public void dismiss(){if(panel!=null){panel.destroy();panel=null;}super.dismiss();}
  }
  private void key(String k,String c,boolean down){if(ready){if("Escape".equals(k)){if(down)web.evaluateJavascript("window.thorControls.pause()",null);}else if(c.startsWith("Digit")){String[] names={"X","Y","L1","R1","L2","R2","A","B"};web.evaluateJavascript("window.thorControls.controller("+quote(names[Integer.parseInt(k)-1])+","+down+")",null);}else web.evaluateJavascript("window.thorControls.key("+quote(k)+","+quote(c)+","+down+")",null);}}
@@ -246,17 +268,21 @@ public class MainActivity extends Activity {
    try{JSONObject all=spellManual();org.json.JSONArray old=all.optJSONArray(character),next=new org.json.JSONArray();if(old!=null)for(int i=0;i<old.length();i++)if(!id.equals(old.optString(i)))next.put(old.optString(i));if(manual)next.put(id);all.put(character,next);getPreferences(0).edit().putString("spellManual",all.toString()).apply();applySettings();}catch(Exception ignored){}
  }
  private JSONObject panelOptions(){
-   JSONObject data=new JSONObject();android.content.SharedPreferences p=getPreferences(0);try{data.put("mode",autoMode());data.put("manual",spellManual());data.put("shortcuts",spellShortcuts());for(String key:Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper"))data.put(key,p.getBoolean(key,true));data.put("cursorSensitivity",p.getInt("cursorSensitivity",100));data.put("labelOpacity",p.getInt("labelOpacity",45));}catch(Exception ignored){}return data;
+   JSONObject data=new JSONObject();android.content.SharedPreferences p=getPreferences(0);try{data.put("mode",autoMode());data.put("manual",spellManual());data.put("shortcuts",spellShortcuts());for(String key:Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper","safeAutoSell"))data.put(key,p.getBoolean(key,!"safeAutoSell".equals(key)));data.put("cursorSensitivity",p.getInt("cursorSensitivity",100));data.put("labelOpacity",p.getInt("labelOpacity",45));}catch(Exception ignored){}return data;
  }
  private void savePanelOption(String name,String value){
    android.content.SharedPreferences.Editor edit=getPreferences(0).edit();
    if("autoSpellMode".equals(name)&&Arrays.asList("off","buffs","full").contains(value))edit.putString(name,value);
-   else if(Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper").contains(name)&&Arrays.asList("true","false").contains(value))edit.putBoolean(name,"true".equals(value));
+   else if(Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper","safeAutoSell").contains(name)&&Arrays.asList("true","false").contains(value))edit.putBoolean(name,"true".equals(value));
    else if(Arrays.asList("cursorSensitivity","labelOpacity").contains(name))try{int v=Integer.parseInt(value),min="cursorSensitivity".equals(name)?25:15,max="cursorSensitivity".equals(name)?250:85;if(v<min||v>max)return;edit.putInt(name,v);if("cursorSensitivity".equals(name))cursorSensitivity=v/100f;}catch(Exception ignored){return;}
    else return;
    edit.apply();applySettings();
  }
- private void applySettings(){if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorControls.configure({autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
+ private void applySettings(){if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
+ protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);if(pendingBackup!=null)state.putString("pendingProgressBackup",pendingBackup);}
+ private void exportProgress(){if(!ready)return;web.evaluateJavascript("window.thorProgressBackup.export()",result->{if(result==null||"null".equals(result)){Toast.makeText(this,ui("Aucune progression à exporter"),Toast.LENGTH_LONG).show();return;}try{pendingBackup=new JSONObject(result).toString(2);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Retro-Survival-progression.json");startActivityForResult(intent,EXPORT_PROGRESS);}catch(Exception ignored){}});}
+ private void importProgress(){new AlertDialog.Builder(this).setMessage(ui("Restaurer remplacera la progression locale et redémarrera le jeu.")).setNegativeButton(ui("Annuler"),null).setPositiveButton(ui("Choisir le fichier"),(dialog,which)->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE),IMPORT_PROGRESS)).show();}
+ protected void onActivityResult(int request,int result,Intent intent){super.onActivityResult(request,result,intent);if(result!=RESULT_OK||intent==null||intent.getData()==null){pendingBackup=null;return;}try{if(request==EXPORT_PROGRESS&&pendingBackup!=null){try(OutputStream out=getContentResolver().openOutputStream(intent.getData(),"wt")){out.write(pendingBackup.getBytes(StandardCharsets.UTF_8));}pendingBackup=null;Toast.makeText(this,ui("Progression exportée"),Toast.LENGTH_LONG).show();}else if(request==IMPORT_PROGRESS){String value;try(InputStream in=getContentResolver().openInputStream(intent.getData())){ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int count;while((count=in.read(buffer))!=-1){out.write(buffer,0,count);if(out.size()>262144)throw new IOException("Backup too large");}value=new String(out.toByteArray(),StandardCharsets.UTF_8);}JSONObject backup=new JSONObject(value);web.evaluateJavascript("window.thorProgressBackup.restore("+backup.toString()+")",accepted->{if("true".equals(accepted))web.reload();else Toast.makeText(this,ui("Sauvegarde incompatible"),Toast.LENGTH_LONG).show();});}}catch(Exception ex){Toast.makeText(this,ui("Sauvegarde incompatible"),Toast.LENGTH_LONG).show();}}
  private void settings(){
    reset();if(ready)web.evaluateJavascript("window.thorControls.beginPreferences()",paused->settingsDialog("true".equals(paused)));else settingsDialog(false);
  }
@@ -276,6 +302,7 @@ public class MainActivity extends Activity {
    auto.setOnCheckedChangeListener((group,id)->{RadioButton choice=group.findViewById(id);if(choice!=null){p.edit().putString("autoSpellMode",(String)choice.getTag()).apply();applySettings();}});
    TextView autoHint=new TextView(this);autoHint.setText(ui("Buffs : dès qu’ils sont disponibles. Tous les sorts : buffs, attaques et zones. Tu gardes le déplacement et les choix."));layout.addView(autoHint);Button shortcuts=new Button(this);shortcuts.setText(ui("Raccourcis des sorts"));shortcuts.setOnClickListener(v->shortcutDialog());layout.addView(shortcuts);
    Switch cursor=new Switch(this);cursor.setText(ui("Masquer le curseur pendant les combats"));cursor.setChecked(p.getBoolean("hideCombatCursor",true));layout.addView(cursor);cursor.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("hideCombatCursor",v).apply();applySettings();});
+   Switch sale=new Switch(this);sale.setText(ui("Vendre les doublons identiques moins bons"));sale.setChecked(p.getBoolean("safeAutoSell",false));layout.addView(sale);sale.setOnCheckedChangeListener((button,value)->{p.edit().putBoolean("safeAutoSell",value).apply();applySettings();});
    Switch helper=new Switch(this);helper.setText(ui("Alerte de PV faibles sur la fiche"));helper.setChecked(p.getBoolean("combatHelper",true));layout.addView(helper);helper.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("combatHelper",v).apply();applySettings();});
    Switch radial=new Switch(this);radial.setText(ui("Visée radiale des sorts à cibler"));radial.setChecked(p.getBoolean("radialAim",true));layout.addView(radial);radial.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("radialAim",v).apply();applySettings();});
    Switch joystick=new Switch(this);joystick.setText(ui("Joystick visuel en bas à gauche"));joystick.setChecked(p.getBoolean("showJoystick",true));layout.addView(joystick);
@@ -286,6 +313,7 @@ public class MainActivity extends Activity {
    labels.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showLabels",v).apply();applySettings();});
    joystick.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showJoystick",v).apply();applySettings();});
    slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int value,boolean user){opacity.setText(ui("Opacité des touches : ")+value+" %");p.edit().putInt("labelOpacity",value).apply();applySettings();}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
+   Button export=new Button(this);export.setText(ui("Exporter la progression"));export.setOnClickListener(v->exportProgress());layout.addView(export);Button restore=new Button(this);restore.setText(ui("Restaurer la progression"));restore.setOnClickListener(v->importProgress());layout.addView(restore);
    ScrollView scroll=new ScrollView(this);scroll.addView(layout);
    boolean[] showHelp={false};AlertDialog dialog=new AlertDialog.Builder(this).setTitle(ui("Paramètres de jeu et manette")).setView(scroll).setPositiveButton(ui("Fermer"),null).setNeutralButton(ui("Commandes"),(d,w)->{showHelp[0]=true;help();}).create();
    dialog.setOnDismissListener(d->{controllerStatus=null;displayStatus=null;if(resumeGame&&!showHelp[0]&&ready)web.evaluateJavascript("window.thorControls.endPreferences()",null);web.requestFocus();immersive();});dialog.show();

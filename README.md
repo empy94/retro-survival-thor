@@ -59,13 +59,15 @@ Sur un appareil compatible comme le Thor : cœur de PV, kamas, caractéristiques
 
 Sorts et raccourcis capturés sur l’APK **1.13.0** signée ; Options sur **1.12.0**, intégrées dans un visuel du Thor. Autres appareils et manettes externes : compatibles selon Android, non testés matériellement.
 
+**Moins de choix répétitifs :** active « Vendre les doublons identiques moins bons » dans les options. Seul un objet déjà équipé, de même identité et sans aucun effet meilleur, est vendu. Nouveaux objets, effets meilleurs, rayonnants et objets permanents restent proposés.
+
 ## Installer et jouer
 
 1. Télécharge l’APK ci-dessus, installe-la et ouvre **Retro Survival**.
 2. Utilise le tactile ou connecte ta manette dans Android.
 3. Sur Thor / Cocoon : **Toutes les applis → Retro Survival → appui long → Ajouter au Menu Home**.
 
-Pour une mise à jour, installe par-dessus l’application existante. Sa sauvegarde est distincte de Chrome.
+Pour une mise à jour, installe par-dessus l’application existante. Sa sauvegarde est distincte de Chrome. **⚙ APK → Exporter / Restaurer la progression** permet de garder une copie des cartes débloquées, records et objets permanents.
 
 **Android 16 : utilise la version 1.13.2 ou plus récente.** La cible Android a été actualisée pour corriger l’alerte « ancienne version d’Android ». Play Protect peut encore proposer une analyse de cette APK distribuée hors Play Store : laisse cette protection activée. L’application demande uniquement l’accès Internet. [Explication Google](https://developers.google.com/android/play-protect/warning-dev-guidance).
 

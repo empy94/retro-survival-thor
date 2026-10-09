@@ -18,7 +18,7 @@
  const el=id=>document.getElementById(id),text=value=>window.thorLocale?.text(value)||value;
  let page=0,character='feca',chosenClass=false,data={},signature='',optionsSignature='',start=null,skipClick=false;
  const classes={feca:'Féca',iop:'Iop',sram:'Sram'};
- function showPage(next){window.thorDeckChoice.close();page=Math.max(0,Math.min(2,next));['character','spells','options'].forEach((name,i)=>el('page-'+name).hidden=i!==page);document.querySelectorAll('[data-page]').forEach(n=>n.setAttribute('aria-pressed',String(Number(n.dataset.page)===page)));}
+ function showPage(next){window.thorDeckChoice.close();const pages=[...document.querySelectorAll('.deck-page')];page=Math.max(0,Math.min(pages.length-1,next));pages.forEach((node,i)=>node.hidden=i!==page);document.querySelectorAll('[data-page]').forEach(n=>n.setAttribute('aria-pressed',String(Number(n.dataset.page)===page)));}
  function card(tag,value){const n=document.createElement(tag);n.textContent=value;return n;}
  function saveOption(name,value){window.ThorDeck?.setOption(name,String(value));}
  function renderSpells(){
@@ -43,7 +43,7 @@
   const controls=data.controls||{};const next=JSON.stringify([data.locale,controls]);if(next===optionsSignature)return;optionsSignature=next;
   const rows=[],row=(label,input)=>{const r=card('label','');r.className='deck-option';r.append(card('span',text(label)),input);rows.push(r);return r;};
   const choices=[['off','Désactivée'],['buffs','Buffs auto uniquement'],['full','Tous les sorts intelligents']].map(([value,label])=>({value,label:text(label)}));const select=window.thorDeckChoice.create(text('Assistance des sorts'),choices,controls.mode||'off',value=>saveOption('autoSpellMode',value));row('Assistance des sorts',select);
-  for(const [key,label] of [['radialAim','Visée radiale des sorts à cibler'],['hideCombatCursor','Masquer le curseur pendant les combats'],['showLabels','Touches sur les sorts actifs'],['showJoystick','Joystick visuel en bas à gauche'],['combatHelper','Alerte de PV faibles sur la fiche']]){const input=document.createElement('input');input.type='checkbox';input.checked=controls[key]!==false;input.onchange=()=>saveOption(key,input.checked);row(label,input);}
+  for(const [key,label] of [['radialAim','Visée radiale des sorts à cibler'],['hideCombatCursor','Masquer le curseur pendant les combats'],['showLabels','Touches sur les sorts actifs'],['showJoystick','Joystick visuel en bas à gauche'],['combatHelper','Alerte de PV faibles sur la fiche'],['safeAutoSell','Vendre les doublons identiques moins bons']]){const input=document.createElement('input');input.type='checkbox';input.checked=key==='safeAutoSell'?controls[key]===true:controls[key]!==false;input.onchange=()=>saveOption(key,input.checked);row(label,input);}
   for(const [key,label,min,max] of [['cursorSensitivity','Sensibilité du curseur : ',25,250],['labelOpacity','Opacité des touches : ',15,85]]){const input=document.createElement('input');input.type='range';input.min=min;input.max=max;input.value=controls[key]??(key==='cursorSensitivity'?100:45);const out=card('output',input.value+' %');input.oninput=()=>out.textContent=input.value+' %';input.onchange=()=>saveOption(key,input.value);row(label,input).append(out);}
   el('deck-options').replaceChildren(...rows);
  }

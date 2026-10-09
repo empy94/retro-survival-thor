@@ -1,5 +1,11 @@
 # Versions
 
+## 1.15.0 — 9 octobre 2026
+
+- Vente automatique sécurisée, facultative : même objet équipé, tous les effets égaux ou inférieurs. Nouveaux objets, meilleur effet, rayonnants et objets permanents protégés.
+- Export/import de progression au format JSON depuis les paramètres, avec le sélecteur Android. Cartes débloquées, records et collection permanente ; ne sauvegarde pas le combat en cours.
+- Nouveaux réglages traduits en français, anglais et espagnol.
+
 ## 1.13.2 — 9 octobre 2026
 
 - Cible Android 15 (API 35) : correction de la cause de l’alerte Play Protect « ancienne version d’Android » sur Android 16.

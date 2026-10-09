@@ -22,6 +22,7 @@
    return {live,hud};
  }
  window.thorDashboard={
+ context(){this.playerPosition();return liveRef?.current||null;},
  character(){this.playerPosition();return window.thorSpellPolicy?.classFor(liveRef?.current?.levelId);},
  combatState(includeTargets=true){
    if(!this.playerPosition())return null;

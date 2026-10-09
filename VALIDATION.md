@@ -1,5 +1,14 @@
 # Vérifications
 
+## Version 1.15.0
+
+- Treize suites JavaScript, plus les deux tests Java de limitation des évaluations et de maintien des gâchettes. Vente testée : même identité, chaque effet inférieur/égal, protection d’un meilleur effet même avec un G global inférieur, nouveaux/rayonnants/permanents, chemin original conservé si désactivée.
+- Sur la WebView réelle du Thor Android 13 : dialogue original de doublon inférieur fermé par la vente, kamas crédités ; réglage activé dans les paramètres Android et conservé après redémarrage. Le cas de comparaison a été préparé pour le test ; pas d’essai prolongé de toutes les tables de butin.
+- Export effectué via le vrai sélecteur Android dans Téléchargements/Retro-Survival-progression.json ; import du même fichier effectué, cartes/records/collection inchangés. Pas d’autorisation de stockage étendue.
+- L’adaptation native utilise exclusivement le module officiel dont le SHA-256 est vérifié. Si sa version change, l’adaptation ne s’applique pas. Le code du jeu est chargé depuis son site et n’est pas inclus dans l’APK.
+- Option de vente traitée dans la lecture existante à 2 Hz ; aucun nouvel intervalle par image. Pas de mesure exhaustive des FPS ni d’essai Samsung Android 16.
+
+
 ## Version 1.13.2
 
 - APK signées reconstruites : cible API 35, minimum API 28, version 17. Permission INTERNET uniquement, débogage désactivé. Onze suites JavaScript réussies.
