@@ -1,3 +1,8 @@
+## 1.19.0 — mises à jour locales des modules
+
+- Prise en charge des fichiers de compatibilité importés par une extension de même signature : signature du fichier contrôlée également par l’application principale, scripts bornés et adaptation limitée au SHA-256 exact du module officiel.
+- Retour aux adaptations intégrées si le fichier local est absent ou invalide. Les sauvegardes ne sont pas modifiées.
+
 ## 1.18.1 — compatibilité avec la dernière mise à jour
 
 - Adaptations actualisées pour `page-CsVXhSaF.js`, statistiques et commandes privées incluses.

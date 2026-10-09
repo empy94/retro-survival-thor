@@ -1,3 +1,12 @@
+# Version 1.19.0 — import local — 9 octobre 2026
+
+- Treize suites JavaScript publiques, cinq tests Java existants, suite privée et tests des fichiers signés réussis. Vérificateur partagé identique dans les deux APK.
+- Tests JVM : signature correcte, contenu modifié, mauvaise clé, JSON invalide, schéma incompatible, identifiant de version incorrect, SHA non exact, script absent ou trop long, limite de lecture et conservation des accents.
+- Thor : import réel via le sélecteur Android, confirmation et copie interne byte-identique du fichier 1.3.0 ; un fichier modifié est refusé sans remplacer l’import actif. Retour à la version intégrée vérifié.
+- Activité de test Android réservée au build Debug -DeviceTests : fournisseur réel de l’extension reconnu depuis l’identité de l’application principale ; scripts signés disponibles pour le hash prévu, hash différent refusé ; fichier stocké altéré -> adaptations intégrées. Cette activité et le mode débogage sont absents de l’APK finale.
+- APK finales 1.19.0 (code 28) et extension 1.3.0 (code 9) installées. Les mises à jour locales peuvent apporter un adaptateur du module officiel et les règles/panneau/scripts de l’extension. Les changements Java, permissions ou commandes natives nécessitent toujours une APK.
+- Limite : le site officiel ne répondait plus au réseau local pendant la dernière vérification (connexion HTTPS expirée aussi depuis le PC). Import et liaison Android validés ; chargement en jeu du fichier importé et nouvelle campagne non validés dans cette session.
+
 # Version 1.18.1 — 9 octobre 2026
 
 - Révision officielle `page-CsVXhSaF.js`, SHA-256 `a14150ba87429dbc69ff354a7de00274f356148304deb74d54d6760e780a63e7`. Nouvelle correspondance des fonctions internes et HUD extrait du moteur actuel.

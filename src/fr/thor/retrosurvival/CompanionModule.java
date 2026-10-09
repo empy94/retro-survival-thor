@@ -8,6 +8,7 @@ import android.os.Bundle;
 /** Optional modules are accepted only from the same signing identity as the host. */
 final class CompanionModule {
  private Bundle data=new Bundle();
+ private LocalUpdate imported;
  CompanionModule(Context context){
   PackageManager manager=context.getPackageManager();
   for(ResolveInfo entry:manager.queryIntentServices(new Intent("fr.thor.retrosurvival.COMPANION"),PackageManager.GET_META_DATA))try{
@@ -18,9 +19,18 @@ final class CompanionModule {
    Bundle result=context.getContentResolver().call(Uri.parse("content://"+authority),"load",null,null);
    if(result==null||result.getInt("protocol")!=1||!result.getBoolean("enabled"))continue;
    for(String key:new String[]{"bootstrap","panelScript","panelStyle","moduleHook","moduleHookCurrent","moduleHookPrevious","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
+   String envelope=result.getString("localUpdateEnvelope","");
+   if(!envelope.isEmpty())try{
+    String key;try(java.io.InputStream in=context.getAssets().open("local-update-public-key.txt")){key=LocalUpdate.read(in);}
+    imported=LocalUpdate.parse(envelope,key);
+    for(String field:new String[]{"bootstrap","panelScript","panelStyle","snapshot","frame","command"})result.putString(field,imported.script(field));
+   }catch(Exception invalid){imported=null;}
    data=result;break;
   }catch(Exception ignored){}
  }
+ boolean supportsLocalGame(String hash){return enabled()&&imported!=null&&imported.gameHash.equals(hash);}
+ String localMainHook(){return imported==null?"":imported.script("mainHook")+"\n;window.thorLocalUpdateVersion=\""+imported.version+"\";";}
+ String localRulesHook(){return imported==null?"":imported.script("rulesHook");}
  boolean supportsGameModule(String hash){return GameModuleVersions.companionSupports(get("gameModuleSha256"),hash);}
  boolean enabled(){return data.getBoolean("enabled",false);}
  String get(String key){return data.getString(key,"");}
