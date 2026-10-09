@@ -181,3 +181,9 @@ Ces vérifications ne remplacent pas un test manuel complet des boutons physique
 - Une nouvelle partie a été lancée normalement et laissée en pause avec Start, niveau 2 / vague 1. L’ancienne partie a été interrompue avec accord explicite.
 - Fiche toujours à 2 Hz et rendu des sorts uniquement quand les informations changent ; aucune nouvelle boucle permanente. Pas de mesure de FPS ni de test prolongé de performance pour cette version.
 - SHA-256 APK finale : `397429aaabf8dd7529141a0fe27eb07d810576ec0a4b1346940e05b3c0cdbf92`.
+
+## 1.13.1 — sélecteurs sur le second écran (9 octobre 2026)
+
+- Le journal du Thor contient un arrêt fatal de Chromium/JNI lors des ouvertures de listes sur le second écran. Les listes natives HTML select sont remplacées par des boutons ouvrant une liste dans le document, sans demander une fenêtre Android.
+- Test isolé : ouverture, sélection, rappel de sauvegarde, fermeture sans changement, fermeture au changement de page et absence de création de select natif.
+- Sur le Thor : toucher du bouton Automatique dans Sorts, affichage des 25 choix dans la WebView réelle, processus conservé. Les menus de raccourcis et d’assistance utilisent le même sélecteur.

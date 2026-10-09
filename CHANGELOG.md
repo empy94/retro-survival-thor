@@ -1,5 +1,9 @@
 # Versions
 
+## 1.13.1 — 9 octobre 2026
+
+- Fermeture sur le second écran corrigée : les listes de raccourcis et d’assistance s’ouvrent directement dans la page, sans fenêtre native Android. Choix, fermeture et sauvegarde conservés.
+
 ## 1.13.0 — 9 octobre 2026
 
 - Croix/stick dans les comparaisons de butin : actions du dialogue externe, sans blocage dans la carte de l’objet déjà équipé.
