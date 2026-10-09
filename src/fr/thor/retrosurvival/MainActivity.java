@@ -185,6 +185,8 @@ public class MainActivity extends Activity {
      if(!GameModuleVersions.supported(hash.toString()))return null;
      try(InputStream hook=getAssets().open(GameModuleVersions.current(hash.toString())?"native-module-hook-current.js":GameModuleVersions.previous2(hash.toString())?"native-module-hook-previous2.js":GameModuleVersions.previous(hash.toString())?"native-module-hook-previous.js":"native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(companion.supportsGameModule(hash.toString())?companion.get(GameModuleVersions.current(hash.toString())?"moduleHookCurrent":GameModuleVersions.previous2(hash.toString())?"moduleHookPrevious2":GameModuleVersions.previous(hash.toString())?"moduleHookPrevious":"moduleHook"):"");adaptedUrl=url;}
      }
+     // Also patch older imported envelopes, without altering their saved data.
+     if(GameModuleVersions.current(hash.toString()))try(InputStream performance=getAssets().open("native-performance-hook-current.js")){adaptedModule+="\n"+read(performance);}
    }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));}catch(Exception ex){android.util.Log.w("ThorRetro","Game adapter unavailable",ex);return null;}
  }
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}
