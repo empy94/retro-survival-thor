@@ -21,13 +21,14 @@ New-Item -ItemType Directory -Force -Path $build,"$build\gen","$build\classes","
 $manifest="$project\AndroidManifest.xml"
 if($DeviceTests -and !$Debug){throw 'DeviceTests requires Debug'}
 if($Debug){New-Item -ItemType Directory -Force -Path "$build\debug" | Out-Null;$manifest="$build\debug\AndroidManifest.xml";[IO.File]::WriteAllText($manifest,[IO.File]::ReadAllText("$project\AndroidManifest.xml").Replace('<application ','<application android:debuggable="true" '))}
-if($DeviceTests){[IO.File]::WriteAllText($manifest,[IO.File]::ReadAllText($manifest).Replace('</application>','<activity android:name=".LocalUpdateDeviceTest" android:exported="true"/></application>'))}
+if($DeviceTests){[IO.File]::WriteAllText($manifest,[IO.File]::ReadAllText($manifest).Replace('</application>','<activity android:name=".LocalUpdateDeviceTest" android:exported="true"/><activity android:name=".LocalSessionDeviceTest" android:exported="true"/></application>'))}
 & "$bt\aapt.exe" package -f -m -M $manifest -S "$project\res" -A "$project\assets" -I $android -J "$build\gen" -F "$build\unsigned.apk"
 if($LASTEXITCODE){throw 'Resource packaging failed'}
 $sources=@(Get-ChildItem "$project\src","$build\gen" -Recurse -Filter '*.java' | ForEach-Object FullName)
 $deviceClass="$build\classes\fr\thor\retrosurvival\LocalUpdateDeviceTest.class"
+Get-ChildItem -LiteralPath "$build\classes\fr\thor\retrosurvival" -Filter 'LocalSessionDeviceTest*.class' -ErrorAction SilentlyContinue | Remove-Item
 if(Test-Path -LiteralPath $deviceClass){Remove-Item -LiteralPath $deviceClass}
-if($DeviceTests){$sources+=@("$project\tests\android\LocalUpdateDeviceTest.java")}
+if($DeviceTests){$sources+=@("$project\tests\android\LocalUpdateDeviceTest.java","$project\tests\android\LocalSessionDeviceTest.java")}
 & "$jdk\bin\javac.exe" --release 8 -g -encoding UTF-8 -classpath $android -d "$build\classes" $sources
 if($LASTEXITCODE){throw 'Java compilation failed'}
 & "$jdk\bin\jar.exe" cf "$build\classes.jar" -C "$build\classes" .

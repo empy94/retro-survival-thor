@@ -14,4 +14,4 @@
 
 /* The native touch deck omits Enutrof targets, although castTouchAbility
  * accepts their vectors. Enable the same hold/move/release path as other casts. */
-;(function(){for(const id of ['shovelJudgment', 'slaughteringShovel', 'shovelKiss', 'mound', 'animatedChest', 'shovelThrow', 'corruption']){if(!hO.includes(id))hO.push(id);}})();
+;(function(){for(const id of ['shovelJudgment', 'slaughteringShovel', 'shovelKiss', 'mound', 'animatedChest', 'shovelThrow', 'corruption']){if(!fO.includes(id))fO.push(id);}})();

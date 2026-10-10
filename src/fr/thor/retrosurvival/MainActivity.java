@@ -21,11 +21,70 @@ public class MainActivity extends Activity {
  private WebView web,shortcutPanel;
  private FrameLayout gameSurface;private LinearLayout loadPanel;private long loadGeneration;private boolean loadFailed;
  private CompanionModule companion;
+ private volatile long lastCacheWarning;private volatile boolean localSession;private boolean switchingSession;private LocalGameCache localCache;private String localGuard;
  private boolean updateStarted;
  private String pendingBackup;
  private static final int EXPORT_PROGRESS=410,IMPORT_PROGRESS=411;
  private String adaptedModule,adaptedUrl;
- private void companionCall(String json){if(companion==null||!companion.enabled()||characterScreen==null||!ready||!active||json==null||json.length()>2048)return;try{JSONObject request=new JSONObject(json);web.evaluateJavascript(companion.command(request.toString()),null);}catch(Exception ignored){}}
+ private void companionCall(String json){
+  if(companion==null||!companion.enabled()||!ready||!active||json==null||json.length()>2048)return;
+  try{JSONObject request=new JSONObject(json);String kind=request.optString("kind");
+   if("session-online".equals(kind)){if(localSession)restartSession(false);return;}
+   if(!localSession){activateLocalSession();return;}
+   if(!"session-local".equals(kind))web.evaluateJavascript(companion.command(request.toString()),null);
+  }catch(Exception ignored){}
+ }
+ private void activateLocalSession(){
+  if(switchingSession)return;
+  if(!localCache.ready()){Toast.makeText(this,"Charge d’abord le jeu en ligne pour préparer sa copie locale.",Toast.LENGTH_LONG).show();return;}
+  switchingSession=true;
+  web.evaluateJavascript("window.thorProgressBackup?.export()?.progress||null",result->{
+   try{if(result!=null&&result.length()<100000&&result.startsWith("{")){new JSONObject(result);getSharedPreferences("local-session",0).edit().putString("seed",result).commit();}}
+   catch(Exception ignored){}
+   new Thread(()->{try{localCache.freeze();runOnUiThread(()->restartSession(true));}catch(Exception error){runOnUiThread(()->{switchingSession=false;Toast.makeText(this,"Copie locale indisponible : charge une version reconnue du jeu en ligne avant d’activer les cheats.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
+  });
+ }
+ private void restartSession(boolean local){
+  // Tear down the old document before opening the other storage origin.
+  switchingSession=true;reset();ready=false;active=false;++loadGeneration;controlGate.invalidate();dashboardGate.invalidate();handler.removeCallbacks(tick);handler.removeCallbacks(characterTick);closeCharacterScreen();
+  if(shortcutPanel!=null){shortcutPanel.destroy();shortcutPanel=null;}
+  if(web!=null){web.stopLoading();web.destroy();web=null;}
+  startActivity(new Intent(this,MainActivity.class).putExtra("localSession",local).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+ }
+ private String gameUrl(){return localSession?SessionNetworkPolicy.LOCAL_URL:"https://retrosurvival.online/";}
+ private WebResourceResponse deniedLocal(){return new WebResourceResponse("application/json","UTF-8",403,"Local session",Collections.singletonMap("Cache-Control","no-store"),new ByteArrayInputStream("{\"error\":\"Local session\"}".getBytes(StandardCharsets.UTF_8)));}
+ private static String contentType(String path){
+  if(path.endsWith(".js"))return "text/javascript";if(path.endsWith(".css"))return "text/css";if(path.endsWith(".woff2"))return "font/woff2";if(path.endsWith(".woff"))return "font/woff";
+  if(path.endsWith(".png"))return "image/png";if(path.endsWith(".webp"))return "image/webp";if(path.endsWith(".svg"))return "image/svg+xml";if(path.endsWith(".jpg"))return "image/jpeg";if(path.endsWith(".ogg"))return "audio/ogg";if(path.endsWith(".mp3"))return "audio/mpeg";if(path.endsWith(".wav"))return "audio/wav";return "application/octet-stream";
+ }
+ private String injectRoot(String html){
+  String seed=localSession?getSharedPreferences("local-session",0).getString("seed","null"):"null";
+  String prefix="<script>window.thorLocalSeed="+seed.replace("<","\\u003c")+";"+localGuard+"</script>";
+  if(localSession){
+   // No connections, frames, workers, forms or remote images can escape the local origin.
+   prefix="<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'\">"+prefix;
+   html=html.replace("https://retrosurvival.online", "https://"+SessionNetworkPolicy.LOCAL_HOST);
+  }
+  return html.replace("<head>","<head>"+prefix+"<script>"+bootstrap+(localSession?"\n"+companion.get("bootstrap"):"")+"</script>");
+ }
+ private WebResourceResponse localResource(WebResourceRequest request){
+  try{
+   String path=SessionNetworkPolicy.staticPath(request.getUrl().toString());
+   if(path==null||!("GET".equals(request.getMethod())||"HEAD".equals(request.getMethod())))return deniedLocal();
+   if(path.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(request);return adapted==null?deniedLocal():adapted;}
+   byte[] bytes=localCache.getFrozen(path);if(bytes==null){if(!path.equals("/favicon.ico")&&SystemClock.uptimeMillis()-lastCacheWarning>5000){lastCacheWarning=SystemClock.uptimeMillis();runOnUiThread(()->Toast.makeText(this,"Ressource locale absente. Charge cette carte en mode normal, puis relance le mode local.",Toast.LENGTH_LONG).show());}return deniedLocal();}
+   if(path.equals("/"))bytes=injectRoot(new String(bytes,StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
+   return new WebResourceResponse(path.equals("/")?"text/html":contentType(path),"UTF-8",200,"OK",Collections.singletonMap("Access-Control-Allow-Origin",SessionNetworkPolicy.LOCAL_URL.substring(0,SessionNetworkPolicy.LOCAL_URL.length()-1)),new ByteArrayInputStream(bytes));
+  }catch(Exception error){return deniedLocal();}
+ }
+ private WebResourceResponse cacheOnlineResource(WebResourceRequest request){
+  String path=SessionNetworkPolicy.staticPath(request.getUrl().toString());if(path==null||path.equals("/")||!"GET".equals(request.getMethod()))return null;
+  try{
+   HttpURLConnection connection=(HttpURLConnection)new URL(request.getUrl().toString()).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);
+   try{if(connection.getResponseCode()!=200)return null;byte[] bytes;try(InputStream in=connection.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] buf=new byte[16384];int n;while((n=in.read(buf))!=-1){out.write(buf,0,n);if(out.size()>64000000)throw new IOException("Resource too large");}bytes=out.toByteArray();}try{localCache.put(path,bytes);}catch(Exception cacheError){android.util.Log.w("ThorRetro","Public resource cache unavailable",cacheError);}return new WebResourceResponse(contentType(path),"UTF-8",new ByteArrayInputStream(bytes));}finally{connection.disconnect();}
+  }catch(Exception error){return null;}
+ }
+
 
  private String gameLanguage="fr";
  private JSONObject languageTable=new JSONObject(),spellCatalog=new JSONObject();
@@ -52,7 +111,7 @@ public class MainActivity extends Activity {
  private final EvaluationGate controlGate=new EvaluationGate(),dashboardGate=new EvaluationGate();
  private final Runnable characterTick=new Runnable(){public void run(){
    if(!active)return;
-   if(ready&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript(companion.snapshot("(window.thorSalePolicy?.tick(),window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'})"),result->{
+   if(ready&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript(companion.snapshot(localSession,"(window.thorSalePolicy?.tick(),window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'})"),result->{
      if(!dashboardGate.complete(request)||!active||!ready)return;
      try{if(result.length()>65536)return;String next=new JSONObject(result).toString();if(!next.equals(characterData)){characterData=next;if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}}catch(Exception ignored){}
    });}
@@ -84,7 +143,7 @@ public class MainActivity extends Activity {
      if(held.contains(KeyEvent.KEYCODE_DPAD_UP))my=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_DOWN))my=1;
      final float rightX=rx,rightY=ry,elapsed=dt;
      boolean digital=held.contains(KeyEvent.KEYCODE_DPAD_LEFT)||held.contains(KeyEvent.KEYCODE_DPAD_RIGHT)||held.contains(KeyEvent.KEYCODE_DPAD_UP)||held.contains(KeyEvent.KEYCODE_DPAD_DOWN);
-     web.evaluateJavascript((companion==null?"":companion.get("frame"))+"window.thorControls.stick("+mx+","+my+","+digital+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
+     web.evaluateJavascript((localSession?companion.get("frame"):"")+"window.thorControls.stick("+mx+","+my+","+digital+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
      if(!controlGate.complete(request))return;
      if(!active||!ready)return;
      if(!"true".equals(radial)&&(Math.abs(rightX)>.16f||Math.abs(rightY)>.16f)){
@@ -101,6 +160,8 @@ public class MainActivity extends Activity {
  public void onCreate(Bundle state){
    super.onCreate(state);
    companion=new CompanionModule(this);
+   localSession=companion.enabled()&&(state==null?getIntent().getBooleanExtra("localSession",false):state.getBoolean("localSession",false));localCache=new LocalGameCache(getFilesDir());
+   try(InputStream in=getAssets().open("local-session.js")){localGuard=read(in);}catch(Exception error){throw new RuntimeException(error);}
    if(state!=null)pendingBackup=state.getString("pendingProgressBackup");
    gameLanguage=getPreferences(0).getString("gameLanguage","fr");try(InputStream in=getAssets().open("locale.json")){languageTable=new JSONObject(read(in));}catch(Exception ignored){}
    cursorSensitivity=Math.max(25,Math.min(250,getPreferences(0).getInt("cursorSensitivity",100)))/100f;
@@ -109,36 +170,40 @@ public class MainActivity extends Activity {
    try(InputStream mapping=getAssets().open("spell-bindings.js");InputStream in=getAssets().open("controls.js");InputStream telemetry=getAssets().open("telemetry.js")){try(InputStream menu=getAssets().open("menu-navigation.js")){try(InputStream locale=getAssets().open("locale.js")){try(InputStream collection=getAssets().open("collection.js")){bootstrap=read(collection)+"\n"+read(locale)+"\n"+read(menu)+"\n"+read(mapping)+"\n"+read(in)+"\n"+read(telemetry);try(InputStream auto=getAssets().open("auto-spells.js")){bootstrap+="\n"+read(auto);}}}}}catch(Exception ex){throw new RuntimeException(ex);}
    try(InputStream policy=getAssets().open("spell-policy.js");InputStream catalog=getAssets().open("spell-catalog.json")){bootstrap=read(policy)+"\n"+bootstrap;spellCatalog=new JSONObject(read(catalog));}catch(Exception ex){throw new RuntimeException(ex);}
    try(InputStream sale=getAssets().open("safe-sales.js");InputStream backup=getAssets().open("progress-backup.js")){bootstrap+="\n"+read(sale)+"\n"+read(backup);}catch(Exception ex){throw new RuntimeException(ex);}
-   bootstrap+="\n"+companion.get("bootstrap");
+   // Training code is injected only into the isolated local document.
    inputs=getSystemService(InputManager.class);inputs.registerInputDeviceListener(inputListener,handler);
    displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
    web=new WebView(this);gameSurface=new FrameLayout(this);gameSurface.addView(web,new FrameLayout.LayoutParams(-1,-1));setContentView(gameSurface);fitModernWindow(getWindow(),gameSurface);
-   web.addJavascriptInterface(new Object(){@JavascriptInterface public void setLanguage(String code){if(!Arrays.asList("fr","en","es").contains(code))return;runOnUiThread(()->{gameLanguage=code;getPreferences(0).edit().putString("gameLanguage",code).apply();});}@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&web.getUrl().startsWith("https://retrosurvival.online/"))settings();});}},"ThorPreferences");
+   web.addJavascriptInterface(new Object(){@JavascriptInterface public void setLanguage(String code){if(!Arrays.asList("fr","en","es").contains(code))return;runOnUiThread(()->{gameLanguage=code;getPreferences(0).edit().putString("gameLanguage",code).apply();});}@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&(web.getUrl().startsWith("https://retrosurvival.online/")||web.getUrl().startsWith(SessionNetworkPolicy.LOCAL_URL)))settings();});}},"ThorPreferences");
    WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(false);
-   s.setSupportZoom(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);
+   s.setBlockNetworkLoads(localSession);s.setSupportZoom(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);
    WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)!=0);
+   ServiceWorkerController.getInstance().setServiceWorkerClient(new ServiceWorkerClient(){public WebResourceResponse shouldInterceptRequest(WebResourceRequest request){return localSession?deniedLocal():null;}});
    web.setWebChromeClient(new WebChromeClient(){public boolean onConsoleMessage(ConsoleMessage m){android.util.Log.i("ThorRetro",m.message());return true;}});
    web.setWebViewClient(new WebViewClient(){
      public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){
+       if(localSession)return !SessionNetworkPolicy.LOCAL_HOST.equals(r.getUrl().getHost());
        if("https".equals(r.getUrl().getScheme())&&"retrosurvival.online".equals(r.getUrl().getHost()))return false;
        try{startActivity(new Intent(Intent.ACTION_VIEW,r.getUrl()));}catch(Exception ignored){}return true;
      }
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
-       if(official&&SessionNetworkPolicy.blocks(companion.localSession(),r.getMethod(),route))return new WebResourceResponse("application/json","UTF-8",403,"Local session",Collections.singletonMap("Cache-Control","no-store"),new ByteArrayInputStream("{\"error\":\"Local session\"}".getBytes(StandardCharsets.UTF_8)));
+       if(localSession)return localResource(r);
        if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
 
+       if(!r.isForMainFrame())return cacheOnlineResource(r);
        if(!r.isForMainFrame()||!"GET".equals(r.getMethod())||!"retrosurvival.online".equals(r.getUrl().getHost())||!"/".equals(r.getUrl().getPath()))return null;
        try{
          HttpURLConnection c=(HttpURLConnection)new URL(r.getUrl().toString()).openConnection();
-         c.setConnectTimeout(15000);c.setReadTimeout(20000);c.setRequestProperty("User-Agent",s.getUserAgentString());
+         c.setInstanceFollowRedirects(false);c.setConnectTimeout(15000);c.setReadTimeout(20000);c.setRequestProperty("User-Agent",s.getUserAgentString());
          c.setRequestProperty("Accept-Language","fr-FR,fr;q=0.9");
          String cookies=CookieManager.getInstance().getCookie(r.getUrl().toString());if(cookies!=null)c.setRequestProperty("Cookie",cookies);
          int status=c.getResponseCode();if(status!=200){c.disconnect();return null;}
          List<String> setCookies=c.getHeaderFields().get("Set-Cookie");if(setCookies!=null)for(String cookie:setCookies)CookieManager.getInstance().setCookie(r.getUrl().toString(),cookie);
          String html;try(InputStream in=c.getInputStream()){html=read(in);}finally{c.disconnect();}
          int head=html.indexOf("<head>");if(head<0)return null;
-         html=html.substring(0,head+6)+"<script>"+bootstrap+"</script>"+html.substring(head+6);
+         try{localCache.put("/",html.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Root cache unavailable",cacheError);}
+         html=injectRoot(html);
          return new WebResourceResponse("text/html","UTF-8",new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
        }catch(Exception ex){android.util.Log.e("ThorRetro","Loading controls",ex);return null;}
      }
@@ -151,14 +216,14 @@ public class MainActivity extends Activity {
        if(!getPreferences(0).getBoolean("helpSeen",false)){getPreferences(0).edit().putBoolean("helpSeen",true).apply();help();}
      }
    });
-   web.loadUrl("https://retrosurvival.online/");web.requestFocus();
+   web.loadUrl(gameUrl());web.requestFocus();
  }
  private void showLoadingPanel(){
   hideLoadPanel();loadPanel=new LinearLayout(this);loadPanel.setOrientation(1);loadPanel.setGravity(Gravity.CENTER);loadPanel.setBackgroundColor(0xff17251c);
   TextView label=new TextView(this);label.setText(ui("Chargement de Retro Survival…"));label.setTextColor(0xffffe4a0);label.setTextSize(24);label.setPadding(24,24,24,24);loadPanel.addView(label);loadPanel.addView(new ProgressBar(this));gameSurface.addView(loadPanel,new FrameLayout.LayoutParams(-1,-1));
  }
  private void hideLoadPanel(){if(loadPanel!=null){gameSurface.removeView(loadPanel);loadPanel=null;}}
- private void retryGame(){++loadGeneration;loadFailed=false;hideLoadPanel();adaptedModule=null;adaptedUrl=null;web.stopLoading();web.loadUrl("https://retrosurvival.online/");}
+ private void retryGame(){++loadGeneration;loadFailed=false;hideLoadPanel();adaptedModule=null;adaptedUrl=null;web.stopLoading();web.loadUrl(gameUrl());}
  private void showLoadFailure(String reason){
   if(isFinishing()||isDestroyed())return;loadFailed=true;ready=false;reset();hideLoadPanel();
   loadPanel=new LinearLayout(this);loadPanel.setOrientation(1);loadPanel.setGravity(Gravity.CENTER);loadPanel.setPadding(48,32,48,32);loadPanel.setBackgroundColor(0xff17251c);
@@ -177,22 +242,24 @@ public class MainActivity extends Activity {
  private void immersive(){getWindow().getDecorView().setSystemUiVisibility(5894);}
  private synchronized WebResourceResponse adaptModule(WebResourceRequest request){
    try{String url=request.getUrl().toString();if(adaptedModule==null||!url.equals(adaptedUrl)){
-     HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setConnectTimeout(15000);connection.setReadTimeout(20000);String source;try(InputStream in=connection.getInputStream()){source=read(in);}finally{connection.disconnect();}if(source.length()>4000000)return null;
+     String source;
+     if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
+     else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>4000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
-     if(companion.supportsLocalGame(hash.toString())){
+     if(localSession&&companion.supportsLocalGame(hash.toString())){
       adaptedModule=source+"\n"+companion.localMainHook()+"\n"+companion.localRulesHook();adaptedUrl=url;
      }else{
      if(!GameModuleVersions.supported(hash.toString()))return null;
-     try(InputStream hook=getAssets().open(GameModuleVersions.current(hash.toString())?"native-module-hook-current.js":GameModuleVersions.previous3(hash.toString())?"native-module-hook-previous3.js":GameModuleVersions.previous2(hash.toString())?"native-module-hook-previous2.js":GameModuleVersions.previous(hash.toString())?"native-module-hook-previous.js":"native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(companion.supportsGameModule(hash.toString())?companion.get(GameModuleVersions.current(hash.toString())?"moduleHookCurrent":GameModuleVersions.previous3(hash.toString())?"moduleHookPrevious3":GameModuleVersions.previous2(hash.toString())?"moduleHookPrevious2":GameModuleVersions.previous(hash.toString())?"moduleHookPrevious":"moduleHook"):"");adaptedUrl=url;}
+     try(InputStream hook=getAssets().open(GameModuleVersions.current(hash.toString())?"native-module-hook-current.js":GameModuleVersions.previous5(hash.toString())?"native-module-hook-previous5.js":GameModuleVersions.previous4(hash.toString())?"native-module-hook-previous4.js":GameModuleVersions.previous3(hash.toString())?"native-module-hook-previous3.js":GameModuleVersions.previous2(hash.toString())?"native-module-hook-previous2.js":GameModuleVersions.previous(hash.toString())?"native-module-hook-previous.js":"native-module-hook.js")){adaptedModule=source+"\n"+read(hook)+"\n"+(localSession&&companion.supportsGameModule(hash.toString())?companion.get(GameModuleVersions.current(hash.toString())?"moduleHookCurrent":GameModuleVersions.previous5(hash.toString())?"moduleHookPrevious5":GameModuleVersions.previous4(hash.toString())?"moduleHookPrevious4":GameModuleVersions.previous3(hash.toString())?"moduleHookPrevious3":GameModuleVersions.previous2(hash.toString())?"moduleHookPrevious2":GameModuleVersions.previous(hash.toString())?"moduleHookPrevious":"moduleHook"):"");adaptedUrl=url;}
      }
      // Also patch older imported envelopes, without altering their saved data.
-     if(GameModuleVersions.current(hash.toString())||GameModuleVersions.previous3(hash.toString()))try(InputStream performance=getAssets().open(GameModuleVersions.current(hash.toString())?"native-performance-hook-current.js":"native-performance-hook-previous3.js")){adaptedModule+="\n"+read(performance);}
+     if(GameModuleVersions.current(hash.toString())||GameModuleVersions.previous5(hash.toString())||GameModuleVersions.previous4(hash.toString())||GameModuleVersions.previous3(hash.toString()))try(InputStream performance=getAssets().open(GameModuleVersions.current(hash.toString())?"native-performance-hook-current.js":GameModuleVersions.previous5(hash.toString())?"native-performance-hook-previous5.js":GameModuleVersions.previous4(hash.toString())?"native-performance-hook-previous4.js":"native-performance-hook-previous3.js")){adaptedModule+="\n"+read(performance);}
    }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));}catch(Exception ex){android.util.Log.w("ThorRetro","Game adapter unavailable",ex);return null;}
  }
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}
  private void syncActive(){if(ready&&web!=null)web.evaluateJavascript("window.thorControls.setActive("+(active&&hasWindowFocus())+")",null);}
  public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus)immersive();else reset();syncActive();}
- protected void onResume(){super.onResume();if(!updateStarted){updateStarted=true;UpdateChecker.schedule(this);new Thread(()->{String tag=UpdateChecker.check(this,false);UpdateChecker.notifyAvailable(this,tag);if(!tag.isEmpty())runOnUiThread(()->{if(active)Toast.makeText(this,"Nouvelle APK "+tag+" disponible dans ⚙ APK → Mises à jour.",Toast.LENGTH_LONG).show();});},"RetroUpdateStartup").start();}active=true;previousTick=SystemClock.uptimeMillis();handler.post(tick);handler.post(characterTick);if(web!=null)web.onResume();syncActive();showCharacterScreen();}
+ protected void onResume(){super.onResume();if(!localSession&&!updateStarted){updateStarted=true;UpdateChecker.schedule(this);new Thread(()->{String tag=UpdateChecker.check(this,false);UpdateChecker.notifyAvailable(this,tag);if(!tag.isEmpty())runOnUiThread(()->{if(active)Toast.makeText(this,"Nouvelle APK "+tag+" disponible dans ⚙ APK → Mises à jour.",Toast.LENGTH_LONG).show();});},"RetroUpdateStartup").start();}active=true;previousTick=SystemClock.uptimeMillis();handler.post(tick);handler.post(characterTick);if(web!=null)web.onResume();syncActive();showCharacterScreen();}
  protected void onPause(){reset();active=false;syncActive();handler.removeCallbacks(tick);handler.removeCallbacks(characterTick);closeCharacterScreen();if(web!=null)web.onPause();super.onPause();}
  protected void onDestroy(){if(inputs!=null)inputs.unregisterInputDeviceListener(inputListener);if(displays!=null)displays.unregisterDisplayListener(displayListener);closeCharacterScreen();if(web!=null)web.destroy();super.onDestroy();}
  private void closeCharacterScreen(){if(characterScreen!=null){characterScreen.dismiss();characterScreen=null;}}
@@ -210,11 +277,12 @@ public class MainActivity extends Activity {
    protected void onCreate(Bundle state){super.onCreate(state);
      getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
      getWindow().getDecorView().setSystemUiVisibility(5894);
-     panel=new WebView(getContext());setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
+     panel=new WebView(getContext());setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setBlockNetworkLoads(localSession);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
      panel.addJavascriptInterface(new Object(){@JavascriptInterface public void companionCall(String json){runOnUiThread(()->MainActivity.this.companionCall(json));}@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
-     panel.setWebViewClient(new WebViewClient(){public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
-     try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}html=html.replace("</head>","<style>"+companion.get("panelStyle")+"</style></head>").replace("</body>","<script>"+companion.get("panelScript")+"</script></body>");panel.loadDataWithBaseURL("https://retrosurvival.online/",html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
+     panel.setWebViewClient(new WebViewClient(){public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return localSession?localResource(r):cacheOnlineResource(r);}public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
+     try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}html=html.replace("</head>","<style>"+companion.get("panelStyle")+"</style></head>").replace("</body>","<script>"+companion.get("panelScript")+"</script></body>");panel.loadDataWithBaseURL(gameUrl(),html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
    }
+   protected void onStop(){if(panel!=null){panel.destroy();panel=null;}super.onStop();}
    void update(String json){if(loaded&&panel!=null)try{JSONObject data=new JSONObject(json);data.put("controls",panelOptions());panel.evaluateJavascript("window.renderThorDashboard("+data.toString()+");window.thorCompanionPanel?.render("+data.opt("companion")+")",null);}catch(Exception ignored){}}
    public void dismiss(){if(panel!=null){panel.destroy();panel=null;}super.dismiss();}
  }
@@ -281,9 +349,9 @@ public class MainActivity extends Activity {
  }
  private void updateShortcutPanel(){if(shortcutPanel!=null)try{JSONObject data=new JSONObject(characterData);data.put("controls",panelOptions());shortcutPanel.evaluateJavascript("window.renderThorDashboard("+data.toString()+")",null);}catch(Exception ignored){}}
  private void shortcutDialog(){
-   final WebView editor=new WebView(this);editor.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(int)(getResources().getDisplayMetrics().heightPixels*.65)));editor.setMinimumHeight((int)(getResources().getDisplayMetrics().heightPixels*.65));shortcutPanel=editor;editor.getSettings().setJavaScriptEnabled(true);editor.getSettings().setAllowFileAccess(false);editor.getSettings().setAllowContentAccess(false);
+   final WebView editor=new WebView(this);editor.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(int)(getResources().getDisplayMetrics().heightPixels*.65)));editor.setMinimumHeight((int)(getResources().getDisplayMetrics().heightPixels*.65));shortcutPanel=editor;editor.getSettings().setJavaScriptEnabled(true);editor.getSettings().setBlockNetworkLoads(localSession);editor.getSettings().setAllowFileAccess(false);editor.getSettings().setAllowContentAccess(false);
    editor.addJavascriptInterface(new Object(){@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
-   editor.setWebViewClient(new WebViewClient(){public void onPageFinished(WebView v,String url){updateShortcutPanel();editor.evaluateJavascript("window.thorDeckUI.page(1)",null);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest request){return true;}});
+   editor.setWebViewClient(new WebViewClient(){public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return localSession?localResource(r):cacheOnlineResource(r);}public void onPageFinished(WebView v,String url){updateShortcutPanel();editor.evaluateJavascript("window.thorDeckUI.page(1)",null);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest request){return true;}});
    try(InputStream html=getAssets().open("dashboard.html");InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js");InputStream locale=getAssets().open("locale.js");InputStream deck=getAssets().open("deck.js")){String source=read(html).replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"\n"+read(locale)+"</script>").replace("</body>","<script>"+read(deck)+"</script></body>");editor.loadDataWithBaseURL("https://retrosurvival.online/",source,"text/html","UTF-8",null);}catch(Exception ex){editor.destroy();shortcutPanel=null;return;}
    FrameLayout editorHolder=new FrameLayout(this);int editorHeight=(int)(getResources().getDisplayMetrics().heightPixels*.65);editorHolder.setMinimumHeight(editorHeight);editorHolder.addView(editor,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,editorHeight));AlertDialog dialog=new AlertDialog.Builder(this).setTitle(ui("Raccourcis des sorts")).setView(editorHolder).setPositiveButton(ui("Fermer"),null).create();dialog.setOnDismissListener(d->{if(shortcutPanel==editor)shortcutPanel=null;editor.destroy();immersive();});dialog.show();dialog.getWindow().setLayout((int)(getResources().getDisplayMetrics().widthPixels*.94), (int)(getResources().getDisplayMetrics().heightPixels*.9));
  }
@@ -305,7 +373,7 @@ public class MainActivity extends Activity {
    edit.apply();applySettings();
  }
  private void applySettings(){if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
- protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);if(pendingBackup!=null)state.putString("pendingProgressBackup",pendingBackup);}
+ protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);if(pendingBackup!=null)state.putString("pendingProgressBackup",pendingBackup);state.putBoolean("localSession",localSession);}
  private void exportProgress(){if(!ready)return;web.evaluateJavascript("window.thorProgressBackup.export()",result->{if(result==null||"null".equals(result)){Toast.makeText(this,ui("Aucune progression à exporter"),Toast.LENGTH_LONG).show();return;}try{pendingBackup=new JSONObject(result).toString(2);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Retro-Survival-progression.json");startActivityForResult(intent,EXPORT_PROGRESS);}catch(Exception ignored){}});}
  private void importProgress(){new AlertDialog.Builder(this).setMessage(ui("Restaurer remplacera la progression locale et redémarrera le jeu.")).setNegativeButton(ui("Annuler"),null).setPositiveButton(ui("Choisir le fichier"),(dialog,which)->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE),IMPORT_PROGRESS)).show();}
  protected void onActivityResult(int request,int result,Intent intent){super.onActivityResult(request,result,intent);if(result!=RESULT_OK||intent==null||intent.getData()==null){pendingBackup=null;return;}try{if(request==EXPORT_PROGRESS&&pendingBackup!=null){try(OutputStream out=getContentResolver().openOutputStream(intent.getData(),"wt")){out.write(pendingBackup.getBytes(StandardCharsets.UTF_8));}pendingBackup=null;Toast.makeText(this,ui("Progression exportée"),Toast.LENGTH_LONG).show();}else if(request==IMPORT_PROGRESS){String value;try(InputStream in=getContentResolver().openInputStream(intent.getData())){ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int count;while((count=in.read(buffer))!=-1){out.write(buffer,0,count);if(out.size()>262144)throw new IOException("Backup too large");}value=new String(out.toByteArray(),StandardCharsets.UTF_8);}JSONObject backup=new JSONObject(value);web.evaluateJavascript("window.thorProgressBackup.restore("+backup.toString()+")",accepted->{if("true".equals(accepted))web.reload();else Toast.makeText(this,ui("Sauvegarde incompatible"),Toast.LENGTH_LONG).show();});}}catch(Exception ex){Toast.makeText(this,ui("Sauvegarde incompatible"),Toast.LENGTH_LONG).show();}}

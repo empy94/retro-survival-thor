@@ -3,8 +3,8 @@
  * once per discarded clip every 750 ms, overwhelming older Android WebViews. */
 ;(function(){
  if(window.thorAnimationRegistryCached)return;
- const original=jo,registries=new Map();
- jo=level=>{
+ const original=Ao,registries=new Map();
+ Ao=level=>{
    if(!['astrub','wabbit','litneg','gelee'].includes(level))return original(level);
    if(!registries.has(level))registries.set(level,original(level));
    return registries.get(level);
@@ -14,4 +14,4 @@
 
 /* The native touch deck omits Enutrof targets, although castTouchAbility
  * accepts their vectors. Enable the same hold/move/release path as other casts. */
-;(function(){for(const id of ['shovelJudgment', 'slaughteringShovel', 'shovelKiss', 'mound', 'animatedChest', 'shovelThrow', 'corruption']){if(!hO.includes(id))hO.push(id);}})();
+;(function(){for(const id of ['shovelJudgment', 'slaughteringShovel', 'shovelKiss', 'mound', 'animatedChest', 'shovelThrow', 'corruption']){if(!mO.includes(id))mO.push(id);}})();

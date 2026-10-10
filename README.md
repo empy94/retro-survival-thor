@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.17.0 :** nouveau contenu Enutrof, Iop et Sram, 186 équipements, quatre Dofus et accents français corrigés.
+**Mise à jour 1.20.0 :** compatibilité avec la révision du 10 octobre et prise en charge des sessions locales isolées pour les extensions personnelles compatibles. Le lancement normal reste en ligne.
 
 ## Trois façons de jouer
 

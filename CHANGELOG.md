@@ -1,3 +1,9 @@
+## 1.20.0 — sessions locales isolées — 10 octobre 2026
+
+- L’extension personnelle peut relancer une session locale distincte : cache des fichiers publics, origine et sauvegarde séparées, réseau du jeu bloqué. Retour au jeu en ligne sans transfert de progression locale.
+- Les scripts privés et les adaptations importées restent réservés au mode local. Un export local ne peut pas être importé dans la sauvegarde en ligne.
+- Compatibilité avec `page-CDA_LRxd.js` et les deux révisions intermédiaires conservées.
+
 ## 1.19.1 — dernière révision et écran de connexion
 
 - Compatibilité avec `page-CMBWUFaS.js`, adaptations de statistiques, équipement et vente actualisées ; révisions précédentes conservées.

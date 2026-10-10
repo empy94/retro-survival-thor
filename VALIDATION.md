@@ -1,3 +1,13 @@
+# Version 1.20.0 — 10 octobre 2026
+
+- Moteur audité `page-CDA_LRxd.js`, SHA-256 `45b98330489267a4de67380f852ac518fa847159a50c53876d8438a8f86f424e`. Deux révisions intermédiaires conservées avec adaptations séparées.
+- Suites JavaScript publiques et privée réussies, tests Java de sélection des modules, politique réseau/cache et signature des imports réussis. Cache : fichiers publics seulement, remplacement atomique, snapshot figé et aucune réponse API stockée. Tests de sauvegarde : import local refusé en ligne.
+- WebView Android réelle sur émulateur : cache statique utilisable avec réseau natif bloqué ; API locales, hôtes distants et beacon refusés. Activité réservée au build de test, absente de l’APK finale.
+- Thor : passage réel ON → copie locale → OFF ; modifications locales des records et récompenses sans changement de la sauvegarde en ligne, comparée avant/après. Origine locale distincte, scripts de cheats absents en ligne. Requêtes progress/leaderboard/run/achievement rejetées localement, beacon refusé.
+- Moteur courant sur Thor : Astrub lancé jusqu’au choix de niveau 2, 14 statistiques et 186 équipements disponibles ; prospection native modifiée et HUD rafraîchi. Ruban `.unofficial-host-banner` masqué en local, constaté par capture réelle. Ressource non précachée refusée avec message, sans accès réseau de secours.
+- APK finales 1.20.0 (code 32) et extension 1.3.4 (code 13) installées par-dessus les anciennes ; import signé 1.3.4 appliqué via le sélecteur Android. SHA-256 APK principale : `ed23b10d4bbe09af3dbe05fc8765dc9b4bc36c3cfb169ebcaa77052bc1d889a9`.
+- Limites : pas de campagne exhaustive ni de garantie sur les décisions de modération. Une carte ou une image non chargée auparavant en ligne peut manquer en local. Le moteur local reste figé ; les nouveaux moteurs nécessitent une compatibilité auditée avant leur première copie. Jeu en ligne accessible sur le Wi-Fi du Thor, VPN déconnecté.
+
 # Version 1.19.1 — 9 octobre 2026
 
 - Nouvelle révision officielle `page-CMBWUFaS.js`, SHA-256 `fb819a5e5509d0ab0a03f1f250a1794bd054a9fb2864e6bc1bdbf4f7aad158a9`, récupérée via le VPN temporaire du PC. Connexion directe au serveur expirée depuis le PC et le Thor.
