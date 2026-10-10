@@ -82,11 +82,3 @@ Pour une mise à jour, installe par-dessus l’application existante. Sa sauvega
 [Guide complet](docs/guide.md) · [Nouveautés](CHANGELOG.md) · [Tests et limites](VALIDATION.md) · [Code et compilation](docs/guide.md#construire-lapplication)
 
 Lanceur indépendant : le jeu est chargé depuis son site officiel. Non affilié à Retro Survival ou Ankama. Code du lanceur sous licence MIT.
-
-## Version 1.19.3 : révision suivante et visée Enutrof
-
-Prise en charge de `page-DfOhw_qp.js` (SHA-256 `9b75f2de166e5940fa13c107b46b505f31ac0f1f75174345108b9789a4006106`). La version 1.19.2 ne reconnaissait pas cette révision arrivée pendant les essais ; son correctif ne s’appliquait donc pas à ce nouveau module. L’adaptation précédente et son correctif sont conservés séparément.
-
-Les sept sorts ciblés de l’Enutrof suivent désormais le transport tactile maintenir/viser/relâcher, dans le moteur natif comme dans les commandes du Thor. Le planificateur automatique choisit une cible ennemie, suit les portées et améliorations, et évite de redemander un Coffre Animé déjà présent. Les sorts passifs et personnels gardent leur fonctionnement normal.
-
-Vérification : Sufokia a atteint la vague 3 et le choix du niveau 5 après environ 47 secondes de jeu sur le Thor. Le relevé de 90 secondes (incluant cette pause de choix) n’a capturé aucune erreur JavaScript ; médiane des intervalles d’affichage 16,667 ms. Visée contrôlée sur une instance PC isolée du moteur réel : un Lancer de Pelle demandé en (850 ; 605,82) est placé dans la file native à ces mêmes coordonnées, contre (1070 ; 545,82) avant correction. Tests de cibles, portées améliorées, registres et compatibilité des modules réussis. Toutes les vagues n’ont pas été parcourues.
