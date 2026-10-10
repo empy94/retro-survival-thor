@@ -110,12 +110,20 @@ public class MainActivity extends Activity {
  private String characterData="{\"status\":\"title\"}";
  private final EvaluationGate controlGate=new EvaluationGate(),dashboardGate=new EvaluationGate();
  private final ControlPulse controlPulse=new ControlPulse();
- private void configureWebAccessibility(WebView view){
+ private final class GameWebView extends WebView {
+  private boolean exposeAccessibility=true;
+  GameWebView(Context context){super(context);configureWebAccessibility(this);}
+  @Override public android.view.accessibility.AccessibilityNodeProvider getAccessibilityNodeProvider(){
+   return exposeAccessibility?super.getAccessibilityNodeProvider():null;
+  }
+ }
+ private void configureWebAccessibility(GameWebView view){
   android.view.accessibility.AccessibilityManager manager=getSystemService(android.view.accessibility.AccessibilityManager.class);
   if(manager==null)return;
   java.util.List<String> packages=new java.util.ArrayList<>();
   for(android.accessibilityservice.AccessibilityServiceInfo service:manager.getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK))if(service.getResolveInfo()!=null&&service.getResolveInfo().serviceInfo!=null)packages.add(service.getResolveInfo().serviceInfo.packageName);
   boolean expose=WebAccessibilityPolicy.expose(manager.isTouchExplorationEnabled(),packages);
+  view.exposeAccessibility=expose;
   view.setImportantForAccessibility(expose?View.IMPORTANT_FOR_ACCESSIBILITY_AUTO:View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
  }
  private final Runnable characterTick=new Runnable(){public void run(){
@@ -184,7 +192,7 @@ public class MainActivity extends Activity {
    // Training code is injected only into the isolated local document.
    inputs=getSystemService(InputManager.class);inputs.registerInputDeviceListener(inputListener,handler);
    displays=getSystemService(DisplayManager.class);displays.registerDisplayListener(displayListener,handler);
-   web=new WebView(this);configureWebAccessibility(web);gameSurface=new FrameLayout(this);gameSurface.addView(web,new FrameLayout.LayoutParams(-1,-1));setContentView(gameSurface);fitModernWindow(getWindow(),gameSurface);
+   web=new GameWebView(this);gameSurface=new FrameLayout(this);gameSurface.addView(web,new FrameLayout.LayoutParams(-1,-1));setContentView(gameSurface);fitModernWindow(getWindow(),gameSurface);
    web.addJavascriptInterface(new Object(){@JavascriptInterface public void setLanguage(String code){if(!Arrays.asList("fr","en","es").contains(code))return;runOnUiThread(()->{gameLanguage=code;getPreferences(0).edit().putString("gameLanguage",code).apply();});}@JavascriptInterface public void openSettings(){runOnUiThread(()->{if(web.getUrl()!=null&&(web.getUrl().startsWith("https://retrosurvival.online/")||web.getUrl().startsWith(SessionNetworkPolicy.LOCAL_URL)))settings();});}},"ThorPreferences");
    WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setMediaPlaybackRequiresUserGesture(false);
    s.setBlockNetworkLoads(localSession);s.setSupportZoom(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);
@@ -288,7 +296,7 @@ public class MainActivity extends Activity {
    protected void onCreate(Bundle state){super.onCreate(state);
      getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
      getWindow().getDecorView().setSystemUiVisibility(5894);
-     panel=new WebView(getContext());configureWebAccessibility(panel);setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setBlockNetworkLoads(localSession);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
+     panel=new GameWebView(getContext());setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setBlockNetworkLoads(localSession);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
      panel.addJavascriptInterface(new Object(){@JavascriptInterface public void companionCall(String json){runOnUiThread(()->MainActivity.this.companionCall(json));}@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
      panel.setWebViewClient(new WebViewClient(){public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return localSession?localResource(r):cacheOnlineResource(r);}public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
      try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}html=html.replace("</head>","<style>"+companion.get("panelStyle")+"</style></head>").replace("</body>","<script>"+companion.get("panelScript")+"</script></body>");panel.loadDataWithBaseURL(gameUrl(),html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
