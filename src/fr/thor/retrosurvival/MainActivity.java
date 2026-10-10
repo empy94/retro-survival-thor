@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
   web.evaluateJavascript("window.thorProgressBackup?.export()?.progress||null",result->{
    try{if(result!=null&&result.length()<100000&&result.startsWith("{")){new JSONObject(result);getSharedPreferences("local-session",0).edit().putString("seed",result).commit();}}
    catch(Exception ignored){}
-   new Thread(()->{try{localCache.freeze();runOnUiThread(()->restartSession(true));}catch(Exception error){runOnUiThread(()->{switchingSession=false;Toast.makeText(this,"Copie locale indisponible : charge une version reconnue du jeu en ligne avant d’activer les cheats.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
+   new Thread(()->{try{localCache.freeze();runOnUiThread(()->restartSession(true));}catch(Exception error){runOnUiThread(()->{switchingSession=false;Toast.makeText(this,"Copie locale indisponible : charge une version reconnue du jeu en ligne avant d’activer le mode local.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
   });
  }
  private void restartSession(boolean local){

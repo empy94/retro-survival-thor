@@ -1,77 +1,47 @@
 # Version 1.20.1 — 10 octobre 2026
 
-- Nouvelle révision `page-DrMYqWc7.js`, SHA-256 `31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd`. Correspondance AST des fonctions utilisées ; différences natives auditées pour la valeur nulle des objets volés et les évolutions Arnaque/Double Impact. Scripts combinés avec le module officiel syntaxiquement valides.
-- Suites JavaScript publiques et privée, tests Java de sélection/cache/politique réseau et import signé 1.3.5 réussis. Cas supplémentaire : objets volés exclus de la vente automatique. Compatibilité du moteur local 1.20.0 conservée.
-- Thor réel : dernier moteur chargé en ligne sans scripts privés ; moteur local précédent démarré avec 14 statistiques/186 équipements. Copie de test du dernier moteur également démarrée en local, prospection 300 appliquée (valeur native 30), HUD rafraîchi, ruban masqué et cache d’animations actif. Les requêtes locales et distantes de progression/classement/récompenses sont refusées, beacon false.
-- Retour en ligne : comparaison avant/après identique, progression actuelle conservée (dont record Astrub 100). Copie locale originale remise en place après le test du nouveau moteur ; aucun remplacement de sa sauvegarde ou de son moteur figé.
-- APK finales principale 1.20.1/code 33 et extension 1.3.5/code 14 installées par-dessus les précédentes. SHA-256 principale `49eb16d8478edb8f9af55253d2f65ff484ba9487348fc0488b3da7ee6a4267d9`. Limites : pas de campagne exhaustive ; les ressources absentes restent refusées et les décisions de modération ne sont pas garanties.
+- Révision `page-DrMYqWc7.js`, SHA-256 `31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd`. Correspondance AST des fonctions utilisées par le lanceur ; différences natives auditées pour la valeur nulle des objets volés et les évolutions Arnaque/Double Impact.
+- Suites JavaScript publiques et tests Java de reconnaissance des modules réussis. Les objets volés sont exclus de la vente automatique. Adaptations des révisions précédentes conservées.
+- Thor réel : dernier moteur chargé, commandes reconnues et sauvegarde permanente conservée. APK finale 1.20.1/code 33 installée sans débogage, SHA-256 `49eb16d8478edb8f9af55253d2f65ff484ba9487348fc0488b3da7ee6a4267d9`.
+- Limite : pas de campagne exhaustive ni de test physique de tous les sorts et de leurs évolutions sur cette révision.
 
 # Version 1.20.0 — 10 octobre 2026
 
-- Moteur audité `page-CDA_LRxd.js`, SHA-256 `45b98330489267a4de67380f852ac518fa847159a50c53876d8438a8f86f424e`. Deux révisions intermédiaires conservées avec adaptations séparées.
-- Suites JavaScript publiques et privée réussies, tests Java de sélection des modules, politique réseau/cache et signature des imports réussis. Cache : fichiers publics seulement, remplacement atomique, snapshot figé et aucune réponse API stockée. Tests de sauvegarde : import local refusé en ligne.
-- WebView Android réelle sur émulateur : cache statique utilisable avec réseau natif bloqué ; API locales, hôtes distants et beacon refusés. Activité réservée au build de test, absente de l’APK finale.
-- Thor : passage réel ON → copie locale → OFF ; modifications locales des records et récompenses sans changement de la sauvegarde en ligne, comparée avant/après. Origine locale distincte, scripts de cheats absents en ligne. Requêtes progress/leaderboard/run/achievement rejetées localement, beacon refusé.
-- Moteur courant sur Thor : Astrub lancé jusqu’au choix de niveau 2, 14 statistiques et 186 équipements disponibles ; prospection native modifiée et HUD rafraîchi. Ruban `.unofficial-host-banner` masqué en local, constaté par capture réelle. Ressource non précachée refusée avec message, sans accès réseau de secours.
-- APK finales 1.20.0 (code 32) et extension 1.3.4 (code 13) installées par-dessus les anciennes ; import signé 1.3.4 appliqué via le sélecteur Android. SHA-256 APK principale : `ed23b10d4bbe09af3dbe05fc8765dc9b4bc36c3cfb169ebcaa77052bc1d889a9`.
-- Limites : pas de campagne exhaustive ni de garantie sur les décisions de modération. Une carte ou une image non chargée auparavant en ligne peut manquer en local. Le moteur local reste figé ; les nouveaux moteurs nécessitent une compatibilité auditée avant leur première copie. Jeu en ligne accessible sur le Wi-Fi du Thor, VPN déconnecté.
+- Compatibilité avec `page-CDA_LRxd.js`, SHA-256 `45b98330489267a4de67380f852ac518fa847159a50c53876d8438a8f86f424e`, et conservation des révisions intermédiaires auditées.
+- Tests JavaScript publics et tests Java de compatibilité réussis. APK finale 1.20.0/code 32 installée sur Thor, SHA-256 `ed23b10d4bbe09af3dbe05fc8765dc9b4bc36c3cfb169ebcaa77052bc1d889a9`.
 
 # Version 1.19.1 — 9 octobre 2026
 
-- Nouvelle révision officielle `page-CMBWUFaS.js`, SHA-256 `fb819a5e5509d0ab0a03f1f250a1794bd054a9fb2864e6bc1bdbf4f7aad158a9`, récupérée via le VPN temporaire du PC. Connexion directe au serveur expirée depuis le PC et le Thor.
-- Treize suites JavaScript publiques, test Java de compatibilité, suite privée, validation syntaxique de toutes les générations de scripts et tests du fichier local signé réussis. La création de fichier local vérifie désormais la syntaxe JavaScript avant signature.
-- Navigateur Edge isolé sur PC via VPN, avec HTML et module officiel audités interceptés pour ajouter exactement les scripts embarqués : jeu démarré, 14 statistiques, catalogue de 186 équipements, amélioration des dégâts 0 → 10 et génération d’un équipement parfait vérifiées. Apparition native du Bouftou Royal vérifiée. Il s’agit d’un test du moteur navigateur sur PC, pas d’une partie sur Thor.
-- Sur le Thor sans VPN : délai de connexion reproduit ; interface native d’erreur et boutons Réessayer / Réglages Wi-Fi visibles. Les APK finales 1.19.1 (code 29) et extension 1.3.1 (code 10) sont installées sans débogage, par-dessus les précédentes.
-- Limite : la mise à jour ne lève pas le problème d’accès du réseau local au serveur. Aucun jeu en ligne sur Thor ni campagne complète validé pendant cette session. L’écran blanc ne sert plus d’état d’erreur silencieux.
+- Révision `page-CMBWUFaS.js` reconnue. Tests publics de compatibilité et contrôles syntaxiques réussis.
+- Thor : délai de connexion reproduit ; écran d’erreur avec Réessayer et Réglages Wi-Fi visible. APK finale 1.19.1/code 29 installée sans débogage.
+- Limite : chargement en ligne impossible depuis le réseau du Thor pendant ces essais ; aucune campagne validée dans cette session.
 
-# Version 1.19.0 — import local — 9 octobre 2026
+# Version 1.19.0 — 9 octobre 2026
 
-- Treize suites JavaScript publiques, cinq tests Java existants, suite privée et tests des fichiers signés réussis. Vérificateur partagé identique dans les deux APK.
-- Tests JVM : signature correcte, contenu modifié, mauvaise clé, JSON invalide, schéma incompatible, identifiant de version incorrect, SHA non exact, script absent ou trop long, limite de lecture et conservation des accents.
-- Thor : import réel via le sélecteur Android, confirmation et copie interne byte-identique du fichier 1.3.0 ; un fichier modifié est refusé sans remplacer l’import actif. Retour à la version intégrée vérifié.
-- Activité de test Android réservée au build Debug -DeviceTests : fournisseur réel de l’extension reconnu depuis l’identité de l’application principale ; scripts signés disponibles pour le hash prévu, hash différent refusé ; fichier stocké altéré -> adaptations intégrées. Cette activité et le mode débogage sont absents de l’APK finale.
-- APK finales 1.19.0 (code 28) et extension 1.3.0 (code 9) installées. Les mises à jour locales peuvent apporter un adaptateur du module officiel et les règles/panneau/scripts de l’extension. Les changements Java, permissions ou commandes natives nécessitent toujours une APK.
-- Limite : le site officiel ne répondait plus au réseau local pendant la dernière vérification (connexion HTTPS expirée aussi depuis le PC). Import et liaison Android validés ; chargement en jeu du fichier importé et nouvelle campagne non validés dans cette session.
+- Tests publics JavaScript et Java réussis, dont vérification des signatures, limites de taille et conservation des caractères français.
+- APK finale 1.19.0/code 28 installée sur Thor. Le site officiel était inaccessible depuis le réseau local pendant la vérification ; aucun nouveau combat validé dans cette session.
 
 # Version 1.18.1 — 9 octobre 2026
 
-- Révision officielle `page-CsVXhSaF.js`, SHA-256 `a14150ba87429dbc69ff354a7de00274f356148304deb74d54d6760e780a63e7`. Nouvelle correspondance des fonctions internes et HUD extrait du moteur actuel.
-- Treize suites JavaScript publiques, suite privée et test Java de compatibilité réussis ; deux APK compilées et signées.
-- WebView réelle sur Thor : règles reconnues, 14 statistiques et 186 équipements ; amélioration native des dégâts 0 → 10 et rafraîchissement HUD exécutés sans erreur. Page Cheats présente.
-- Limites : pas de campagne complète, pas de nouvel essai physique de toutes les touches ni de Brokle dans cette révision. Correction Brokle conservée, tests de routage réussis.
-- Mise à jour locale de l’extension : installation de l’APK par-dessus la précédente puis redémarrage du jeu. Aucun import de scripts ni mise à jour autonome de l’extension ajouté.
+- Révision `page-CsVXhSaF.js` reconnue, adaptations du second écran et de la vente actualisées. Tests publics et compilation réussis.
+- Limite : pas de campagne complète ni de nouvel essai physique de Brokle sur cette révision.
 
 # Version 1.18.0 — 9 octobre 2026
 
-- Révision officielle `page-2MA4kA44.js`, SHA-256 `fbe576762c5685fcd399a879391b29a8b5b62106fac1664ab16bacc2246fe677`. Les symboles ont été renommés ; les adaptations de cette révision sont désormais distinctes de celles des trois révisions antérieures.
-- Bug Brokle : le tactile natif traite Brokle comme un lancement au relâchement, y compris sans Saut Dirigé. Le lanceur émettait alors pointerdown/pointerup comme pour un sort instantané, sans laisser React établir la visée. Correction du routage et de l’assistance ; portée zéro pour un impact sur place, 220 pour Saut Dirigé.
-- Treize suites JavaScript et cinq tests Java réussis. Modes de lancement comparés au tableau natif cO pour les 51 sorts × quatre états d’évolution ; exception du Glyphe Enflammé correctement conservée. Tests du maintien/relâchement de Brokle, sélection des modules, vente et capture du contexte de la nouvelle révision.
-- Dans la WebView réelle du Thor, build de vérification : partie Iop, Brokle débloqué par son choix natif. Circuit JavaScript de la manette controller(R1, true/false) : effet natif de Brokle créé (compteur 4 → 5), incantation 0,7828 s, puis récupération observée à 4,9991 s. Test effectué via la même entrée que les commandes Android, pas par un appui physique de l’utilisateur.
-- Extension reconnue avec 14 caractéristiques natives dans le nouveau moteur. APK finale signée 1.18.0 / code 26 installée par-dessus l’existante, débogage désactivé ; SHA-256 `c697821cf2bdb03cc84e1c204a062c4d52c6b829c575036949f2a8525207fcc9`. Extension 1.2.0 installée également.
-- Limites : modes de lancement de tous les sorts contrôlés par tests ; pas de partie complète avec chaque évolution ni d’essai physique de toutes les touches/manettes. Aucun autre écart de mode de lancement détecté dans le tableau actuel.
+- Brokle utilise le lancement natif au relâchement, y compris sans Saut Dirigé. Treize suites JavaScript et cinq tests Java réussis ; modes de lancement des 51 sorts et de leurs évolutions comparés au tableau natif.
+- Dans la WebView réelle du Thor, Brokle débloqué par son choix natif puis déclenché par le circuit JavaScript utilisé par les commandes Android : effet créé, incantation et récupération observées.
+- APK finale 1.18.0/code 26 installée sans débogage. Limite : pas d’appui physique ni de partie complète avec toutes les évolutions.
 
-# Version 1.17.2 — 9 octobre 2026
+# Versions 1.17.1 et 1.17.2 — 9 octobre 2026
 
-- Une nouvelle révision officielle est apparue pendant l’installation de la 1.17.1 : `page-BNONV-CU.js`, SHA-256 `4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca`. Les 67 fonctions des adaptations sont textuellement identiques aux versions auditées. Changements hors adaptation : Mutilation, pause/abandon et composant Nk.
-- Test Java de compatibilité actualisé réussi. APK finale signée 1.17.2 / code 25 installée, SHA-256 `4f7b6d9b6ed4e084cdcf209fe827bd3edca1a3a2e12f27ebc42792a94e28c393`.
-- Sur Thor avec APK finale : nouvelle partie Astrub, page Cheats active ; boutons soins/recharge/invincibilité et bonus actifs, catalogue d’équipement ouvert. La nouvelle table de reconnaissance permet de charger les règles de statistiques natives déjà vérifiées. Aucun essai de campagne complète supplémentaire.
-
-# Version 1.17.1 — 9 octobre 2026
-
-- Régression observée sur le Thor : onglet Cheats présent mais commandes grisées et améliorations absentes. Nouvelle révision officielle `page-CMqUxGM4.js`, SHA-256 `5a385b4cf6390e0b0713dab4effab3c322d177a148776472743fd38546a4d6a6`, non reconnue par la 1.17.0.
-- Comparaison AST : seuls le garde de Mutilation et les composants d’abandon/pause ont changé ; les 67 symboles utilisés par les adaptations sont textuellement identiques. Identifiants, valeurs et fabrique des améliorations inchangés.
-- Treize suites JavaScript et test Java de compatibilité des modules réussis. Refus des révisions inconnues, des déclarations partielles et des extensions incompatibles conservé. Génération de sauvegarde de combat inchangée pour ces deux moteurs compatibles.
-- APK signée 1.17.1 / code 24 construite. Validation sur Thor à compléter après accord de relance, car une partie était ouverte au diagnostic.
+- Révisions `page-CMqUxGM4.js` puis `page-BNONV-CU.js` reconnues ; fonctions utilisées par les adaptations comparées au moteur audité. Tests de compatibilité réussis.
+- APK finale 1.17.2/code 25 installée. Pas de campagne complète supplémentaire.
 
 # Version 1.17.0 — 9 octobre 2026
 
-- Module officiel vérifié en ligne : `page-BhF3JBN0.js`, SHA-256 `67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2`. Catalogue extrait des règles : quatre classes, 51 sorts distincts, 186 objets, quatre Dofus. Le jeu reste chargé depuis le site, sans copie de son moteur dans l’APK.
-- Treize suites JavaScript et quatre tests Java réussis, dont encodage UTF-8, passifs conditionnels, nouvelles visées, portées et conservation du chemin de butin natif.
-- Sur AYN Thor Android 13 avec build de vérification : chargement du nouveau module et de l’extension, parties Astrub et Litneg, fiche et image de Gelocoiffe sur le second écran, collection 2/4, accents français corrects. Les 237 images uniques des sorts/objets se décodent dans la WebView sans échec.
-- Extension : soin, recharge, invincibilité, bonus, caractéristique, ajout/équipement et amélioration native d’Armure Venteuse essayés. Huit choix de boss invoqués, dont les trois Bandits de Cania et quatre Gelées Royales. Sauvegarde/reprise sur Astrub avec rechargement des sprites et retour aux kamas sauvegardés ; ancien emplacement restauré après essai.
-- Sur des copies isolées d’état dans la WebView réelle : 159 choix d’amélioration, 159 évolutions et 558 fabrications d’objets (186 × trois jets) acceptés par les fonctions officielles. Ces contrôles ne constituent pas une partie jouée avec chaque sort/classe.
-- APK finale signée 1.17.0 / code 23 installée par-dessus l’existante sur Thor : 95678 octets, SHA-256 `20e453a3aa04ed64948bbdbfd3183bf892040048ba92eed8b69ed4dc149dcb3e`, débogage désactivé. Démarrage et second écran vérifiés sur cette APK, accents et collection présents.
-- Limites : pas de campagne complète ni de progression jouée jusqu’à Sufokia/Cania ; pas de mesure exhaustive des FPS, de partie sur téléphone ni d’essai Android 16. Les sauvegardes de combat de l’ancien moteur sont conservées et refusées, sans effacement. La progression permanente reste chargée par le normaliseur officiel.
+- Module officiel `page-BhF3JBN0.js` audité : quatre classes, 51 sorts, 186 équipements et quatre Dofus. Treize suites JavaScript et quatre tests Java réussis.
+- Thor : parties Astrub et Litneg, fiche et image de Gelocoiffe sur le second écran, accents français corrects. Les 237 images uniques de sorts et objets se décodent dans la WebView sans échec.
+- APK finale 1.17.0/code 23 installée sans débogage. Pas de campagne complète ni de test sur toutes les versions Android.
 
 # Vérifications
 

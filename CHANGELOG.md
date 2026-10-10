@@ -1,13 +1,11 @@
 ## 1.20.1 — dernière révision du 10 octobre 2026
 
 - Prise en charge de `page-DrMYqWc7.js` ; adaptations des commandes, visée Enutrof et cache d’animations actualisées.
-- Conservation des adaptations du moteur local précédent, sans remplacement de sa copie figée ni transfert de progression.
+- Conservation des adaptations des révisions précédentes du moteur.
 - Vente automatique : les objets volés restent exclus, conformément à leur nouvelle valeur native nulle.
 
-## 1.20.0 — sessions locales isolées — 10 octobre 2026
+## 1.20.0 — compatibilité du 10 octobre 2026
 
-- L’extension personnelle peut relancer une session locale distincte : cache des fichiers publics, origine et sauvegarde séparées, réseau du jeu bloqué. Retour au jeu en ligne sans transfert de progression locale.
-- Les scripts privés et les adaptations importées restent réservés au mode local. Un export local ne peut pas être importé dans la sauvegarde en ligne.
 - Compatibilité avec `page-CDA_LRxd.js` et les deux révisions intermédiaires conservées.
 
 ## 1.19.1 — dernière révision et écran de connexion
@@ -18,12 +16,12 @@
 
 ## 1.19.0 — mises à jour locales des modules
 
-- Prise en charge des fichiers de compatibilité importés par une extension de même signature : signature du fichier contrôlée également par l’application principale, scripts bornés et adaptation limitée au SHA-256 exact du module officiel.
+- Prise en charge des fichiers de compatibilité signés : signature du fichier contrôlée également par l’application principale, scripts bornés et adaptation limitée au SHA-256 exact du module officiel.
 - Retour aux adaptations intégrées si le fichier local est absent ou invalide. Les sauvegardes ne sont pas modifiées.
 
 ## 1.18.1 — compatibilité avec la dernière mise à jour
 
-- Adaptations actualisées pour `page-CsVXhSaF.js`, statistiques et commandes privées incluses.
+- Adaptations actualisées pour `page-CsVXhSaF.js`, fiche du personnage et commandes manette incluses.
 - Conservation des quatre révisions précédentes avec leurs propres adaptations.
 - Vente automatique : conservation du nouveau placement natif des objets sur le terrain.
 
@@ -37,17 +35,17 @@
 ## 1.17.2 — dernière révision officielle
 
 - Prise en charge de `page-BNONV-CU.js`, révision supplémentaire publiée pendant l’installation. Les 67 fonctions des adaptations sont toujours identiques.
-- APK finale installée sur Thor avec extension 1.1.2 ; commandes Cheats actives sur la révision actuelle.
+- APK finale installée sur Thor ; module officiel reconnu.
 
-## 1.17.1 — rétablissement de l’extension Cheats
+## 1.17.1 — compatibilité du module officiel
 
 - Reconnaissance de la révision officielle `page-CMqUxGM4.js`, publiée après la 1.17.0. Les 67 fonctions nécessaires aux adaptations sont identiques à la version précédente.
-- Acceptation des deux révisions auditées et de leur déclaration de compatibilité par l’extension, pour rétablir notamment les améliorations de statistiques +1/+5.
+- Reconnaissance des deux révisions auditées par les adaptations du lanceur.
 - Compatibilité des sauvegardes de combat entre ces deux révisions conservée, sans effacement.
 
 ## 1.17.0 — contenu du 9 octobre 2026
 
-- Adaptation au nouveau moteur officiel, avec contrôle de version partagé entre l’application et l’extension.
+- Adaptation au nouveau moteur officiel, avec contrôle de version dans l’application.
 - Enutrof/Sufokia, 51 sorts, 186 équipements et quatre Dofus dans les listes et l’écran secondaire.
 - Nouveaux sorts Iop/Sram, sorts devenant passifs après évolution, visée d’Arnaque/Brokle et portées natives de Bond/Téléportation.
 - Accents français corrigés dans les noms, effets et collection ; contrôle d’encodage ajouté aux tests.

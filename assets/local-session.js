@@ -2,7 +2,7 @@
  const local=location.origin==='https://thor-local.invalid';
  Object.defineProperty(window,'thorSession',{value:Object.freeze({local}),writable:false,configurable:false});
  if(!local)return;
- // The native Cheats switch shows the mode without covering the playfield.
+ // The session control shows the mode without covering the playfield.
  const style=document.createElement("style");style.textContent=".unofficial-host-banner{display:none!important}";document.head.append(style);
  // Runs in the first script of the local document, before any native game code.
  const allowed=input=>{try{const u=new URL(typeof input==='string'?input:input.url,location.href);return u.origin===location.origin&&(u.pathname.startsWith('/assets/')||u.pathname.startsWith('/_next/static/'));}catch{return false;}};
