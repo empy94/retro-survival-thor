@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
  private WebView web,shortcutPanel;
  private FrameLayout gameSurface;private LinearLayout loadPanel;private long loadGeneration;private boolean loadFailed;
  private CompanionModule companion;
- private volatile long lastCacheWarning;private volatile boolean localSession;private boolean switchingSession;private LocalGameCache localCache;private String localGuard;
+ private volatile long lastCacheWarning;private volatile boolean localSession;private boolean switchingSession;private LocalGameCache localCache;private String localGuard,progressTransfer;
  private boolean updateStarted;
  private String pendingBackup;
  private static final int EXPORT_PROGRESS=410,IMPORT_PROGRESS=411;
@@ -59,8 +59,9 @@ public class MainActivity extends Activity {
   web.evaluateJavascript("(()=>{try{return JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null');}catch(e){return null;}})()",result->{
    try{
     if(result==null||result.length()>=100000||!result.startsWith("{")||new JSONObject(result).optJSONObject("waveRecords")==null)throw new IOException("Invalid local progress");
-    // Retain a device-only recovery copy. Never inject this into the online origin.
-    if(!getSharedPreferences("local-session",0).edit().putString("seed",result).commit())throw new IOException("Local backup failed");
+    // Keep the local recovery copy and explicitly transfer only the permanent progression.
+    String transfer=new JSONObject().put("id",UUID.randomUUID().toString()).put("progress",new JSONObject(result)).toString();
+    if(!getSharedPreferences("local-session",0).edit().putString("seed",result).putString("onlineTransfer",transfer).commit())throw new IOException("Local backup failed");
     restartSession(false);
    }catch(Exception error){switchingSession=false;Toast.makeText(this,"La progression locale n’a pas pu être conservée. Réessaie avant de quitter ce mode.",Toast.LENGTH_LONG).show();}
   });
@@ -82,6 +83,10 @@ public class MainActivity extends Activity {
   String seed=localSession?getSharedPreferences("local-session",0).getString("seed","null"):"null";
   String revision=localSession?getSharedPreferences("local-session",0).getString("seedRevision",""):"";
   String prefix="<script>window.thorLocalSeed="+seed.replace("<","\\u003c")+";window.thorLocalSeedRevision="+JSONObject.quote(revision)+";"+localGuard+"</script>";
+  if(!localSession&&companion.enabled()){
+   String transfer=getSharedPreferences("local-session",0).getString("onlineTransfer","null");
+   prefix+="<script>window.thorProgressTransfer="+transfer.replace("<","\\u003c")+";"+progressTransfer+"</script>";
+  }
   if(localSession){
    // No connections, frames, workers, forms or remote images can escape the local origin.
    prefix="<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'\">"+prefix;
@@ -203,6 +208,7 @@ public class MainActivity extends Activity {
    companion=new CompanionModule(this);
    localSession=companion.enabled()&&(state==null?getIntent().getBooleanExtra("localSession",false):state.getBoolean("localSession",false));localCache=new LocalGameCache(getFilesDir());
    try(InputStream in=getAssets().open("local-session.js")){localGuard=read(in);}catch(Exception error){throw new RuntimeException(error);}
+   try(InputStream in=getAssets().open("progress-transfer.js")){progressTransfer=read(in);}catch(Exception error){throw new RuntimeException(error);}
    if(state!=null)pendingBackup=state.getString("pendingProgressBackup");
    gameLanguage=getPreferences(0).getString("gameLanguage","fr");try(InputStream in=getAssets().open("locale.json")){languageTable=new JSONObject(read(in));}catch(Exception ignored){}
    cursorSensitivity=Math.max(25,Math.min(250,getPreferences(0).getInt("cursorSensitivity",100)))/100f;
