@@ -14,7 +14,17 @@
  navigator.sendBeacon=()=>false;
  for(const name of ['WebSocket','EventSource','Worker','SharedWorker','RTCPeerConnection','webkitRTCPeerConnection'])if(name in window)window[name]=function(){throw reject();};
  if(navigator.serviceWorker)navigator.serviceWorker.register=()=>Promise.reject(reject());
- const seed=window.thorLocalSeed;
- if(seed&&!localStorage.getItem('retro-survival.progress.v1'))localStorage.setItem('retro-survival.progress.v1',JSON.stringify(seed));
+ const seed=window.thorLocalSeed,revision=window.thorLocalSeedRevision;
+ const key='retro-survival.progress.v1',revisionKey='thor.local.seed-revision';
+ if(seed&&typeof seed==='object'&&!Array.isArray(seed)&&seed.waveRecords&&typeof seed.waveRecords==='object'&&!Array.isArray(seed.waveRecords)){
+  const existing=localStorage.getItem(key);
+  if(typeof revision==='string'&&revision&&revision!==localStorage.getItem(revisionKey)){
+   // Preserve the last local progression before starting from the current online copy.
+   if(existing)localStorage.setItem('thor.local.previous-progress',existing);
+   localStorage.setItem(key,JSON.stringify(seed));
+   localStorage.setItem(revisionKey,revision);
+  }else if(!existing)localStorage.setItem(key,JSON.stringify(seed));
+ }
  delete window.thorLocalSeed;
+ delete window.thorLocalSeedRevision;
 })();

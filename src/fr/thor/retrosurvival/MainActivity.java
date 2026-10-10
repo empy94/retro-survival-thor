@@ -38,9 +38,13 @@ public class MainActivity extends Activity {
   if(switchingSession)return;
   if(!localCache.ready()){Toast.makeText(this,"Charge d’abord le jeu en ligne pour préparer sa copie locale.",Toast.LENGTH_LONG).show();return;}
   switchingSession=true;
-  web.evaluateJavascript("window.thorProgressBackup?.export()?.progress||null",result->{
-   try{if(result!=null&&result.length()<100000&&result.startsWith("{")){new JSONObject(result);getSharedPreferences("local-session",0).edit().putString("seed",result).commit();}}
-   catch(Exception ignored){}
+  web.evaluateJavascript("(()=>{try{return JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null');}catch(e){return null;}})()",result->{
+   try{
+    if(result==null||result.length()>=100000||!result.startsWith("{"))throw new IOException("No current progress");
+    JSONObject progress=new JSONObject(result);
+    if(progress.optJSONObject("waveRecords")==null)throw new IOException("Invalid progress");
+    if(!getSharedPreferences("local-session",0).edit().putString("seed",result).putString("seedRevision",UUID.randomUUID().toString()).commit())throw new IOException("Seed storage failed");
+   }catch(Exception error){switchingSession=false;Toast.makeText(this,"Ta sauvegarde actuelle n’a pas pu être copiée. Attends le chargement du jeu, puis réessaie.",Toast.LENGTH_LONG).show();return;}
    new Thread(()->{try{localCache.freeze();runOnUiThread(()->restartSession(true));}catch(Exception error){runOnUiThread(()->{switchingSession=false;Toast.makeText(this,"Copie locale indisponible : charge une version reconnue du jeu en ligne avant d’activer le mode local.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
   });
  }
@@ -59,7 +63,8 @@ public class MainActivity extends Activity {
  }
  private String injectRoot(String html){
   String seed=localSession?getSharedPreferences("local-session",0).getString("seed","null"):"null";
-  String prefix="<script>window.thorLocalSeed="+seed.replace("<","\\u003c")+";"+localGuard+"</script>";
+  String revision=localSession?getSharedPreferences("local-session",0).getString("seedRevision",""):"";
+  String prefix="<script>window.thorLocalSeed="+seed.replace("<","\\u003c")+";window.thorLocalSeedRevision="+JSONObject.quote(revision)+";"+localGuard+"</script>";
   if(localSession){
    // No connections, frames, workers, forms or remote images can escape the local origin.
    prefix="<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'\">"+prefix;
