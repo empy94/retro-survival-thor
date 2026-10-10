@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
  private void companionCall(String json){
   if(companion==null||!companion.enabled()||!ready||!active||json==null||json.length()>2048)return;
   try{JSONObject request=new JSONObject(json);String kind=request.optString("kind");
-   if("session-online".equals(kind)){if(localSession)restartSession(false);return;}
+   if("session-online".equals(kind)){if(localSession)leaveLocalSession();return;}
    if(!localSession){activateLocalSession();return;}
    if(!"session-local".equals(kind))web.evaluateJavascript(companion.command(request.toString()),null);
   }catch(Exception ignored){}
@@ -38,6 +38,8 @@ public class MainActivity extends Activity {
   if(switchingSession)return;
   if(!localCache.ready()){Toast.makeText(this,"Charge d’abord le jeu en ligne pour préparer sa copie locale.",Toast.LENGTH_LONG).show();return;}
   switchingSession=true;
+  // The existing local origin remains authoritative after its first initialization.
+  if(!getSharedPreferences("local-session",0).getString("seedRevision","").isEmpty()){launchLocalSnapshot();return;}
   web.evaluateJavascript("(()=>{try{return JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null');}catch(e){return null;}})()",result->{
    try{
     if(result==null||result.length()>=100000||!result.startsWith("{"))throw new IOException("No current progress");
@@ -45,7 +47,22 @@ public class MainActivity extends Activity {
     if(progress.optJSONObject("waveRecords")==null)throw new IOException("Invalid progress");
     if(!getSharedPreferences("local-session",0).edit().putString("seed",result).putString("seedRevision",UUID.randomUUID().toString()).commit())throw new IOException("Seed storage failed");
    }catch(Exception error){switchingSession=false;Toast.makeText(this,"Ta sauvegarde actuelle n’a pas pu être copiée. Attends le chargement du jeu, puis réessaie.",Toast.LENGTH_LONG).show();return;}
-   new Thread(()->{try{localCache.freeze();runOnUiThread(()->restartSession(true));}catch(Exception error){runOnUiThread(()->{switchingSession=false;Toast.makeText(this,"Copie locale indisponible : charge une version reconnue du jeu en ligne avant d’activer le mode local.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
+   launchLocalSnapshot();
+  });
+ }
+ private void launchLocalSnapshot(){
+  new Thread(()->{try{localCache.freeze();runOnUiThread(()->restartSession(true));}catch(Exception error){runOnUiThread(()->{switchingSession=false;Toast.makeText(this,"Copie locale indisponible : charge une version reconnue du jeu en ligne avant d’activer le mode local.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
+ }
+ private void leaveLocalSession(){
+  if(switchingSession)return;
+  switchingSession=true;
+  web.evaluateJavascript("(()=>{try{return JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null');}catch(e){return null;}})()",result->{
+   try{
+    if(result==null||result.length()>=100000||!result.startsWith("{")||new JSONObject(result).optJSONObject("waveRecords")==null)throw new IOException("Invalid local progress");
+    // Retain a device-only recovery copy. Never inject this into the online origin.
+    if(!getSharedPreferences("local-session",0).edit().putString("seed",result).commit())throw new IOException("Local backup failed");
+    restartSession(false);
+   }catch(Exception error){switchingSession=false;Toast.makeText(this,"La progression locale n’a pas pu être conservée. Réessaie avant de quitter ce mode.",Toast.LENGTH_LONG).show();}
   });
  }
  private void restartSession(boolean local){
