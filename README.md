@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.20.2 :** réduction de la charge des menus sur Thor, notamment le classement ; compatibilité avec la dernière révision du 10 octobre conservée.
+**Mise à jour 1.20.3 :** compatibilité avec les nouvelles révisions du 10 octobre et réactivation de l’optimisation des animations de Sufokia.
 
 ## Trois façons de jouer
 

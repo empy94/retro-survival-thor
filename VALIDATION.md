@@ -1,3 +1,12 @@
+# Version 1.20.3 — 10 octobre 2026
+
+- Révision chargée sur Thor : `page-D4sIe3FD.js`, SHA-256 `767dba829cdc81e035c43934762c427be444499a96aa84357f7311178db9d0eb`. Révision intermédiaire `page-BRODZTee.js`, SHA-256 `04dd91fe93a041fa743ba9e2926a61d3177dce9f5f4c9f5607e46acfb2e28dd0`, conservée avec les adaptations précédentes. Correspondances AST des fonctions utilisées vérifiées ; les fonctions ambiguës de statistiques ont été distinguées par leurs appels.
+- Le moteur non reconnu ne recevait pas le cache d’animations. Après adaptation : cache et contexte natif présents sur le module effectivement chargé par le Thor.
+- Profilage en combat réel Enutrof/Sufokia : 954 images mesurées pendant les phases actives, médiane 16,667 ms et 95e percentile 17,021 ms. Temps de jeu passé de 2,638 à 18,646 secondes, vague 2 et sept ennemis. Les choix de niveau ont été validés par les boutons normaux pour exclure les pauses de la mesure. Aucune modification des règles ni de la sauvegarde utilisée pour cet essai.
+- Suites JavaScript publiques et tests Java de compatibilité réussis ; régression de cache sur la révision actuelle et les révisions précédentes couverte.
+- APK finale sans débogage 1.20.3/code 35 installée sur Thor, SHA-256 `a0036f4d261db14ddc42e4dbaa5011db43ea137fee564543d66e52cfc051682b`. La mesure détaillée des images provient de l’APK de diagnostic ; le lancement à Sufokia et les entrées Android sont revérifiés séparément sur l’APK finale.
+- Limites : mesure courte après chargement initial, pas de validation des vagues avancées ni de campagne exhaustive. Le classement historique n’est pas validé par cet essai.
+
 # Version 1.20.2 — 10 octobre 2026
 
 - Diagnostic sur Thor : délais d’entrée Android dans le classement et après saisie, avec le thread principal dans le composant WebView natif. NordVPN inactif pendant la reproduction. WebView système 109.0.5414.123 ; la cause unique n’est pas établie.

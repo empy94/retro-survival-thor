@@ -5,10 +5,11 @@ public class GameModuleVersionsTest {
   if(!GameModuleVersions.supported("4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca")||!GameModuleVersions.supported(old)||!GameModuleVersions.supported(current)||GameModuleVersions.supported("unknown"))throw new AssertionError("audited builds");
   if(!GameModuleVersions.companionSupports(old+"\n"+current,current)||!GameModuleVersions.companionSupports(old,old))throw new AssertionError("companion compatibility");
   if(GameModuleVersions.companionSupports(old,current)||GameModuleVersions.companionSupports("prefix"+current,current)||GameModuleVersions.companionSupports("unknown","unknown")||GameModuleVersions.companionSupports(null,current))throw new AssertionError("exact-match guard");
-  String latest="31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd";if(!GameModuleVersions.current(latest)||!GameModuleVersions.supported(latest)||!GameModuleVersions.companionSupports(old+"\n"+latest,latest)||GameModuleVersions.current(old))throw new AssertionError("current hook selection");
+  String latest="767dba829cdc81e035c43934762c427be444499a96aa84357f7311178db9d0eb";if(!GameModuleVersions.current(latest)||!GameModuleVersions.supported(latest)||!GameModuleVersions.companionSupports(old+"\n"+latest,latest)||GameModuleVersions.current(old))throw new AssertionError("current hook selection");
   if(!GameModuleVersions.previous3("fb819a5e5509d0ab0a03f1f250a1794bd054a9fb2864e6bc1bdbf4f7aad158a9")||!GameModuleVersions.supported("fb819a5e5509d0ab0a03f1f250a1794bd054a9fb2864e6bc1bdbf4f7aad158a9"))throw new AssertionError("prior performance fix selection");
   if(!GameModuleVersions.previous4("9b75f2de166e5940fa13c107b46b505f31ac0f1f75174345108b9789a4006106"))throw new AssertionError("prior hook selection");
   if(!GameModuleVersions.previous6("45b98330489267a4de67380f852ac518fa847159a50c53876d8438a8f86f424e"))throw new AssertionError("previous local snapshot supported");
+  if(!GameModuleVersions.previous7("31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd")||!GameModuleVersions.previous7("04dd91fe93a041fa743ba9e2926a61d3177dce9f5f4c9f5607e46acfb2e28dd0"))throw new AssertionError("intermediate revisions preserved");
   System.out.println("Audited game versions and companion compatibility passed");
  }
 }

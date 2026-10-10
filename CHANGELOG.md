@@ -1,3 +1,9 @@
+## 1.20.3 — Sufokia et nouvelles révisions du jeu
+
+- Prise en charge de `page-D4sIe3FD.js` et de la révision intermédiaire `page-BRODZTee.js`. Les révisions précédentes restent reconnues.
+- Cache des registres d’animations de nouveau appliqué au moteur actualisé : suppression des reconstructions répétées qui surchargeaient Sufokia à l’apparition des monstres.
+- Adaptations des commandes, de la visée et de la vente mises à jour pour les nouveaux noms du moteur.
+
 ## 1.20.2 — stabilité des menus sur Thor
 
 - Réduction des échanges entre Android et le jeu au repos ; commandes actives et relâchements restent immédiats.
