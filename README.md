@@ -83,14 +83,6 @@ Pour une mise à jour, installe par-dessus l’application existante. Sa sauvega
 
 Lanceur indépendant : le jeu est chargé depuis son site officiel. Non affilié à Retro Survival ou Ankama. Code du lanceur sous licence MIT.
 
-## Version 1.19.2 : Sufokia / Enutrof
-
-Correction du gel à l’apparition de l’Arakne sur le Thor, avec le module officiel `page-CMBWUFaS.js`. Le moteur reconstruit son catalogue d’animations dans une boucle de nettoyage ; les registres statiques sont désormais conservés par carte. Le correctif suit le contrôle SHA-256 du module et s’applique aussi lorsqu’une ancienne mise à jour locale est importée. Aucun changement aux sorts, dégâts, ennemis ou sauvegardes.
-
-Vérification réelle sur Thor : le profil avant correction attribuait 4186 des 5598 échantillons au constructeur du catalogue, plus 1310 au ramasse-miettes. Sur la partie gelée avec une Arakne, le correctif en mémoire a fait avancer le temps du jeu de 3,603 à 5,625 secondes en environ deux secondes réelles. Les tests couvrent la conservation des descripteurs et un seul calcul par carte. Ce contrôle ne prouve pas la stabilité de toutes les vagues.
-
-L’erreur réseau constatée ensuite est distincte : le lanceur Android a forcé l’arrêt du jeu et de NordVPN à 22:10:52. Aucun bannissement de compte ni filtrage serveur causé par cette boucle n’a été établi.
-
 ## Version 1.19.3 : révision suivante et visée Enutrof
 
 Prise en charge de `page-DfOhw_qp.js` (SHA-256 `9b75f2de166e5940fa13c107b46b505f31ac0f1f75174345108b9789a4006106`). La version 1.19.2 ne reconnaissait pas cette révision arrivée pendant les essais ; son correctif ne s’appliquait donc pas à ce nouveau module. L’adaptation précédente et son correctif sont conservés séparément.
