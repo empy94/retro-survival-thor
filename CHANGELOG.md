@@ -1,3 +1,9 @@
+## 1.20.2 — stabilité des menus sur Thor
+
+- Réduction des échanges entre Android et le jeu au repos ; commandes actives et relâchements restent immédiats.
+- Navigation manette : les boutons des menus ne sont plus tous remesurés à chaque passage au repos.
+- Les WebViews du jeu limitent leur arbre d’accessibilité lorsque seuls les moniteurs connus de la console sont présents au démarrage. Les lecteurs d’écran et les services inconnus conservent l’accès normal.
+
 ## 1.20.1 — dernière révision du 10 octobre 2026
 
 - Prise en charge de `page-DrMYqWc7.js` ; adaptations des commandes, visée Enutrof et cache d’animations actualisées.

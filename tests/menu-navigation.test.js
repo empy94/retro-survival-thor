@@ -1,13 +1,15 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const classes=initial=>{const values=new Set(initial);return {contains:v=>values.has(v),add:v=>values.add(v),remove:v=>values.delete(v)};};
-let phase='phase-title',clicked=0;
-function item(text,left,top=20){return {text,isConnected:true,disabled:false,classList:classes([]),getAttribute:()=>null,matches:()=>false,closest:()=>null,getBoundingClientRect:()=>({left,top,width:80,height:50,right:left+80,bottom:top+50}),scrollIntoView(){},click(){clicked++}};}
+let phase='phase-title',clicked=0,measurements=0;
+function item(text,left,top=20){return {text,isConnected:true,disabled:false,classList:classes([]),getAttribute:()=>null,matches:()=>false,closest:()=>null,getBoundingClientRect:()=>{measurements++;return {left,top,width:80,height:50,right:left+80,bottom:top+50}},scrollIntoView(){},click(){clicked++}};}
 const first=item('Jouer',10),second=item('Classement',110),disabled=item('Verrouillé',210);disabled.disabled=true;
 let items=[first,second,disabled];
 const main={get className(){return phase},classList:{contains:v=>phase.includes(v)},querySelector:()=>null,querySelectorAll:s=>s.startsWith('[role=')||s.startsWith('.levelup-overlay')?[]:items};
 let padCalls=0;const window={thorControls:{pad:()=>padCalls++}};vm.runInNewContext(fs.readFileSync('assets/menu-navigation.js','utf8'),{window,document:{querySelector:()=>main,addEventListener(){}},innerWidth:500,innerHeight:500,getComputedStyle:()=>({display:'block',visibility:'visible'})});
 const menu=window.thorMenu,selected=el=>el.classList.contains('thor-menu-selected');
 assert.equal(menu.tick(0,0,0),true);assert.equal(menu.activate(),false);
+const idleMeasurements=measurements;for(let n=0;n<300;n++)menu.tick(0,0,n);
+assert.equal(measurements,idleMeasurements,'unchanged menu does not remeasure every button at rest');
 menu.tick(1,0,10);assert(selected(first));
 assert.equal(padCalls,1,'menu direction explicitly switches away from pointer mode');
 menu.tick(1,0,30);assert(selected(first),'held direction does not immediately repeat');

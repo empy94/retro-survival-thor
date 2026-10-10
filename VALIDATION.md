@@ -1,3 +1,13 @@
+# Version 1.20.2 — 10 octobre 2026
+
+- Diagnostic sur Thor : délais d’entrée Android dans le classement et après saisie, avec le thread principal dans le composant WebView natif. NordVPN inactif pendant la reproduction. WebView système 109.0.5414.123 ; la cause unique n’est pas établie.
+- Réduction des évaluations au repos et suppression des mesures répétées des boutons sans mouvement. Les entrées actives et le premier relâchement restent immédiats. Limitation de l’arbre d’accessibilité uniquement pour les moniteurs connus présents au démarrage ; aucun service système désactivé.
+- Les suites JavaScript publiques et le test Java de cadence/accessibilité passent. Tests de navigation : menus imbriqués, retour de sélection et boutons disparus préservés.
+- La version de débogage a encore produit des ANR malgré des commandes répondant par intermittence : ce résultat ne valide pas la stabilité. La version finale sans débogage est vérifiée séparément sur le Thor.
+- APK finale 1.20.2/code 34 installée sans effacement des données, SHA-256 `1d2e9f6250258ef7292489a114130e3f63665ece3460ac4edaf6446131f8f6dc`.
+- Thor réel, APK finale : classement chargé et 40 gestes de défilement natifs, ouverture/saisie/fermeture du clavier dans le champ de récupération sans soumission, retour aux menus. Aucun nouvel ANR pendant les cinq premières minutes de ces essais. Compte affiché et record Astrub 100 conservés.
+- Limites : essais bornés des menus ; aucune campagne exhaustive, aucun essai physique de tous les sorts et aucun lecteur d’écran réel testé.
+
 # Version 1.20.1 — 10 octobre 2026
 
 - Révision `page-DrMYqWc7.js`, SHA-256 `31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd`. Correspondance AST des fonctions utilisées par le lanceur ; différences natives auditées pour la valeur nulle des objets volés et les évolutions Arnaque/Double Impact.

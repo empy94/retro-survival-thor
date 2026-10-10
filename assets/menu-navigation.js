@@ -27,9 +27,9 @@
  function choose(el){selected?.classList.remove('thor-menu-selected');selected=el;if(el){el.classList.add('thor-menu-selected');el.scrollIntoView({block:'nearest',inline:'nearest'});}}
  function tick(x,y,now){
    if(!menu()){clear();lastScope=null;return false;}
-   const items=sync();
    const direction=Math.max(Math.abs(x),Math.abs(y))<.5?'':Math.abs(x)>=Math.abs(y)?(x>0?'right':'left'):(y>0?'down':'up');
-   if(!direction){lastDirection='';nextRepeat=0;if(selected&&!selected.isConnected)clear();return true;}
+   if(!direction){lastDirection='';nextRepeat=0;if(selected&&!selected.isConnected)clear();if(scope()!==lastScope)sync();return true;}
+   const items=sync();
    root.thorControls?.pad();
    if(direction===lastDirection&&now<nextRepeat)return true;
    nextRepeat=now+(direction===lastDirection?150:400);lastDirection=direction;
