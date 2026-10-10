@@ -1,7 +1,7 @@
 (function(){'use strict';
  let enabled=false,last=null;
  function canSell(equipment,item){
-  if(!item||item.slot==='dofus'||item.radiant||!Array.isArray(item.rolls)||!item.rolls.length||!item.rolls.every(Number.isFinite))return false;
+  if(!item||item.stolen||item.slot==='dofus'||item.radiant||!Array.isArray(item.rolls)||!item.rolls.length||!item.rolls.every(Number.isFinite))return false;
   const own=Object.values(equipment||{}).flatMap(value=>Array.isArray(value)?value:value?[value]:[]).find(e=>e.id===item.id&&e.slot===item.slot);
   return !!own&&Array.isArray(own.rolls)&&own.rolls.length===item.rolls.length&&own.rolls.every(Number.isFinite)&&item.rolls.every((value,i)=>value<=own.rolls[i]);
  }

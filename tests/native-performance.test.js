@@ -1,9 +1,9 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-for(const [file,binding] of [['current','jo'],['previous5','Ao'],['previous4','jo'],['previous3','ko']]){
+for(const [file,binding] of [['current','jo'],['previous6','jo'],['previous5','Ao'],['previous4','jo'],['previous3','ko']]){
 const script=fs.readFileSync('assets/native-performance-hook-'+file+'.js','utf8');
 const shared={fighterIdle:{src:'fighter.webp'},arakneIdle:{src:'arakne.png'}};
 let calls=0;
-const touch=['dash','fear'];const ctx={window:{},hO:touch,mO:touch,fO:touch,pO:touch,[binding]:level=>{calls++;return {...shared,level};}};
+const touch=['dash','fear'];const ctx={window:{},UO:touch,hO:touch,mO:touch,fO:touch,pO:touch,[binding]:level=>{calls++;return {...shared,level};}};
 vm.createContext(ctx);vm.runInContext(script,ctx);
 for(const level of ['astrub','wabbit','litneg','gelee']){
  const registry=ctx[binding](level);

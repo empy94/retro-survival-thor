@@ -1,3 +1,9 @@
+## 1.20.1 — dernière révision du 10 octobre 2026
+
+- Prise en charge de `page-DrMYqWc7.js` ; adaptations des commandes, visée Enutrof et cache d’animations actualisées.
+- Conservation des adaptations du moteur local précédent, sans remplacement de sa copie figée ni transfert de progression.
+- Vente automatique : les objets volés restent exclus, conformément à leur nouvelle valeur native nulle.
+
 ## 1.20.0 — sessions locales isolées — 10 octobre 2026
 
 - L’extension personnelle peut relancer une session locale distincte : cache des fichiers publics, origine et sauvegarde séparées, réseau du jeu bloqué. Retour au jeu en ligne sans transfert de progression locale.

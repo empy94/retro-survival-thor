@@ -1,3 +1,11 @@
+# Version 1.20.1 — 10 octobre 2026
+
+- Nouvelle révision `page-DrMYqWc7.js`, SHA-256 `31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd`. Correspondance AST des fonctions utilisées ; différences natives auditées pour la valeur nulle des objets volés et les évolutions Arnaque/Double Impact. Scripts combinés avec le module officiel syntaxiquement valides.
+- Suites JavaScript publiques et privée, tests Java de sélection/cache/politique réseau et import signé 1.3.5 réussis. Cas supplémentaire : objets volés exclus de la vente automatique. Compatibilité du moteur local 1.20.0 conservée.
+- Thor réel : dernier moteur chargé en ligne sans scripts privés ; moteur local précédent démarré avec 14 statistiques/186 équipements. Copie de test du dernier moteur également démarrée en local, prospection 300 appliquée (valeur native 30), HUD rafraîchi, ruban masqué et cache d’animations actif. Les requêtes locales et distantes de progression/classement/récompenses sont refusées, beacon false.
+- Retour en ligne : comparaison avant/après identique, progression actuelle conservée (dont record Astrub 100). Copie locale originale remise en place après le test du nouveau moteur ; aucun remplacement de sa sauvegarde ou de son moteur figé.
+- APK finales principale 1.20.1/code 33 et extension 1.3.5/code 14 installées par-dessus les précédentes. SHA-256 principale `49eb16d8478edb8f9af55253d2f65ff484ba9487348fc0488b3da7ee6a4267d9`. Limites : pas de campagne exhaustive ; les ressources absentes restent refusées et les décisions de modération ne sont pas garanties.
+
 # Version 1.20.0 — 10 octobre 2026
 
 - Moteur audité `page-CDA_LRxd.js`, SHA-256 `45b98330489267a4de67380f852ac518fa847159a50c53876d8438a8f86f424e`. Deux révisions intermédiaires conservées avec adaptations séparées.
