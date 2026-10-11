@@ -1,9 +1,9 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-for(const [file,binding] of [['current','jo'],['previous7','jo'],['previous6','jo'],['previous5','Ao'],['previous4','jo'],['previous3','ko']]){
+for(const [file,binding] of [['current','zo'],['previous8','jo'],['previous7','jo'],['previous6','jo'],['previous5','Ao'],['previous4','jo'],['previous3','ko']]){
 const script=fs.readFileSync('assets/native-performance-hook-'+file+'.js','utf8');
 const shared={fighterIdle:{src:'fighter.webp'},arakneIdle:{src:'arakne.png'}};
 let calls=0;
-const touch=['dash','fear'];const ctx={window:{},qO:touch,UO:touch,hO:touch,mO:touch,fO:touch,pO:touch,[binding]:level=>{calls++;return {...shared,level};}};
+const touch=['dash','fear'];const ctx={window:{},Ga:()=>false,dk:touch,qO:touch,UO:touch,hO:touch,mO:touch,fO:touch,pO:touch,[binding]:level=>{calls++;return {...shared,level};}};
 vm.createContext(ctx);vm.runInContext(script,ctx);
 for(const level of ['astrub','wabbit','litneg','gelee']){
  const registry=ctx[binding](level);
@@ -11,6 +11,7 @@ for(const level of ['astrub','wabbit','litneg','gelee']){
  for(let frame=0;frame<100;frame++)for(let clip=0;clip<200;clip++)assert.equal(ctx[binding](level),registry);
  assert.equal(registry.arakneIdle,shared.arakneIdle,'native animation descriptors retained');
 }
+if(file==='current'){assert.equal(ctx.Ga(),true);assert.equal(ctx.window.thorMobileAssetsEnabled,true);}
 assert.equal(calls,4,'one merge per supported map, rather than per discarded animation');
 assert.notEqual(ctx[binding]('future-map'),ctx[binding]('future-map'),'unknown maps retain native behavior');
 assert.equal(touch.length,9);assert(touch.includes('shovelThrow'));

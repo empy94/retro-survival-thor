@@ -1,3 +1,9 @@
+## 1.20.7 — Compatibilité et charge graphique
+
+- Prise en charge de la révision du 11 octobre et de son module plus volumineux.
+- Cache des registres d’animations et ressources mobiles pour limiter la charge et la mémoire.
+- Gestion des arrêts du moteur WebView sur les deux écrans : retour au menu avec conservation de la progression enregistrée. Le combat interrompu ne peut pas être repris.
+
 ## 1.20.3 — Sufokia et nouvelles révisions du jeu
 
 - Prise en charge de `page-D4sIe3FD.js` et de la révision intermédiaire `page-BRODZTee.js`. Les révisions précédentes restent reconnues.

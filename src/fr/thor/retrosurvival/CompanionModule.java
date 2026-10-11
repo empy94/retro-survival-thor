@@ -18,7 +18,7 @@ final class CompanionModule {
    ProviderInfo provider=manager.resolveContentProvider(authority,0);if(provider==null||!provider.packageName.equals(service.packageName))continue;
    Bundle result=context.getContentResolver().call(Uri.parse("content://"+authority),"load",null,null);
    if(result==null||result.getInt("protocol")!=1||!result.getBoolean("enabled"))continue;
-   for(String key:new String[]{"bootstrap","panelScript","panelStyle","moduleHook","moduleHookCurrent","moduleHookPrevious7","moduleHookPrevious6","moduleHookPrevious4","moduleHookPrevious5","moduleHookPrevious3","moduleHookPrevious","moduleHookPrevious2","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
+   for(String key:new String[]{"bootstrap","panelScript","panelStyle","moduleHook","moduleHookCurrent","moduleHookPrevious8","moduleHookPrevious7","moduleHookPrevious6","moduleHookPrevious4","moduleHookPrevious5","moduleHookPrevious3","moduleHookPrevious","moduleHookPrevious2","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
    String envelope=result.getString("localUpdateEnvelope","");
    if(!envelope.isEmpty())try{
     String key;try(java.io.InputStream in=context.getAssets().open("local-update-public-key.txt")){key=LocalUpdate.read(in);}

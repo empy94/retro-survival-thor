@@ -36,15 +36,22 @@ final class LocalGameCache {
   return java.nio.file.Files.readAllBytes(source.toPath());
  }
  synchronized void freeze()throws Exception{
-  if(new File(frozen,"complete").isFile())return;
-  byte[] html=get("/");if(html==null)throw new IOException("No root");
+  File marker=new File(frozen,"complete");
+  byte[] html=get("/");if(html==null){if(marker.isFile())return;throw new IOException("No root");}
   java.util.regex.Matcher module=java.util.regex.Pattern.compile("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js").matcher(new String(html,StandardCharsets.UTF_8));
-  if(!module.find())throw new IOException("No module");byte[] bytes=get(module.group());if(bytes==null)throw new IOException("No module data");
+  if(!module.find()){if(marker.isFile())return;throw new IOException("No module");}byte[] bytes=get(module.group());if(bytes==null){if(marker.isFile())return;throw new IOException("No module data");}
   StringBuilder hash=new StringBuilder();for(byte b:MessageDigest.getInstance("SHA-256").digest(bytes))hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
-  if(!GameModuleVersions.supported(hash.toString()))throw new IOException("Unknown game module");
-  frozen.mkdirs();File[] entries=root.listFiles();if(entries==null)throw new IOException("Empty cache");
-  for(File source:entries)if(source.isFile()&&source.getName().matches("[a-f0-9]{64}"))java.nio.file.Files.copy(source.toPath(),new File(frozen,source.getName()).toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-  try(FileOutputStream out=new FileOutputStream(new File(frozen,"complete"))){out.write(hash.toString().getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
+  if(!GameModuleVersions.supported(hash.toString())){if(marker.isFile())return;throw new IOException("Unknown game module");}
+  if(marker.isFile()&&hash.toString().equals(new String(java.nio.file.Files.readAllBytes(marker.toPath()),StandardCharsets.UTF_8)))return;
+  // Refresh complete resources without changing the local storage origin or its save.
+  File staging=new File(root.getParentFile(),"local-game-isolated-building-"+hash.toString().substring(0,12));
+  staging.mkdirs();File[] entries=root.listFiles();if(entries==null)throw new IOException("Empty cache");
+  for(File source:entries)if(source.isFile()&&source.getName().matches("[a-f0-9]{64}"))java.nio.file.Files.copy(source.toPath(),new File(staging,source.getName()).toPath(),java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+  try(FileOutputStream out=new FileOutputStream(new File(staging,"complete"))){out.write(hash.toString().getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
+  File archive=new File(root.getParentFile(),"local-game-isolated-backup-"+System.currentTimeMillis());
+  boolean archived=frozen.exists();
+  if(archived&&!frozen.renameTo(archive))throw new IOException("Cannot preserve previous snapshot");
+  if(!staging.renameTo(frozen)){if(archived)archive.renameTo(frozen);throw new IOException("Cannot activate new snapshot");}
  }
  boolean ready(){try{byte[] html=new File(frozen,"complete").isFile()?getFrozen("/"):get("/");return html!=null&&new String(html,StandardCharsets.UTF_8).contains("<head>");}catch(Exception ignored){return false;}}
 }
