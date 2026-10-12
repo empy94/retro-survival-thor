@@ -1,10 +1,11 @@
 (function(root){
  'use strict';
  // IDs used by the official game's touch controls (checked 2026-10-09).
- const aimed=new Set(['dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','celestialSword','iopSword','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear','arnaque','brokle','shovelJudgment','slaughteringShovel','shovelKiss','mound','animatedChest','shovelThrow','corruption']);
+ const aimed=new Set(["dash","immobilizationGlyph","burningGlyph","staffBoomerang","cut","swordOfFate","jump","intimidation","celestialSword","iopSword","brokle","lethalAttack","massTrap","repulsiveTrap","sramDouble","fear","arnaque","cracklerStrike","toad","shovelJudgment","mound","animatedChest","shovelThrow","corruption"]);
  const names=['X','Y','L1','R1','L2','R2','A','B',...['L1','R1','L2','R2'].flatMap(m=>['X','Y','A','B'].map(b=>m+' + '+b))];
  const travel=new Set(['dash','jump']);
  function isTravel(id){return travel.has(id);}
+ function isHeld(id){return id==='stingingClaw';}
  function travelRange(id,upgrades={},awakenings={}){
    const upgrade=key=>Number.isFinite(upgrades[key])?Math.max(0,upgrades[key]):0;
    if(id==='dash')return (150+upgrade('dashRange')*50)*(awakenings.dash===1?2:awakenings.dash===2?.75:1);
@@ -14,6 +15,8 @@
  function needsAim(id,awakenings={}){return aimed.has(id)&&!(id==='burningGlyph'&&awakenings.burningGlyph===2);}
  function radialSpec(id,upgrades={},awakenings={}){
    if(!needsAim(id,awakenings))return null;
+   const native=root.thorGameAdapter?.radialSpec?.(id);if(native)return native;
+   if(id==='cracklerStrike')return {distance:180,variable:false,showRange:false};
    if(isTravel(id))return {distance:travelRange(id,upgrades,awakenings),variable:false,showRange:true};
    const upgrade=key=>Number.isFinite(upgrades[key])?Math.max(0,upgrades[key]):0;
    const enutrofRange=Number(upgrades.enutrofSpell?.[id]?.range)||0;
@@ -25,7 +28,7 @@
    if(id==='staffBoomerang')return {distance:310*(1+upgrade('staffRange')*.2),variable:false,showRange:true};
    if(id==='cut')return {distance:350*(1+upgrade('cutRange')*.2)*(awakenings.cut===1?1.65:1),variable:true,showRange:true};
    if(id==='brokle'&&awakenings.brokle!==1)return {distance:0,variable:false,showRange:false};
-   const ranges={burningGlyph:200,immobilizationGlyph:200,celestialSword:360,iopSword:380,lethalAttack:80,massTrap:230,repulsiveTrap:330,sramDouble:80,brokle:220};
+   const ranges={cracklerStrike:250,bearCry:250,toad:250,intimidation:125,burningGlyph:200,immobilizationGlyph:200,celestialSword:360,iopSword:380,lethalAttack:80,massTrap:230,repulsiveTrap:330,sramDouble:80,brokle:220};
    if(id in ranges)return {distance:ranges[id],variable:true,showRange:true};
    // These casts use direction rather than distance. This is a visible aiming
    // handle, not a claim about their attack range or area of effect.
@@ -44,6 +47,6 @@
    }
    return slots;
  }
- const api={names,needsAim,assign,isTravel,travelRange,radialSpec};
+ const api={names,needsAim,assign,isTravel,isHeld,travelRange,radialSpec};
  if(typeof module==='object'&&module.exports)module.exports=api;else root.thorSpellBindings=api;
 })(typeof window==='object'?window:globalThis);

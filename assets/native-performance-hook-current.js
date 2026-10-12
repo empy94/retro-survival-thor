@@ -5,11 +5,11 @@
  if(window.thorAnimationRegistryCached)return;
  // Prefer the official mobile sprite variants and reduced appearance atlas scale.
  // Android WebView can expose desktop pointer/memory hints on a controller console.
- Ga=()=>true;
+ fs=()=>true;
  window.thorMobileAssetsEnabled=true;
- const original=zo,registries=new Map();
- zo=level=>{
-   if(!['astrub','wabbit','litneg','gelee'].includes(level))return original(level);
+ const original=fc,registries=new Map();
+ fc=level=>{
+   if(!['astrub','wabbit','litneg','gelee','dragoeuf'].includes(level))return original(level);
    if(!registries.has(level))registries.set(level,original(level));
    return registries.get(level);
  };
@@ -18,4 +18,4 @@
 
 /* The native touch deck omits Enutrof targets, although castTouchAbility
  * accepts their vectors. Enable the same hold/move/release path as other casts. */
-;(function(){for(const id of ['shovelJudgment', 'slaughteringShovel', 'shovelKiss', 'mound', 'animatedChest', 'shovelThrow', 'corruption']){if(!dk.includes(id))dk.push(id);}})();
+;(function(){for(const id of ['shovelJudgment', 'slaughteringShovel', 'shovelKiss', 'mound', 'animatedChest', 'shovelThrow', 'corruption']){if(!TN.includes(id))TN.push(id);}})();

@@ -8,7 +8,7 @@ Deux crashs spontanés antérieurs du moteur WebView sont présents dans les jou
 
 ## Validation réelle sur AYN Thor
 
-- Iop / Wabbit : essai de 120 secondes, environ 70 secondes de combat actif, jusqu’à la vague 3. 4 198 images actives mesurées ; médiane 16,667 ms, percentile 95 à 16,988 ms. Pas de crash spontané pendant cet essai. Les pauses de choix sont exclues des mesures d’image.
+- Sram / Wabbit : essai de 120 secondes, environ 70 secondes de combat actif, jusqu’à la vague 3. 4 198 images actives mesurées ; médiane 16,667 ms, percentile 95 à 16,988 ms. Pas de crash spontané pendant cet essai. Les pauses de choix sont exclues des mesures d’image.
 - Sufokia : 1 005 images actives, environ 17 secondes de combat, vague 2 avec 5 monstres à la fin. Médiane 16,667 ms, percentile 95 à 17,003 ms.
 - Arrêt du moteur provoqué par la commande de diagnostic Chromium : deux vues associées ont traité le crash ; le processus de l’application est resté vivant et le jeu a rechargé son menu avec les commandes actives et la progression enregistrée intacte.
 - Tests JavaScript et Java passés ; compilation Android réalisée.

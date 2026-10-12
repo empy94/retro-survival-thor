@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.20.8 :** maintenance de la gestion des données et des sauvegardes.
+**Mise à jour 1.21.0 :** Osamodas, Presqu’île des Dragoeufs, Dofus Vulbis et compatibilité avec les nouveaux sorts et objets.
 
 ## Trois façons de jouer
 

@@ -3,9 +3,16 @@
  // sole authority for cooldowns, terrain, damage and valid placements.
  const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration'};
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+ function allyBuff(s,spells){
+  const allies=(s.allies||[]).filter(a=>a.hp>0&&[a.x,a.y].every(Number.isFinite));
+  for(const spell of spells){if(!spell.ready||!['bearCry','toad'].includes(spell.id))continue;
+   const timer=spell.id==='toad'?'toadTimer':'bearCryTimer';
+   const target=allies.find(a=>!(a[timer]>0));if(target)return {spell,target:{x:target.x,y:target.y},score:250};
+  }return null;
+ }
  function plan(s,spells,mapping,mode='full'){
    if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
-   if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:null;}
+   if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:allyBuff(s,spells);}
    if(mode!=='full'||!s.enemies.length)return null;
    const p=s.player,enemies=s.enemies.filter(e=>[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
    const nearest=Math.min(...enemies.map(e=>distance(e,p)-e.r)),urgent=nearest<65;
@@ -13,6 +20,7 @@
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
    for(const spell of spells){if(!spell.ready)continue;const id=spell.id;
+     if(id==='bearCry'||id==='toad'){const action=allyBuff(s,[spell]);if(action)candidates.push(action);continue;}
      if(id==='animatedChest'&&s.summons?.chest)continue;
      if(id in buffs){const timer=p[buffs[id]]??s.buffs[buffs[id]];
        if(timer>0)continue;if(id==='invisibility'&&!urgent&&p.hp/p.maxHp>.5)continue;
@@ -26,11 +34,11 @@
        if(best)add(spell,best,900);continue;
      }
      if(id==='sramDouble'&&s.double)continue;
-     if(id==='liberation'||id==='intimidation'||id==='brokle'&&s.awakenings.brokle!==1||id==='burningGlyph'&&!spell.aimed){
+     if(id==='liberation'||id==='brokle'&&s.awakenings.brokle!==1||id==='burningGlyph'&&!spell.aimed){
        const range=id==='liberation'?150*(1+(s.upgrades.liberationRadius||0)*.15):id==='intimidation'?125:110;
        if(nearest<=range)add(spell,id==='brokle'?{x:p.x,y:p.y}:null,id==='liberation'&&urgent?850:120);continue;
      }
-     if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&s.character==='enutrof'&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
+     if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&['enutrof','osamodas'].includes(s.character)&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
      const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow'].includes(id);
      const enutrofRadius={shovelJudgment:85,slaughteringShovel:100,shovelKiss:50,mound:195,corruption:100};

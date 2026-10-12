@@ -36,7 +36,7 @@
      if(!spell){label?.remove();return;}
      if(!label){label=document.createElement('span');label.className='thor-button-label';label.setAttribute('aria-hidden','true');label.style.cssText='position:absolute;right:3px;top:3px;z-index:3;border:1px solid #ffe4a0;border-radius:5px;padding:2px 4px;background:#ffda83;color:#18221b;font:900 11px/1.15 sans-serif;pointer-events:none;box-shadow:0 1px 3px #0008';if(getComputedStyle(el).position==='static')el.style.position='relative';el.append(label);}
      if(label.textContent!==spell.button)label.textContent=spell.button;
-     label.title=spell.id==='brokle'&&window.thorDashboard?.abilities().awakenings?.brokle!==1?text('Relâcher pour lancer'):spell.aimed?text('Maintenir, viser au stick droit, relâcher'):text('Appuyer pour lancer');
+     label.title=window.thorSpellBindings.isHeld?.(spell.id)?text('Maintenir pour canaliser, relâcher pour arrêter'):spell.id==='brokle'&&window.thorDashboard?.abilities().awakenings?.brokle!==1?text('Relâcher pour lancer'):spell.aimed?text('Maintenir, viser au stick droit, relâcher'):text('Appuyer pour lancer');
      label.style.display=settings.showLabels?'':'none';label.style.opacity=String(settings.labelOpacity);
    });
    const z=document.querySelector('.touch-joystick-zone');if(z)z.style.opacity=settings.showJoystick?'1':'0';
@@ -44,7 +44,7 @@
  function event(el,type,id,x,y){el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===177,clientX:x,clientY:y,pageX:x,pageY:y,buttons:type==='pointerup'||type==='pointercancel'?0:1,button:0,bubbles:true,cancelable:true}));}
  function cancelAuto(){const held=autoPointer;autoPointer=null;if(held)event(held.el,'pointercancel',182,held.x,held.y);}
  function manual(){manualUntil=Date.now()+700;cancelAuto();}
- function capture(el){if(el.__thorCapture)return;const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179&&id!==182)real(id);};el.__thorCapture=true;}
+ function capture(el){if(el.__thorCapture)return;const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179&&id!==182&&id!==183)real(id);};el.__thorCapture=true;}
  function aimPoint(held){
    const player=window.thorDashboard?.playerPosition();if(!player)return null;
    let targetX=px,targetY=py,range=null,travel=null,showRange=true,fixed=null;
@@ -84,9 +84,9 @@
  function aimTick(){aimFrame=null;updateAim();if(ability)aimFrame=requestAnimationFrame(aimTick);}
  function finish(type){
    const held=ability;if(!held)return;
-   if(type==='pointerup'){const p=aimPoint(held);if(p){held.x=p.x;held.y=p.y;}else type='pointercancel';}
+   if(type==='pointerup'&&!held.channel){const p=aimPoint(held);if(p){held.x=p.x;held.y=p.y;}else type='pointercancel';}
    ability=null;if(aimFrame!==null){cancelAnimationFrame(aimFrame);aimFrame=null;}
-   event(held.el,type,179,held.x,held.y);held.controls?.classList.remove('thor-aiming');
+   event(held.el,type,held.channel?183:179,held.x,held.y);held.controls?.classList.remove('thor-aiming');
    held.radius?.remove();held.caption?.remove();refreshCursor();
    const label=held.el.querySelector('.thor-button-label');if(label)label.style.background='#ffda83';
  }
@@ -97,6 +97,7 @@
      if(!settings.autoSpells||!this.autoAvailable()||!spell.el.isConnected||spell.el.getAttribute('aria-disabled')==='true')return false;
      const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return false;
      const el=spell.el,r=el.getBoundingClientRect();
+     if(window.thorSpellBindings.isHeld?.(spell.id)){capture(el);const held={el,x:r.left+r.width/2,y:r.top+r.height/2};autoPointer=held;event(el,'pointerdown',182,held.x,held.y);setTimeout(()=>{if(autoPointer===held){autoPointer=null;event(el,'pointerup',182,held.x,held.y);}},600);return true;}
      if(!spell.aimed){event(el,'pointerdown',181,r.left+r.width/2,r.top+r.height/2);event(el,'pointerup',181,r.left+r.width/2,r.top+r.height/2);return true;}
      const player=window.thorDashboard.playerPosition(),travel=window.thorDashboard.travelState();if(!player||!travel||!target)return false;
      const held={el,x:player.x,y:player.y,origin:player};autoPointer=held;capture(el);event(el,'pointerdown',182,held.x,held.y);
@@ -144,7 +145,7 @@
      if(chord){for(const m of modifiers){const route=padRoutes.get(m);if(route&&!route.suppressed){route.suppressed=true;if(ability?.index===route.index)finish('pointercancel');}}padRoutes.set(button,{index:chord.index});this.button(chord.index,true);return true;}
      const spell=slots.find(s=>s?.button===button);
      if(!spell)return button!=='A';
-     const pending=modifiers.includes(button)&&!spell.aimed;padRoutes.set(button,{index:spell.index,pending});if(!pending)this.button(spell.index,true);return true;
+     const pending=modifiers.includes(button)&&!spell.aimed&&!window.thorSpellBindings.isHeld?.(spell.id);padRoutes.set(button,{index:spell.index,pending});if(!pending)this.button(spell.index,true);return true;
    },
    button(index,down){
      if(!down&&ability?.index===index){finish('pointerup');return;}
@@ -153,6 +154,7 @@
      if(document.querySelector('main')?.classList.contains('modal-open'))return;
      const spell=bindings(true)[index];const el=spell?.el;if(!el||el.getAttribute('aria-disabled')==='true')return;
      const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+     if(window.thorSpellBindings.isHeld?.(spell.id)){if(ability)return;capture(el);ability={el,index,id:spell.id,channel:true,x,y};event(el,'pointerdown',183,x,y);return;}
      if(!spell.aimed){event(el,'pointerdown',181,x,y);event(el,'pointerup',181,x,y);return;}
      if(ability)return;
      const player=window.thorDashboard?.playerPosition(true),controls=el.closest('.touch-controls');

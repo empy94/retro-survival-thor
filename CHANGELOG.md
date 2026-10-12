@@ -1,3 +1,12 @@
+## 1.21.0 — Osamodas et Dragoeufs
+
+- Compatibilité avec la révision du 12 octobre : Osamodas, nouvelle carte, nouveaux objets et Dofus Vulbis.
+- Catalogue des sorts, commandes manette et affichage des caractéristiques actualisés pour les cinq classes.
+- Maintien de touche pour Griffe Cinglante et visée des sorts de soutien vers les invocations.
+- Roulage de Pelle et Pelle Massacrante reconnus comme automatiques.
+- Cache d’animations étendu aux Dragoeufs ; optimisations graphiques et récupération du moteur conservées.
+- Correction du compte rendu 1.20.7 : le test Wabbit concernait le Sram.
+
 ## 1.20.8 — Maintenance
 
 - Maintenance de la gestion des données et des sauvegardes.
