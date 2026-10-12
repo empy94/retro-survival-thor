@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.20.7 :** compatibilité avec la dernière révision du jeu, ressources graphiques mobiles et reprise après arrêt du moteur d’affichage.
+**Mise à jour 1.20.8 :** maintenance de la gestion des données et des sauvegardes.
 
 ## Trois façons de jouer
 

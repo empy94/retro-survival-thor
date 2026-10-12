@@ -19,8 +19,9 @@
  if(seed&&typeof seed==='object'&&!Array.isArray(seed)&&seed.waveRecords&&typeof seed.waveRecords==='object'&&!Array.isArray(seed.waveRecords)){
   const existing=localStorage.getItem(key);
   if(typeof revision==='string'&&revision&&revision!==localStorage.getItem(revisionKey)){
-   // Preserve the last local progression before starting from the current online copy.
-   if(existing)localStorage.setItem('thor.local.previous-progress',existing);
+   // A new session starts clean: no progression, pending scores or checkpoints survive.
+   localStorage.clear();
+   sessionStorage.clear();
    localStorage.setItem(key,JSON.stringify(seed));
    localStorage.setItem(revisionKey,revision);
   }else if(!existing)localStorage.setItem(key,JSON.stringify(seed));

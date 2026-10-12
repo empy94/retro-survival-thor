@@ -1,3 +1,8 @@
+## 1.20.8 — Maintenance
+
+- Maintenance de la gestion des données et des sauvegardes.
+- Optimisations graphiques et reprise du moteur d’affichage conservées.
+
 ## 1.20.7 — Compatibilité et charge graphique
 
 - Prise en charge de la révision du 11 octobre et de son module plus volumineux.

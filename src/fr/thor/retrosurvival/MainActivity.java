@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
  private WebView web,shortcutPanel;
  private FrameLayout gameSurface;private LinearLayout loadPanel;private long loadGeneration;private boolean loadFailed;
  private CompanionModule companion;
- private volatile long lastCacheWarning;private volatile boolean localSession;private boolean switchingSession;private LocalGameCache localCache;private String localGuard,progressTransfer;
+ private volatile long lastCacheWarning;private volatile boolean localSession;private boolean switchingSession;private LocalGameCache localCache;private String localGuard;
  private boolean updateStarted;
  private String pendingBackup;
  private static final int EXPORT_PROGRESS=410,IMPORT_PROGRESS=411;
@@ -30,7 +30,8 @@ public class MainActivity extends Activity {
   if(companion==null||!companion.enabled()||!ready||!active||json==null||json.length()>2048)return;
   try{JSONObject request=new JSONObject(json);String kind=request.optString("kind");
    if("session-online".equals(kind)){if(localSession)leaveLocalSession();return;}
-   if(!localSession){activateLocalSession();return;}
+   if("save".equals(kind)||"load".equals(kind))return;
+   if(!localSession){if("session-local".equals(kind))activateLocalSession();return;}
    if(!"session-local".equals(kind))web.evaluateJavascript(companion.command(request.toString()),null);
   }catch(Exception ignored){}
  }
@@ -38,8 +39,6 @@ public class MainActivity extends Activity {
   if(switchingSession)return;
   if(!localCache.ready()){Toast.makeText(this,"Charge d’abord le jeu en ligne pour préparer sa copie locale.",Toast.LENGTH_LONG).show();return;}
   switchingSession=true;
-  // The existing local origin remains authoritative after its first initialization.
-  if(!getSharedPreferences("local-session",0).getString("seedRevision","").isEmpty()){launchLocalSnapshot();return;}
   web.evaluateJavascript("(()=>{try{return JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null');}catch(e){return null;}})()",result->{
    try{
     if(result==null||result.length()>=100000||!result.startsWith("{"))throw new IOException("No current progress");
@@ -56,14 +55,10 @@ public class MainActivity extends Activity {
  private void leaveLocalSession(){
   if(switchingSession)return;
   switchingSession=true;
-  web.evaluateJavascript("(()=>{try{return JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null');}catch(e){return null;}})()",result->{
-   try{
-    if(result==null||result.length()>=100000||!result.startsWith("{")||new JSONObject(result).optJSONObject("waveRecords")==null)throw new IOException("Invalid local progress");
-    // Keep the local recovery copy and explicitly transfer only the permanent progression.
-    String transfer=new JSONObject().put("id",UUID.randomUUID().toString()).put("progress",new JSONObject(result)).toString();
-    if(!getSharedPreferences("local-session",0).edit().putString("seed",result).putString("onlineTransfer",transfer).commit())throw new IOException("Local backup failed");
-    restartSession(false);
-   }catch(Exception error){switchingSession=false;Toast.makeText(this,"La progression locale n’a pas pu être conservée. Réessaie avant de quitter ce mode.",Toast.LENGTH_LONG).show();}
+  web.evaluateJavascript("(()=>{try{localStorage.clear();sessionStorage.clear();return true;}catch(e){return false;}})()",result->{
+   if(!"true".equals(result)){switchingSession=false;Toast.makeText(this,"La session locale n’a pas pu être effacée. Réessaie avant de quitter ce mode.",Toast.LENGTH_LONG).show();return;}
+   if(!getSharedPreferences("local-session",0).edit().remove("seed").remove("seedRevision").remove("onlineTransfer").commit()){switchingSession=false;Toast.makeText(this,"La session locale n’a pas pu être réinitialisée.",Toast.LENGTH_LONG).show();return;}
+   restartSession(false);
   });
  }
  private void restartSession(boolean local){
@@ -83,10 +78,6 @@ public class MainActivity extends Activity {
   String seed=localSession?getSharedPreferences("local-session",0).getString("seed","null"):"null";
   String revision=localSession?getSharedPreferences("local-session",0).getString("seedRevision",""):"";
   String prefix="<script>window.thorLocalSeed="+seed.replace("<","\\u003c")+";window.thorLocalSeedRevision="+JSONObject.quote(revision)+";"+localGuard+"</script>";
-  if(!localSession&&companion.enabled()){
-   String transfer=getSharedPreferences("local-session",0).getString("onlineTransfer","null");
-   prefix+="<script>window.thorProgressTransfer="+transfer.replace("<","\\u003c")+";"+progressTransfer+"</script>";
-  }
   if(localSession){
    // No connections, frames, workers, forms or remote images can escape the local origin.
    prefix="<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'\">"+prefix;
@@ -224,9 +215,10 @@ public class MainActivity extends Activity {
  public void onCreate(Bundle state){
    super.onCreate(state);
    companion=new CompanionModule(this);
-   localSession=companion.enabled()&&(state==null?getIntent().getBooleanExtra("localSession",false):state.getBoolean("localSession",false));localCache=new LocalGameCache(getFilesDir());
+   // Remove obsolete transfer instructions before any game document can load.
+   getSharedPreferences("local-session",0).edit().remove("onlineTransfer").commit();
+   localSession=companion.enabled()&&state==null&&getIntent().getBooleanExtra("localSession",false);getIntent().removeExtra("localSession");localCache=new LocalGameCache(getFilesDir());
    try(InputStream in=getAssets().open("local-session.js")){localGuard=read(in);}catch(Exception error){throw new RuntimeException(error);}
-   try(InputStream in=getAssets().open("progress-transfer.js")){progressTransfer=read(in);}catch(Exception error){throw new RuntimeException(error);}
    if(state!=null)pendingBackup=state.getString("pendingProgressBackup");
    gameLanguage=getPreferences(0).getString("gameLanguage","fr");try(InputStream in=getAssets().open("locale.json")){languageTable=new JSONObject(read(in));}catch(Exception ignored){}
    cursorSensitivity=Math.max(25,Math.min(250,getPreferences(0).getInt("cursorSensitivity",100)))/100f;
@@ -439,7 +431,7 @@ public class MainActivity extends Activity {
  }
  private void applySettings(){if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
  protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);if(pendingBackup!=null)state.putString("pendingProgressBackup",pendingBackup);state.putBoolean("localSession",localSession);}
- private void exportProgress(){if(!ready)return;web.evaluateJavascript("window.thorProgressBackup.export()",result->{if(result==null||"null".equals(result)){Toast.makeText(this,ui("Aucune progression à exporter"),Toast.LENGTH_LONG).show();return;}try{pendingBackup=new JSONObject(result).toString(2);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Retro-Survival-progression.json");startActivityForResult(intent,EXPORT_PROGRESS);}catch(Exception ignored){}});}
+ private void exportProgress(){if(localSession){Toast.makeText(this,"Session locale temporaire : export de progression désactivé.",Toast.LENGTH_LONG).show();return;}if(!ready)return;web.evaluateJavascript("window.thorProgressBackup.export()",result->{if(result==null||"null".equals(result)){Toast.makeText(this,ui("Aucune progression à exporter"),Toast.LENGTH_LONG).show();return;}try{pendingBackup=new JSONObject(result).toString(2);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Retro-Survival-progression.json");startActivityForResult(intent,EXPORT_PROGRESS);}catch(Exception ignored){}});}
  private void importProgress(){new AlertDialog.Builder(this).setMessage(ui("Restaurer remplacera la progression locale et redémarrera le jeu.")).setNegativeButton(ui("Annuler"),null).setPositiveButton(ui("Choisir le fichier"),(dialog,which)->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE),IMPORT_PROGRESS)).show();}
  protected void onActivityResult(int request,int result,Intent intent){super.onActivityResult(request,result,intent);if(result!=RESULT_OK||intent==null||intent.getData()==null){pendingBackup=null;return;}try{if(request==EXPORT_PROGRESS&&pendingBackup!=null){try(OutputStream out=getContentResolver().openOutputStream(intent.getData(),"wt")){out.write(pendingBackup.getBytes(StandardCharsets.UTF_8));}pendingBackup=null;Toast.makeText(this,ui("Progression exportée"),Toast.LENGTH_LONG).show();}else if(request==IMPORT_PROGRESS){String value;try(InputStream in=getContentResolver().openInputStream(intent.getData())){ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int count;while((count=in.read(buffer))!=-1){out.write(buffer,0,count);if(out.size()>262144)throw new IOException("Backup too large");}value=new String(out.toByteArray(),StandardCharsets.UTF_8);}JSONObject backup=new JSONObject(value);web.evaluateJavascript("window.thorProgressBackup.restore("+backup.toString()+")",accepted->{if("true".equals(accepted))web.reload();else Toast.makeText(this,ui("Sauvegarde incompatible"),Toast.LENGTH_LONG).show();});}}catch(Exception ex){Toast.makeText(this,ui("Sauvegarde incompatible"),Toast.LENGTH_LONG).show();}}
  private void settings(){
