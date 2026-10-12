@@ -96,6 +96,7 @@
    autoCast(spell,target){
      if(!settings.autoSpells||!this.autoAvailable()||!spell.el.isConnected||spell.el.getAttribute('aria-disabled')==='true')return false;
      const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return false;
+     if(window.thorGameAdapter?.canAutoCast?.(spell.id)===false)return false;
      const el=spell.el,r=el.getBoundingClientRect();
      if(window.thorSpellBindings.isHeld?.(spell.id)){capture(el);const held={el,x:r.left+r.width/2,y:r.top+r.height/2};autoPointer=held;event(el,'pointerdown',182,held.x,held.y);setTimeout(()=>{if(autoPointer===held){autoPointer=null;event(el,'pointerup',182,held.x,held.y);}},600);return true;}
      if(!spell.aimed){event(el,'pointerdown',181,r.left+r.width/2,r.top+r.height/2);event(el,'pointerup',181,r.left+r.width/2,r.top+r.height/2);return true;}

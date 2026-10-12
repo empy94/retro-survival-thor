@@ -1,3 +1,7 @@
+## 1.21.1 — Affichage de la collection
+
+- Collection permanente repliable sur le second écran, fermée au démarrage pour libérer de la place.
+
 ## 1.21.0 — Osamodas et Dragoeufs
 
 - Compatibilité avec la révision du 12 octobre : Osamodas, nouvelle carte, nouveaux objets et Dofus Vulbis.
