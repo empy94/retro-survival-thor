@@ -28,8 +28,24 @@
 /* Change raster resolution only; world coordinates, simulation and input stay native. */
 ;(function(){
  const original=WB;
+ let quality=['full','balanced','minimal'].includes(window.thorGraphicsQuality)?window.thorGraphicsQuality:'balanced';
+ const limits=()=>quality==='full'?[2,2]:quality==='minimal'?[.75,.75]:[.75,1];
+ const combat=state=>['playing','dying','gameover'].includes(state?.phase);
  window.thorRenderScale=2;
- let frames=0,elapsed=0,last=0,fastWindows=0,ratio=2,fps=60;
+ let frames=0,elapsed=0,last=0,fastWindows=0,ratio=limits()[1],fps=0;
+ window.thorGraphics={configure(value){if(!['full','balanced','minimal'].includes(value)||value===quality)return;quality=value;ratio=limits()[1];frames=0;elapsed=0;last=0;fastWindows=0;},status(){return {quality,resolutionScale:ratio,observedFps:fps};}};
+ window.thorVisualParticles=state=>{
+  if(!combat(state)||quality==='full')return state.particles;
+  const budget=quality==='minimal'?0:64,markers=[],decor=[];
+  for(const particle of state.particles){if(particle.vx===0&&particle.vy===0&&particle.size>=12)markers.push(particle);else decor.push(particle);}
+  return markers.concat(budget?decor.slice(-budget):[]);
+ };
+ let hudStamp='';
+ window.thorHudChanged=state=>{const stamp=[state.player.hp,state.player.maxHp,state.kamas,state.level,state.wave,state.phase].join(':');if(stamp===hudStamp)return false;hudStamp=stamp;return true;};
+ window.thorHudInterval=state=>combat(state)&&quality!=='full'?.2:.08;
+ const cosmetic=new Set(['fecaNaturalSpark','fecaBubbleParticle','fecaFlamicheSmoke','sramTrapSpark','sramRepulsiveSpark','sramFearMote','sramPoisonPuff','sramChakraStem','enutrofCoinParticle']);
+ window.thorDecorativeBlur=value=>combat(window.thorNativeContext?.gameRef.current)&&quality!=='full'?0:value;
+ window.thorHideCosmeticClip=(id,state)=>combat(state)&&quality==='minimal'&&cosmetic.has(id);
  WB=(...args)=>{const api=original(...args),draw=api.renderGame,canvas=args[1],viewport=args[4],paused=args[0].pausedRef;
  api.renderGame=state=>{
   const now=performance.now();
@@ -37,21 +53,21 @@
    if(last&&now-last<250){elapsed+=now-last;frames++;}
    last=now;
    if(frames>=60){fps=frames*1000/elapsed;
-    if(fps<53){ratio=Math.max(1,ratio-.25);fastWindows=0;}
-    else if(fps>58&&state.enemies.length+state.osamodas.summons.length<40){if(++fastWindows>=5){ratio=Math.min(2,ratio+.25);fastWindows=0;}}
+    if(fps<58){ratio=Math.max(limits()[0],ratio-.25);fastWindows=0;}
+    else if(fps>58&&state.enemies.length+state.osamodas.summons.length<40){if(++fastWindows>=5){ratio=Math.min(limits()[1],ratio+.25);fastWindows=0;}}
     else fastWindows=0;
     frames=0;elapsed=0;
    }
   }else{last=0;frames=0;elapsed=0;}
-  window.thorRenderScale=ratio;
-  const scale=Math.min(devicePixelRatio,ratio),width=Math.max(1,Math.round(viewport.width*scale)),height=Math.max(1,Math.round(viewport.height*scale));
+  window.thorRenderScale=combat(state)?ratio:2;
+  const scale=Math.min(devicePixelRatio,window.thorRenderScale),width=Math.max(1,Math.round(viewport.width*scale)),height=Math.max(1,Math.round(viewport.height*scale));
   if(canvas.width!==width)canvas.width=width;
   if(canvas.height!==height)canvas.height=height;
   return draw(state);
  };
  return api;
  };
- window.thorPerformanceStatus=()=>({resolutionScale:ratio,observedFps:fps});
+ window.thorPerformanceStatus=()=>window.thorGraphics.status();
 })();
 
 /* Preserve native reachability, marks and tie ordering without two temporary arrays. */

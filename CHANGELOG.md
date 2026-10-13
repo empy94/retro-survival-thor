@@ -1,3 +1,11 @@
+## 1.21.3 — Réglages graphiques et foules
+
+- Nouveau réglage Graphismes dans Options du second écran et dans ⚙ APK : Qualité complète, Fluidité — objectif 60 FPS, Effets minimaux.
+- Fluidité activée par défaut : définition du combat réduite, effets décoratifs limités et interface moins souvent recalculée. Les changements de PV restent immédiatement affichés.
+- Réduction adaptative supplémentaire si les images ralentissent ; qualité des menus conservée.
+- Élimination des paires de monstres trop éloignées avant le calcul exact des contacts.
+- Indication des FPS mesurés dans le pied de la fiche pendant les combats actifs.
+
 ## 1.21.2 — Performances
 
 - Compatibilité avec les deux révisions vérifiées du 13 octobre : optimisations des animations et ressources mobiles réactivées.

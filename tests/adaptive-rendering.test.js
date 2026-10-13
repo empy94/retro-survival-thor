@@ -6,8 +6,8 @@ assert.equal(ctx.fs(),true);for(const level of ['astrub','wabbit','litneg','gele
 const state={phase:'playing',enemies:Array(100),osamodas:{summons:Array(20)}};
 const api=ctx.WB({pausedRef:paused},canvas,{}, {},viewport);
 for(let i=0;i<245;i++){time+=1000/30;api.renderGame(state);}
-assert.equal(ctx.window.thorPerformanceStatus().resolutionScale,1);assert.equal(canvas.width,800);assert.equal(canvas.height,450);assert.equal(rendered,state,'native state passed intact');
+assert.equal(ctx.window.thorPerformanceStatus().resolutionScale,.75);assert.equal(canvas.width,600);assert.equal(canvas.height,338);assert.equal(rendered,state,'native state passed intact');
 assert.deepEqual(Object.keys(ctx.hN(state)),['crow','tofuSummon']);assert.deepEqual(Object.keys(ctx.bN(state)),['crow','tofuSummon']);
-paused.current=true;for(let i=0;i<400;i++){time+=1000/60;api.renderGame(state);}assert.equal(ctx.window.thorPerformanceStatus().resolutionScale,1,'pause cannot falsely restore quality');
-paused.current=false;state.enemies=[];state.osamodas.summons=[];for(let i=0;i<1300;i++){time+=1000/60;api.renderGame(state);}assert.equal(ctx.window.thorPerformanceStatus().resolutionScale,2,'quiet scene restores quality');
+paused.current=true;for(let i=0;i<400;i++){time+=1000/60;api.renderGame(state);}assert.equal(ctx.window.thorPerformanceStatus().resolutionScale,.75,'pause cannot falsely restore quality');
+paused.current=false;state.enemies=[];state.osamodas.summons=[];for(let i=0;i<1300;i++){time+=1000/60;api.renderGame(state);}assert.equal(ctx.window.thorPerformanceStatus().resolutionScale,1,'quiet scene restores quality');
 console.log('Adaptive rendering: budget, raster size, native state identity, pause and recovery passed.');

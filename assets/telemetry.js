@@ -77,7 +77,7 @@
      return {slot,name,effects,radiant:item.radiant===true,ranges:window.thorCollection?.describe(item)||null,icon:icon?.startsWith('https://retrosurvival.online/assets/')?icon:null};
    }));
    const helper=window.thorControls?.helperEnabled()===false?null:{lowHealth:live.player.hp>0&&live.player.hp/live.player.maxHp<=.25};
-   return {status:'run',locale,collection,helper,character:window.thorSpellPolicy?.classFor(live.levelId),unlocked:Object.keys(live.abilityUnlocked||{}).filter(id=>live.abilityUnlocked[id]),spellBindings:window.thorControls?.bindings?.().filter(Boolean)||[],phase:document.querySelector('.pause-panel')?'paused':live.phase,awakenings:{...live.awakenings},level:live.level,wave:live.wave,hp:live.player.hp,maxHp:live.player.maxHp,kamas:live.kamas,
+   return {status:'run',locale,collection,helper,performance:window.thorPerformanceStatus?.()||null,character:window.thorSpellPolicy?.classFor(live.levelId),unlocked:Object.keys(live.abilityUnlocked||{}).filter(id=>live.abilityUnlocked[id]),spellBindings:window.thorControls?.bindings?.().filter(Boolean)||[],phase:document.querySelector('.pause-panel')?'paused':live.phase,awakenings:{...live.awakenings},level:live.level,wave:live.wave,hp:live.player.hp,maxHp:live.player.maxHp,kamas:live.kamas,
      stats:Object.entries(labels).map(([key,name])=>{const b=hud.statBreakdowns[key];const match=b?.detail?.match(/^(?:Actuellement|Currently|Current|Actualmente)\s*:\s*([^·]+)/);return {name:text(name),value:match?match[1].trim():null,gear:b?.gear||''};}),
      slots:Object.fromEntries(Object.entries(slots).map(([key,name])=>[key,text(name)])),items};
  }};

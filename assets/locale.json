@@ -143,7 +143,11 @@
     "Restaurer remplacera la progression locale et redémarrera le jeu.": "Restoring replaces local progress and restarts the game.",
     "Choisir le fichier": "Choose file",
     "Progression exportée": "Progress exported",
-    "Sauvegarde incompatible": "Incompatible backup"
+    "Sauvegarde incompatible": "Incompatible backup",
+    "Graphismes": "Graphics",
+    "Qualité complète": "Full quality",
+    "Fluidité — objectif 60 FPS": "Smoothness — 60 FPS target",
+    "Effets minimaux": "Minimal effects"
   },
   "es": {
     "Commandes de jeu et manette": "Controles del juego y del mando",
@@ -289,6 +293,10 @@
     "Restaurer remplacera la progression locale et redémarrera le jeu.": "Restaurar sustituye el progreso local y reinicia el juego.",
     "Choisir le fichier": "Elegir archivo",
     "Progression exportée": "Progreso exportado",
-    "Sauvegarde incompatible": "Copia incompatible"
+    "Sauvegarde incompatible": "Copia incompatible",
+    "Graphismes": "Gráficos",
+    "Qualité complète": "Calidad completa",
+    "Fluidité — objectif 60 FPS": "Fluidez — objetivo 60 FPS",
+    "Effets minimaux": "Efectos mínimos"
   }
 }
