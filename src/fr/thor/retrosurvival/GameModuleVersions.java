@@ -2,6 +2,7 @@ package fr.thor.retrosurvival;
 
 /** Only audited game builds may receive native adapters. */
 final class GameModuleVersions {
+ static boolean latest(String hash){return "1d0ca84d7f804519dbeeb7a1eb9233292d6e3a770ffbe04511dcc16dff3491b4".equals(hash)||"ff04eaec039abe829416ee8fb2a48b4edf81b85acae21b26be6cf9b14a92159e".equals(hash);}
  static boolean current(String hash){return "200389afa2729d9ad2204b18d3605c3a8c3df59afae449cbb7da9587db616ca3".equals(hash);}
  static boolean previous9(String hash){return "c2af351bcb11f37c5a5e0545295186420b7581fef3eb52c929fba7986194c35f".equals(hash);}
  static boolean previous8(String hash){return "767dba829cdc81e035c43934762c427be444499a96aa84357f7311178db9d0eb".equals(hash);}
@@ -13,7 +14,7 @@ final class GameModuleVersions {
  static boolean previous2(String hash){return "a14150ba87429dbc69ff354a7de00274f356148304deb74d54d6760e780a63e7".equals(hash);}
  static boolean previous(String hash){return "fbe576762c5685fcd399a879391b29a8b5b62106fac1664ab16bacc2246fe677".equals(hash);}
  static boolean supported(String hash){
-  return current(hash)||previous9(hash)||previous8(hash)||previous7(hash)||previous6(hash)||previous5(hash)||previous4(hash)||previous3(hash)||previous2(hash)||previous(hash)||"67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2".equals(hash)
+  return latest(hash)||current(hash)||previous9(hash)||previous8(hash)||previous7(hash)||previous6(hash)||previous5(hash)||previous4(hash)||previous3(hash)||previous2(hash)||previous(hash)||"67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2".equals(hash)
     || "5a385b4cf6390e0b0713dab4effab3c322d177a148776472743fd38546a4d6a6".equals(hash)
     || "4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca".equals(hash);
  }

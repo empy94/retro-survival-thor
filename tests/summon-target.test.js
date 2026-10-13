@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const native=JSON.parse(fs.readFileSync('tests/fixtures/osamodas-target-oct13.json','utf8'));
+let seed=74891;const rand=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
+const ctx={window:{},devicePixelRatio:2,performance:{now:()=>0},fs:()=>false,hc:()=>({}),HN:[],U:()=>({abilities:[]}),mN(){},yN(){},WB:()=>({renderGame(){}}),IA:{tofu:{contact:34}},Dj:10,X:{markPull:200},hb:(s,e)=>e.reachable};
+vm.createContext(ctx);vm.runInContext('const ZA='+native.ZA+';'+native.pj+';'+native.mj+';const originalTarget=mj;',ctx);
+vm.runInContext(fs.readFileSync('assets/native-performance-hook-latest.js','utf8'),ctx);
+for(let i=0;i<5000;i++){
+ ctx.state={enemies:Array.from({length:i%200},(_,j)=>({id:j,x:Math.floor(rand()*800),y:Math.floor(rand()*500),r:10+rand()*60,hp:rand()<.2?0:2,state:rand()<.2?'dead':'idle',invisibleTimer:rand()<.2?1:0,arrival:rand()<.2?1:0,osamodasMarkTimer:rand()<.3?1:0,reachable:rand()<.3}))};
+ ctx.summon={kind:'tofu',x:400,y:250};
+ assert.equal(vm.runInContext('mj(state,summon)',ctx),vm.runInContext('originalTarget(state,summon)',ctx),'native target identity case '+i);
+}
+ctx.state={enemies:[0,1].map(id=>({id,x:100,y:0,r:10,hp:2,state:'idle',invisibleTimer:0,reachable:true,osamodasMarkTimer:1}))};ctx.summon={kind:'tofu',x:0,y:0};
+assert.equal(vm.runInContext('mj(state,summon).id',ctx),0,'first enemy wins equal-distance ties');
+console.log('Summon target equivalence: 5000 native comparisons plus marked tie ordering passed.');

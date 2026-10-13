@@ -1,3 +1,11 @@
+## 1.21.2 — Performances
+
+- Compatibilité avec les deux révisions vérifiées du 13 octobre : optimisations des animations et ressources mobiles réactivées.
+- Prévisualisations des améliorations calculées uniquement pour les sorts de la classe jouée.
+- Sélection des cibles des invocations sans tableaux temporaires, avec les priorités natives conservées.
+- Résolution du jeu adaptative pendant les combats lents, puis remontée lorsque la charge diminue.
+- Vérification de portée de Corbeau avant son lancement automatique.
+
 ## 1.21.1 — Affichage de la collection
 
 - Collection permanente repliable sur le second écran, fermée au démarrage pour libérer de la place.
