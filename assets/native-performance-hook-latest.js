@@ -32,8 +32,9 @@
  const limits=()=>quality==='full'?[2,2]:quality==='minimal'?[.75,.75]:[.75,1];
  const combat=state=>['playing','dying','gameover'].includes(state?.phase);
  window.thorRenderScale=2;
- let frames=0,elapsed=0,last=0,fastWindows=0,ratio=limits()[1],fps=0;
- window.thorGraphics={configure(value){if(!['full','balanced','minimal'].includes(value)||value===quality)return;quality=value;ratio=limits()[1];frames=0;elapsed=0;last=0;fastWindows=0;},status(){return {quality,resolutionScale:ratio,observedFps:fps};}};
+ let frames=0,elapsed=0,last=null,fastWindows=0,ratio=limits()[1],fps=0,measuring=window.thorGraphicsActive!==false;
+ const resetTiming=()=>{frames=0;elapsed=0;last=null;fps=0;fastWindows=0;};
+ window.thorGraphics={configure(value){if(!['full','balanced','minimal'].includes(value)||value===quality)return;quality=value;ratio=limits()[1];resetTiming();},setActive(value){const next=value===true;if(next!==measuring){measuring=next;resetTiming();}},status(){return {quality,resolutionScale:ratio,observedFps:fps};}};
  window.thorVisualParticles=state=>{
   if(!combat(state)||quality==='full')return state.particles;
   const budget=quality==='minimal'?0:64,markers=[],decor=[];
@@ -49,16 +50,16 @@
  WB=(...args)=>{const api=original(...args),draw=api.renderGame,canvas=args[1],viewport=args[4],paused=args[0].pausedRef;
  api.renderGame=state=>{
   const now=performance.now();
-  if(state.phase==='playing'&&!paused.current){
-   if(last&&now-last<250){elapsed+=now-last;frames++;}
+  if(measuring&&state.phase==='playing'&&!paused.current&&!(typeof document==='object'&&document.hidden)){
+   if(last!==null&&Number.isFinite(now-last)&&now>last){elapsed+=now-last;frames++;}
    last=now;
-   if(frames>=60){fps=frames*1000/elapsed;
+   if(elapsed>=1000&&frames>0){fps=frames*1000/elapsed;
     if(fps<58){ratio=Math.max(limits()[0],ratio-.25);fastWindows=0;}
     else if(fps>58&&state.enemies.length+state.osamodas.summons.length<40){if(++fastWindows>=5){ratio=Math.min(limits()[1],ratio+.25);fastWindows=0;}}
     else fastWindows=0;
     frames=0;elapsed=0;
    }
-  }else{last=0;frames=0;elapsed=0;}
+  }else resetTiming();
   window.thorRenderScale=combat(state)?ratio:2;
   const scale=Math.min(devicePixelRatio,window.thorRenderScale),width=Math.max(1,Math.round(viewport.width*scale)),height=Math.max(1,Math.round(viewport.height*scale));
   if(canvas.width!==width)canvas.width=width;
@@ -67,6 +68,7 @@
  };
  return api;
  };
+ if(typeof document==='object')document.addEventListener('visibilitychange',resetTiming);
  window.thorPerformanceStatus=()=>window.thorGraphics.status();
 })();
 

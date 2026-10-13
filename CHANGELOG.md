@@ -1,3 +1,10 @@
+## 1.21.4 — Mesure de la fluidité
+
+- Les images très longues comptent désormais dans le calcul des FPS, au lieu d’être ignorées.
+- Le réglage automatique réagit après environ une seconde mesurée de ralentissement, plutôt qu’après 60 images.
+- La mesure recommence après une pause, un passage en arrière-plan ou un changement de qualité. Le temps passé hors du jeu n’est pas compté comme un ralentissement.
+- Les trois réglages graphiques et le mode Fluidité par défaut restent disponibles dans Options de l’écran du bas et ⚙ APK.
+
 ## 1.21.3 — Réglages graphiques et foules
 
 - Nouveau réglage Graphismes dans Options du second écran et dans ⚙ APK : Qualité complète, Fluidité — objectif 60 FPS, Effets minimaux.
