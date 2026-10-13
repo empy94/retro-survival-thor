@@ -7,3 +7,6 @@ Les transformations n’affectent que XV (boucle du canvas et cadence de l’int
 Tests JavaScript de régression exécutés. Presets, mesure FPS, pause et arrière-plan vérifiés sur les adaptateurs des anciennes et nouvelles révisions. La sélection des cibles a été comparée à chaque fonction native sur 5 000 scénarios déterministes, avec maintien des marques et des égalités de distance. Le compteur inclut désormais les images de 500 ms et réinitialise la mesure à la reprise et lors d’un changement de qualité.
 
 Compilation et signature vérifiées. Le Thor est déconnecté : cette version n’a pas été installée ni essayée sur la console lors de cette préparation. Les mesures réelles antérieures sont décrites dans VALIDATION_1.21.3.md ; elles ne démontrent pas 60 FPS à la vague 60. Cette version n’ajoute pas de mesure de combat réel.
+
+
+Installation après reconnexion : APK finale installée avec remplacement (sans effacement des données), version Android 1.21.5 / code 46 vérifiée. L’écran titre s’affiche sur le Thor et propose la reprise Dragoeufs vague 8, niveau 17. Aucun combat n’a été lancé pour cette vérification. Aucun maintien de 60 FPS en combat n’est déduit de ce démarrage.
