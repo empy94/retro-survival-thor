@@ -11,6 +11,7 @@ public class GameModuleVersionsTest {
   if(!GameModuleVersions.previous6("45b98330489267a4de67380f852ac518fa847159a50c53876d8438a8f86f424e"))throw new AssertionError("previous local snapshot supported");
   if(!GameModuleVersions.previous7("31348dc9ef6c2cff13d23f0f37d708f0a79c02d6414f2259c880fa48c34119cd")||!GameModuleVersions.previous7("04dd91fe93a041fa743ba9e2926a61d3177dce9f5f4c9f5607e46acfb2e28dd0"))throw new AssertionError("intermediate revisions preserved");
   if(!GameModuleVersions.latest("1d0ca84d7f804519dbeeb7a1eb9233292d6e3a770ffbe04511dcc16dff3491b4")||!GameModuleVersions.supported("1d0ca84d7f804519dbeeb7a1eb9233292d6e3a770ffbe04511dcc16dff3491b4")||GameModuleVersions.latest(latest))throw new AssertionError("latest hook exact hash selection");
+  if(!GameModuleVersions.newest("53641e4311a21c12e3e176a4d32f0d12b79d870db7ea37addd9de121e0cf47b4")||!GameModuleVersions.supported("53641e4311a21c12e3e176a4d32f0d12b79d870db7ea37addd9de121e0cf47b4")||GameModuleVersions.newest(latest))throw new AssertionError("newest exact hash");
   System.out.println("Audited game versions and companion compatibility passed");
  }
 }

@@ -1,8 +1,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const state={levelId:'dragoeuf',phase:'playing',player:{x:0,y:0},enemies:[]};
-for(const suffix of ['current','latest']){
+for(const suffix of ['current','latest','newest']){
 const ctx={window:{thorNativeContext:{gameRef:{current:state}}},LI(){},Tm:{range:650},$j:e=>e.hp>0&&e.state!=='dead'&&e.invisibleTimer<=0&&(e.arrival??0)<=0};
-Object.assign(ctx,{tL:ctx.LI,Am:ctx.Tm,gM:ctx.$j});
+Object.assign(ctx,{tL:ctx.LI,Am:ctx.Tm,gM:ctx.$j,aL:ctx.LI,Mm:ctx.Tm,bM:ctx.$j});
 vm.createContext(ctx);const source=fs.readFileSync('assets/native-module-hook-'+suffix+'.js','utf8').split(';const thorOriginalCanvas')[0];vm.runInContext(source,ctx);
 const can=()=>ctx.window.thorGameAdapter.canAutoCast('crow');
 assert.equal(can(),false);

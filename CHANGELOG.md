@@ -1,3 +1,9 @@
+## 1.21.5 — Compatibilité de la dernière révision
+
+- Adaptateurs et optimisations mis à jour pour la nouvelle révision officielle du 13 octobre.
+- Conservation de la correction FPS 1.21.4, des réglages graphiques et de la vérification de portée de Corbeau.
+- Révisions antérieures vérifiées toujours prises en charge.
+
 ## 1.21.4 — Mesure de la fluidité
 
 - Les images très longues comptent désormais dans le calcul des FPS, au lieu d’être ignorées.
