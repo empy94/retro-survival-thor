@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.21.5 :** Compatible avec la dernière révision vérifiée du jeu. Compteur FPS corrigé pour prendre en compte les images très longues. Graphismes réglables dans **Options de l’écran du bas → Graphismes**, ou dans **⚙ APK**. **Fluidité — objectif 60 FPS** est activé par défaut ; **Effets minimaux** réduit davantage le rendu décoratif pour les grosses vagues. Les monstres, projectiles et avertissements d’attaque restent affichés. Les FPS mesurés apparaissent en bas de la fiche pendant un combat actif.
+**Mise à jour 1.21.6 :** Nouveau mode **Sans animations de sorts**, dans **Options → Graphismes** ou **⚙ APK**, avec repères au sol et projectiles simplifiés. Compatible avec la dernière révision vérifiée du jeu. Compteur FPS corrigé pour prendre en compte les images très longues. Graphismes réglables dans **Options de l’écran du bas → Graphismes**, ou dans **⚙ APK**. **Fluidité — objectif 60 FPS** est activé par défaut ; **Effets minimaux** réduit davantage le rendu décoratif pour les grosses vagues. Les monstres, projectiles et avertissements d’attaque restent affichés. Les FPS mesurés apparaissent en bas de la fiche pendant un combat actif.
 
 ## Trois façons de jouer
 

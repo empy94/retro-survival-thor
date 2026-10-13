@@ -420,14 +420,14 @@ public class MainActivity extends Activity {
    JSONObject classes=spellCatalog.optJSONObject("classes");if(classes==null||!contains(classes.optJSONArray(character),id)||contains(spellCatalog.optJSONArray("passive"),id))return;
    try{JSONObject all=spellManual();org.json.JSONArray old=all.optJSONArray(character),next=new org.json.JSONArray();if(old!=null)for(int i=0;i<old.length();i++)if(!id.equals(old.optString(i)))next.put(old.optString(i));if(manual)next.put(id);all.put(character,next);getPreferences(0).edit().putString("spellManual",all.toString()).apply();applySettings();}catch(Exception ignored){}
  }
- private String graphicsQuality(){String value=getPreferences(0).getString("graphicsQuality","balanced");return Arrays.asList("full","balanced","minimal").contains(value)?value:"balanced";}
+ private String graphicsQuality(){String value=getPreferences(0).getString("graphicsQuality","balanced");return Arrays.asList("full","balanced","minimal","no-spells").contains(value)?value:"balanced";}
  private JSONObject panelOptions(){
    JSONObject data=new JSONObject();android.content.SharedPreferences p=getPreferences(0);try{data.put("mode",autoMode());data.put("graphicsQuality",graphicsQuality());data.put("manual",spellManual());data.put("shortcuts",spellShortcuts());for(String key:Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper","safeAutoSell"))data.put(key,p.getBoolean(key,!"safeAutoSell".equals(key)));data.put("cursorSensitivity",p.getInt("cursorSensitivity",100));data.put("labelOpacity",p.getInt("labelOpacity",45));}catch(Exception ignored){}return data;
  }
  private void savePanelOption(String name,String value){
    android.content.SharedPreferences.Editor edit=getPreferences(0).edit();
    if("autoSpellMode".equals(name)&&Arrays.asList("off","buffs","full").contains(value))edit.putString(name,value);
-   else if("graphicsQuality".equals(name)&&Arrays.asList("full","balanced","minimal").contains(value))edit.putString(name,value);
+   else if("graphicsQuality".equals(name)&&Arrays.asList("full","balanced","minimal","no-spells").contains(value))edit.putString(name,value);
    else if(Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper","safeAutoSell").contains(name)&&Arrays.asList("true","false").contains(value))edit.putBoolean(name,"true".equals(value));
    else if(Arrays.asList("cursorSensitivity","labelOpacity").contains(name))try{int v=Integer.parseInt(value),min="cursorSensitivity".equals(name)?25:15,max="cursorSensitivity".equals(name)?250:85;if(v<min||v>max)return;edit.putInt(name,v);if("cursorSensitivity".equals(name))cursorSensitivity=v/100f;}catch(Exception ignored){return;}
    else return;
@@ -445,7 +445,7 @@ public class MainActivity extends Activity {
    android.content.SharedPreferences p=getPreferences(0);
    LinearLayout layout=new LinearLayout(this);layout.setOrientation(LinearLayout.VERTICAL);int pad=(int)(24*getResources().getDisplayMetrics().density);layout.setPadding(pad,pad/2,pad,pad/2);
    TextView graphicsTitle=new TextView(this);graphicsTitle.setText(ui("Graphismes"));layout.addView(graphicsTitle);
-   RadioGroup graphics=new RadioGroup(this);String[] graphicsKeys={"full","balanced","minimal"},graphicsLabels={"Qualité complète","Fluidité — objectif 60 FPS","Effets minimaux"};
+   RadioGroup graphics=new RadioGroup(this);String[] graphicsKeys={"full","balanced","minimal","no-spells"},graphicsLabels={"Qualité complète","Fluidité — objectif 60 FPS","Effets minimaux","Sans animations de sorts"};
    for(int i=0;i<graphicsKeys.length;i++){RadioButton choice=new RadioButton(this);choice.setId(View.generateViewId());choice.setTag(graphicsKeys[i]);choice.setText(ui(graphicsLabels[i]));graphics.addView(choice);if(graphicsQuality().equals(graphicsKeys[i]))graphics.check(choice.getId());}layout.addView(graphics);
    graphics.setOnCheckedChangeListener((group,id)->{RadioButton choice=group.findViewById(id);if(choice!=null)savePanelOption("graphicsQuality",(String)choice.getTag());});
    controllerStatus=new TextView(this);refreshControllerStatus();layout.addView(controllerStatus);

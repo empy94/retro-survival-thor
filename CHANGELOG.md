@@ -1,3 +1,9 @@
+## 1.21.6 — Sans animations de sorts
+
+- Nouveau choix Graphismes : Sans animations de sorts. Les acteurs restent visibles ; les cellules d’avertissement deviennent des contours simples et les projectiles gardent des repères légers.
+- Gros effets de sorts et particules décoratives supprimés du dessin dans ce mode, sans modifier leurs dégâts, durées ou positions de simulation.
+- Décor en pause rafraîchi à cadence réduite ; changement de qualité et redimensionnement immédiatement redessinés.
+
 ## 1.21.5 — Compatibilité de la dernière révision
 
 - Adaptateurs et optimisations mis à jour pour la nouvelle révision officielle du 13 octobre.
