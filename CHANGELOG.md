@@ -1,3 +1,12 @@
+## 1.21.7 — Hotfix Osamodas et calculs répétitifs
+
+- Compatibilité avec la nouvelle révision officielle : optimisations et mode sans animations réactivés pour ce module vérifié.
+- Trois choix graphiques : Qualité complète, Fluidité — objectif 60 FPS et Sans animations de sorts. L’ancien choix Effets minimaux rejoint le mode sans animations.
+- Bonus d’équipement calculés sans tableaux temporaires ; recherche des effets fixes mise en cache, valeurs et changements d’équipement lus immédiatement.
+- Recherche des cibles des monstres parmi les invocations sans recopier leur liste, en conservant les nouvelles règles de visibilité du jeu.
+- Fond de carte préparé à la définition d’affichage puis réutilisé. Cache invalidé au changement de carte ou de définition.
+- Assistance des sorts : distances et ordre des cibles réutilisés entre les sorts, avec les mêmes choix et scores.
+
 ## 1.21.6 — Sans animations de sorts
 
 - Nouveau choix Graphismes : Sans animations de sorts. Les acteurs restent visibles ; les cellules d’avertissement deviennent des contours simples et les projectiles gardent des repères légers.

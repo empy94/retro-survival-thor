@@ -15,7 +15,10 @@
    if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:allyBuff(s,spells);}
    if(mode!=='full'||!s.enemies.length)return null;
    const p=s.player,enemies=s.enemies.filter(e=>[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
-   const nearest=Math.min(...enemies.map(e=>distance(e,p)-e.r)),urgent=nearest<65;
+   const distances=enemies.map(e=>distance(e,p));
+   const nearest=Math.min(...enemies.map((e,i)=>distances[i]-e.r)),urgent=nearest<65;
+   // Reuse the same native distances and stable target order across spells.
+   const ordered=enemies.map((enemy,i)=>({enemy,distance:distances[i]})).sort((a,b)=>a.distance-b.distance);
    const candidates=[];
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
@@ -46,13 +49,13 @@
      let best=null,bestScore=0;
      // Limit quadratic cluster work: 24 nearest candidate centers, up to 128
      // monsters. No canvas/image analysis, networking, or React tree traversal.
-     const targets=enemies.filter(e=>distance(e,p)<=range+e.r).sort((a,b)=>distance(a,p)-distance(b,p)).slice(0,24);
-     for(const target of targets){const d=distance(target,p),ratio=Math.min(1,range/Math.max(1,d));const q={x:p.x+(target.x-p.x)*ratio,y:p.y+(target.y-p.y)*ratio};
-       let score=0;const vx=(q.x-p.x)/(distance(q,p)||1),vy=(q.y-p.y)/(distance(q,p)||1);
-       for(const enemy of enemies){let hit;
+     const targets=ordered.filter(t=>t.distance<=range+t.enemy.r).slice(0,24);
+     for(const {enemy:target,distance:d} of targets){const ratio=Math.min(1,range/Math.max(1,d));const q={x:p.x+(target.x-p.x)*ratio,y:p.y+(target.y-p.y)*ratio};
+       let score=0;const length=distance(q,p)||1,vx=(q.x-p.x)/length,vy=(q.y-p.y)/length;
+       for(let i=0;i<enemies.length;i++){const enemy=enemies[i];let hit;
          if(directional){const ex=enemy.x-p.x,ey=enemy.y-p.y,along=ex*vx+ey*vy;hit=along>=0&&along<=range+enemy.r&&Math.abs(ex*vy-ey*vx)<=35+enemy.r;}
-         else hit=distance(enemy,q)<=radius+enemy.r;
-         if(hit)score+=100+(distance(enemy,p)<85?25:0);}
+         else{const reach=radius+enemy.r;hit=Math.abs(enemy.x-q.x)<=reach&&Math.abs(enemy.y-q.y)<=reach&&distance(enemy,q)<=reach;}
+         if(hit)score+=100+(distances[i]<85?25:0);}
        // Reduce repeated traps on the same already occupied location.
        if(s.traps?.some(t=>distance(t,q)<50)&&['massTrap','repulsiveTrap'].includes(id))score=0;
        if(score>bestScore){best=q;bestScore=score;}

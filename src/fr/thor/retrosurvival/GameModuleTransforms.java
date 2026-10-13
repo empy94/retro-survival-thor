@@ -3,21 +3,25 @@ import java.util.Arrays;
 
 /** Raster and UI work only; caller first verifies the complete official module hash. */
 final class GameModuleTransforms {
- static String latest(String source){return transform(source,false);}
- static String newest(String source){return transform(source,true);}
- private static String transform(String source,boolean newest){
-      String resize="let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);P.width=";
+ static String latest(String source){return transform(source,0);}
+ static String newest(String source){return transform(source,1);}
+ static String live(String source){return transform(source,2);}
+ private static String transform(String source,int family){
+      boolean newest=family==1,live=family==2;
+      String resize="let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);"+(live?"te":"P")+".width=";
       String render="let u=e.localeRef?.current??`fr`,d=Math.min(devicePixelRatio,2);";
       if(source.indexOf(resize)<0||source.indexOf(resize)!=source.lastIndexOf(resize)||source.indexOf(render)<0||source.indexOf(render)!=source.lastIndexOf(render))return null;
-      String particles="for(let e of o.particles)",hud="c&&ee<=0&&(ee=.08,ne(r),T(",clip="(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1)=>{let p=a.current[e];";
-      String pairs=newest?"let e=f.x-t.x,n=f.y-t.y,a=Math.hypot(e,n),o=cf(f.kind)&&cf(t.kind),s=(f.r+t.r)*(o?eO:QD);if(a>=s)continue;":"let e=f.x-t.x,n=f.y-t.y,a=Math.hypot(e,n),o=of(f.kind)&&of(t.kind),s=(f.r+t.r)*(o?ZD:YD);if(a>=s)continue;";
-      for(String anchor:Arrays.asList(particles,hud,clip,pairs))if(source.indexOf(anchor)<0||source.indexOf(anchor)!=source.lastIndexOf(anchor))return null;
+      String particles="for(let e of o.particles)",hud=live?"l&&M<=0&&(M=.08,ie(i),E(":"c&&ee<=0&&(ee=.08,ne(r),T(",clip=live?"(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0)=>{let m=a.current[e];":"(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1)=>{let p=a.current[e];",map="n.drawImage(r,0,0,e.width,e.height)";
+      String kind=live?"lf":newest?"cf":"of",near=live?"tO":newest?"eO":"ZD",far=live?"$D":newest?"QD":"YD";
+      String pairs="let e=f.x-t.x,n=f.y-t.y,a=Math.hypot(e,n),o="+kind+"(f.kind)&&"+kind+"(t.kind),s=(f.r+t.r)*(o?"+near+":"+far+");if(a>=s)continue;";
+      for(String anchor:Arrays.asList(particles,hud,clip,pairs,map))if(source.indexOf(anchor)<0||source.indexOf(anchor)!=source.lastIndexOf(anchor))return null;
       source=source.replace(particles,"for(let e of window.thorVisualParticles(o))")
-       .replace(hud,"c&&(window.thorHudChanged(r)||ee<=0)&&(ee=window.thorHudInterval(r),ne(r),T(")
-       .replace(clip,"(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1)=>{if(window.thorRenderSpellMarker(n,e,t,r,s,c,d,f,a.current[e],"+(newest?"Kc":"Wc")+",u))return;if(window.thorHideCosmeticClip(e,window.thorNativeContext?.gameRef.current))return;let p=a.current[e];")
-       .replace(pairs,newest?"let e=f.x-t.x,n=f.y-t.y,o=cf(f.kind)&&cf(t.kind),s=(f.r+t.r)*(o?eO:QD);if(Math.abs(e)>=s||Math.abs(n)>=s)continue;let a=Math.hypot(e,n);if(a>=s)continue;":"let e=f.x-t.x,n=f.y-t.y,o=of(f.kind)&&of(t.kind),s=(f.r+t.r)*(o?ZD:YD);if(Math.abs(e)>=s||Math.abs(n)>=s)continue;let a=Math.hypot(e,n);if(a>=s)continue;");
+       .replace(hud,live?"l&&(window.thorHudChanged(i)||M<=0)&&(M=window.thorHudInterval(i),ie(i),E(":"c&&(window.thorHudChanged(r)||ee<=0)&&(ee=window.thorHudInterval(r),ne(r),T(")
+       .replace(clip,clip.substring(0,clip.indexOf("{let "))+"{if(window.thorRenderSpellMarker(n,e,t,r,s,c,d,f,a.current[e],"+(live?"qc":newest?"Kc":"Wc")+",u))return;if(window.thorHideCosmeticClip(e,window.thorNativeContext?.gameRef.current))return;let "+(live?"m":"p")+"=a.current[e];")
+       .replace(pairs,"let e=f.x-t.x,n=f.y-t.y,o="+kind+"(f.kind)&&"+kind+"(t.kind),s=(f.r+t.r)*(o?"+near+":"+far+");if(Math.abs(e)>=s||Math.abs(n)>=s)continue;let a=Math.hypot(e,n);if(a>=s)continue;");
       source=source.replaceAll("n\\.shadowBlur=([0-9]+(?:\\.[0-9]+)?)","n.shadowBlur=window.thorDecorativeBlur($1)");
-      source=source.replace(resize,"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,window.thorRenderScale??2);P.width=").replace(render,"let u=e.localeRef?.current??`fr`,d=Math.min(devicePixelRatio,window.thorRenderScale??2);");
+      source=source.replace(map,"(window.thorDrawMap(n,r,e.width,e.height)||n.drawImage(r,0,0,e.width,e.height))");
+      source=source.replace(resize,"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,window.thorRenderScale??2);"+(live?"te":"P")+".width=").replace(render,"let u=e.localeRef?.current??`fr`,d=Math.min(devicePixelRatio,window.thorRenderScale??2);");
 
   return source;
  }

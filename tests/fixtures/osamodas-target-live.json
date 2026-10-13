@@ -1,0 +1,5 @@
+{
+  "pj": "e=>e.hp>0&&e.state!==`dead`&&e.invisibleTimer<=0&&(e.arrival??0)<=0",
+  "Aj": "function Aj(e,t,n,r){let i=n.filter(n=>Math.hypot(n.x-t.x,n.y-t.y)<=r(n)||vb(e,n));return i.length?i:n}",
+  "jj": "function jj(e,t){let n,r=1/0,i,a=Y.markPull,o=QA[t.kind].contact+Wj;for(let s of Aj(e,t,e.enemies.filter(pj),e=>e.r+o)){let e=Math.hypot(s.x-t.x,s.y-t.y);e<r&&(n=s,r=e),(s.osamodasMarkTimer??0)>0&&e<a&&(i=s,a=e)}return i??n}"
+}

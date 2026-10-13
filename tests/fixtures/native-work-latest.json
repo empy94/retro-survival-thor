@@ -1,0 +1,20 @@
+{
+  "names": {
+    "slots": "Xf",
+    "flat": "bp",
+    "bonus": "tp",
+    "total": "Ep",
+    "target": "Ak",
+    "taunts": "RA",
+    "summons": "ph"
+  },
+  "definitions": {
+    "slots": "[`hat`,`cape`,`boots`,`belt`,`weapon`,`ring`,`amulet`,`shield`,`dofus`]",
+    "flat": "e=>Xf.flatMap(t=>{if(t===`ring`||t===`dofus`)return e[t];let n=e[t];return n?[n]:[]})",
+    "bonus": "(e,t)=>{if(!e)return 0;let n=Yf[e.id].effects.findIndex(e=>e.stat===t);return(n<0?0:e.rolls[n])+(e.radiant?$f[e.id]?.[t]??0:0)}",
+    "total": "(e,t)=>bp(e).reduce((e,n)=>e+tp(n,t),0)",
+    "target": "function Ak(e,t){let n=Math.hypot(e.player.x-t.x,e.player.y-t.y);if(e.levelId===`dragoeuf`){let r=(e.osamodas.playerHiddenTimer??0)>0;if(t.kind===`dragoeuf-flying`&&!r)return;let i,a=r?1/0:Math.min(300,n);for(let n of ph(e.osamodas)){if(n.state===`appear`||(n.invisibleTimer??0)>0)continue;let r=Math.hypot(n.x-t.x,n.y-t.y);if(RA(e,n)&&r<=260)return n;r<a&&(i=n,a=r)}return i}let r=n,i;for(let a of kk(e)){let e=`groupId`in a;if(!e&&n<750)continue;let o=Math.hypot(a.x-t.x,a.y-t.y);o>=(e?200:300)||o<r&&(i=a,r=o)}return i}",
+    "taunts": "(e,t)=>LA(t.kind)||(t.wallTimer??0)>0||t.kind===`tofu`&&e.awakenings.tofuSummon===3",
+    "summons": "e=>e.summons.filter(e=>e.hp>0)"
+  }
+}

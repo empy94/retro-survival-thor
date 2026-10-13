@@ -32,6 +32,8 @@
  const limits=()=>quality==='full'?[2,2]:['minimal','no-spells'].includes(quality)?[.75,.75]:[.75,1];
  const combat=state=>['playing','dying','gameover'].includes(state?.phase);
  window.thorRenderScale=2;
+ const paintMap=window.thorWorkCache?.mapPainter();
+ window.thorDrawMap=(ctx,image,width,height)=>combat(window.thorNativeContext?.gameRef.current)&&quality!=='full'&&!!paintMap?.(ctx,image,width,height);
  let frames=0,elapsed=0,last=null,fastWindows=0,ratio=limits()[1],fps=0,lastPausedDraw=-Infinity,lastDrawQuality=null,lastDrawWidth=0,lastDrawHeight=0,measuring=window.thorGraphicsActive!==false;
  const resetTiming=()=>{frames=0;elapsed=0;last=null;fps=0;fastWindows=0;};
  window.thorGraphics={configure(value){if(!['full','balanced','minimal','no-spells'].includes(value)||value===quality)return;quality=value;ratio=limits()[1];resetTiming();},setActive(value){const next=value===true;if(next!==measuring){measuring=next;resetTiming();}},status(){return {quality,resolutionScale:ratio,observedFps:fps};}};
@@ -97,6 +99,13 @@
  };
  if(typeof document==='object')document.addEventListener('visibilitychange',resetTiming);
  window.thorPerformanceStatus=()=>window.thorGraphics.status();
+})();
+
+/* The catalogue and slot order are immutable; rolls and taunts remain live. */
+;(function(){
+ if(!window.thorWorkCache)return;
+ const work=window.thorWorkCache.install({slots:Qf,items:Zf,radiant:tp,target:Pk,taunts:HA});
+ rp=work.bonus;Op=work.total;Pk=work.enemyTarget;
 })();
 
 /* Preserve native reachability, marks and tie ordering without two temporary arrays. */
