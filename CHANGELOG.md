@@ -1,3 +1,12 @@
+## 1.22.0 — Révision officielle et sorts automatiques
+
+- Adaptation au nouveau jeu réparti en deux modules ; vérification exacte des deux fichiers avant adaptation.
+- Classe reconnue indépendamment de la carte : assistance, raccourcis et fiche du second écran suivent le personnage sélectionné.
+- Portées et aperçus repris des calculs officiels actuels ; garde de ciblage Corbeau maintenue.
+- Cawotte ajoutée au catalogue et à la visée ; assistance complète réservée aux PV bas, avec exception manuelle possible.
+- Bouton Osamodas ajouté au choix de classe de l’écran inférieur. Catalogues actualisés : 64 sorts et 225 équipements.
+- Trois réglages graphiques conservés ; mode sans animations réadapté aux nouveaux sprites, sans retirer les acteurs ni les avertissements au sol.
+
 ## 1.21.7 — Hotfix Osamodas et calculs répétitifs
 
 - Compatibilité avec la nouvelle révision officielle : optimisations et mode sans animations réactivés pour ce module vérifié.

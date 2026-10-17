@@ -3,6 +3,13 @@ import java.util.Arrays;
 
 /** Raster and UI work only; caller first verifies the complete official module hash. */
 final class GameModuleTransforms {
+ static String oct17(String source){
+  String[] before={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);B.width=","let c=e.localeRef?.current??`fr`,l=Math.min(devicePixelRatio,2);","(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{let h=m??a.current[e];","for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:o.particles)","n.drawImage(r,0,0,t.width,t.height)","f&&a<=0&&(a=.08,se(r),ce(r),fe(r))","fe=e=>{M({statValues:qv(e)","let e=m.x-t.x,n=m.y-t.y,a=Math.hypot(e,n),o=ls(m.kind)&&ls(t.kind),s=(m.r+t.r)*(o?xr:_p);if(a>=s)continue;"};
+  String[] after={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,window.thorRenderScale??2);B.width=","let c=e.localeRef?.current??`fr`,l=Math.min(devicePixelRatio,window.thorRenderScale??2);","(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{if(window.thorRenderSpellMarker?.(n,e,t,r,s,c,d,f,m??a.current[e],Xn,u))return;let h=m??a.current[e];","for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:(window.thorVisualParticles?.(o)??o.particles))","(window.thorDrawMap?.(n,r,t.width,t.height)||n.drawImage(r,0,0,t.width,t.height))","f&&(window.thorHudChanged?.(r)||a<=0)&&(a=(window.thorHudInterval?.(r)??.08),se(r),ce(r),fe(r))","fe=e.thorRefreshHud=H.thorRefreshHud=e=>{M({statValues:qv(e)","let e=m.x-t.x,n=m.y-t.y,o=ls(m.kind)&&ls(t.kind),s=(m.r+t.r)*(o?xr:_p);if(Math.abs(e)>=s||Math.abs(n)>=s)continue;let a=Math.hypot(e,n);if(a>=s)continue;"};
+  for(String anchor:before)if(source.indexOf(anchor)<0||source.indexOf(anchor)!=source.lastIndexOf(anchor))return null;
+  for(int i=0;i<before.length;i++)source=source.replace(before[i],after[i]);
+  return source.replaceAll("n\\.shadowBlur=([0-9]+(?:\\.[0-9]+)?)","n.shadowBlur=(window.thorDecorativeBlur?.($1)??$1)");
+ }
  static String latest(String source){return transform(source,0);}
  static String newest(String source){return transform(source,1);}
  static String live(String source){return transform(source,2);}

@@ -74,3 +74,9 @@ assert.equal(choose({...base,character:'enutrof',summons:{chest:true}},['animate
 assert(choose({...base,character:'enutrof',enemies:[{x:930,y:220,r:12}],upgrades:{enutrofSpell:{shovelThrow:{range:2}}}},['shovelThrow'])?.target);
 
 const ally={x:base.player.x+40,y:base.player.y,hp:5,toadTimer:0,bearCryTimer:0};const supported=choose({...base,character:"osamodas",allies:[ally]},["toad"]);assert.deepEqual(supported.target,{x:ally.x,y:ally.y});assert.equal(choose({...base,character:"osamodas",allies:[]},["toad"]),null);assert(choose({...base,character:"osamodas"},["crow"]));
+
+assert.equal(choose(base,['cawotte']),null,'preserve single-use heal at full health');
+const wounded={...base,enemies:[],player:{...base.player,hp:1}};
+assert.deepEqual(choose(wounded,['cawotte']).target,{x:350,y:220});
+assert.equal(buffPlan(wounded,['cawotte']),null);
+assert.equal(plan(wounded,[{...spell('cawotte'),ready:false}],mapping),null);

@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.21.7 :** Compatible avec le hotfix Osamodas vérifié. Réduction des calculs répétés d’équipement et de ciblage ; fond de carte mis en cache. Trois choix dans **Options de l’écran du bas → Graphismes** ou **⚙ APK** : **Qualité complète**, **Fluidité — objectif 60 FPS** (par défaut) et **Sans animations de sorts**. Ce dernier garde les acteurs, repères au sol et projectiles simplifiés. Les FPS mesurés apparaissent en bas de la fiche pendant un combat actif ; 60 FPS constants ne sont pas garantis dans toutes les scènes.
+**Mise à jour 1.22.0 :** Compatibilité avec la révision officielle du 17 octobre. L’assistance reconnaît désormais la classe indépendamment de la carte ; portées et aperçus suivent les calculs actuels du jeu. Cawotte est disponible dans les réglages et réservée aux PV bas en assistance complète. Les cinq classes ont leur bouton sur l’écran inférieur. Trois choix dans **Options → Graphismes** ou **⚙ APK** : **Qualité complète**, **Fluidité — objectif 60 FPS** et **Sans animations de sorts**. Ce dernier garde les acteurs, repères au sol et projectiles simplifiés. Les 60 FPS constants ne sont pas garantis dans toutes les scènes.
 
 ## Trois façons de jouer
 
@@ -26,7 +26,7 @@ Dans **⚙ APK / Select → Assistance des sorts** :
 
 Les sorts déjà automatiques du jeu restent automatiques dans les trois modes. Tes commandes manuelles sont prioritaires ; l’aide s’arrête pendant les choix, la pause et hors de l’application. Elle ne garantit pas la survie.
 
-**Auto avec tes exceptions :** sur le second écran, touche une icône dans **Sorts → Féca / Iop / Sram** pour garder ce sort manuel. Tes choix sont sauvegardés par classe ; les autres sorts suivent le mode global.
+**Auto avec tes exceptions :** sur le second écran, touche une icône dans **Sorts → ta classe** pour garder ce sort manuel. Tes choix sont sauvegardés par classe ; les autres sorts suivent le mode global.
 
 ## Mises à jour de l’application
 

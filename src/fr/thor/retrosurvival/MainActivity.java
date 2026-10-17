@@ -89,6 +89,7 @@ public class MainActivity extends Activity {
   try{
    String path=SessionNetworkPolicy.staticPath(request.getUrl().toString());
    if(path==null||!("GET".equals(request.getMethod())||"HEAD".equals(request.getMethod())))return deniedLocal();
+   if(path.equals("/_next/static/chunks/discord-identity-v9Gyhq15.js")){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
    if(path.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(request);return adapted==null?deniedLocal():adapted;}
    byte[] bytes=localCache.getFrozen(path);if(bytes==null){if(!path.equals("/favicon.ico")&&SystemClock.uptimeMillis()-lastCacheWarning>5000){lastCacheWarning=SystemClock.uptimeMillis();runOnUiThread(()->Toast.makeText(this,"Ressource locale absente. Charge cette carte en mode normal, puis relance le mode local.",Toast.LENGTH_LONG).show());}return deniedLocal();}
    if(path.equals("/"))bytes=injectRoot(new String(bytes,StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
@@ -246,6 +247,7 @@ public class MainActivity extends Activity {
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
        if(localSession)return localResource(r);
+       if(official&&"GET".equals(r.getMethod())&&"/_next/static/chunks/discord-identity-v9Gyhq15.js".equals(route)){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
        if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
 
        if(!r.isForMainFrame())return cacheOnlineResource(r);
@@ -297,12 +299,31 @@ public class MainActivity extends Activity {
    content.requestApplyInsets();
  }
  private void immersive(){getWindow().getDecorView().setSystemUiVisibility(5894);}
+ private String adaptedShared,adaptedSharedUrl;
+ private synchronized WebResourceResponse adaptSharedModule(WebResourceRequest request){
+  try{String url=request.getUrl().toString();if(adaptedShared==null||!url.equals(adaptedSharedUrl)){
+   String source;if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}else{
+    HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}
+    try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Shared module cache unavailable",cacheError);}
+   }
+   if(source.length()>8000000)return null;
+   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString()))return null;
+   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open("native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
+  }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedShared.getBytes(StandardCharsets.UTF_8)));}catch(Exception error){android.util.Log.w("ThorRetro","Shared game adapter unavailable",error);return null;}
+ }
  private synchronized WebResourceResponse adaptModule(WebResourceRequest request){
    try{String url=request.getUrl().toString();if(adaptedModule==null||!url.equals(adaptedUrl)){
      String source;
      if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
      else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>8000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+     if(GameModuleVersions.oct17(hash.toString())){
+      String transformed=GameModuleTransforms.oct17(source);if(transformed==null)return null;
+      try(InputStream hook=getAssets().open("native-module-hook-oct17.js");InputStream performance=getAssets().open("native-performance-hook-oct17.js")){
+       adaptedModule=transformed+"\n"+(localSession&&companion.supportsLocalGame(hash.toString())?companion.localMainHook():read(hook))+"\n"+read(performance)+(localSession?(companion.supportsLocalGame(hash.toString())?"\n"+companion.localRulesHook():companion.supportsGameModule(hash.toString())?"\n"+companion.get("moduleHookOct17"):""):"");adaptedUrl=url;
+      }
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
      if(localSession&&companion.supportsLocalGame(hash.toString())){
       adaptedModule=source+"\n"+companion.localMainHook()+"\n"+companion.localRulesHook();adaptedUrl=url;
      }else{

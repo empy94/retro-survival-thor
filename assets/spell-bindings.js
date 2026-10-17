@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  // IDs used by the official game's touch controls (checked 2026-10-09).
- const aimed=new Set(["dash","immobilizationGlyph","burningGlyph","staffBoomerang","cut","swordOfFate","jump","intimidation","celestialSword","iopSword","brokle","lethalAttack","massTrap","repulsiveTrap","sramDouble","fear","arnaque","cracklerStrike","toad","shovelJudgment","mound","animatedChest","shovelThrow","corruption"]);
+ const aimed=new Set(["cawotte","dash","immobilizationGlyph","burningGlyph","staffBoomerang","cut","swordOfFate","jump","intimidation","celestialSword","iopSword","brokle","lethalAttack","massTrap","repulsiveTrap","sramDouble","fear","arnaque","cracklerStrike","toad","shovelJudgment","mound","animatedChest","shovelThrow","corruption"]);
  const names=['X','Y','L1','R1','L2','R2','A','B',...['L1','R1','L2','R2'].flatMap(m=>['X','Y','A','B'].map(b=>m+' + '+b))];
  const travel=new Set(['dash','jump']);
  function isTravel(id){return travel.has(id);}
@@ -17,6 +17,7 @@
    if(!needsAim(id,awakenings))return null;
    const native=root.thorGameAdapter?.radialSpec?.(id);if(native)return native;
    if(id==='cracklerStrike')return {distance:180,variable:false,showRange:false};
+   if(id==='cawotte')return {distance:200,variable:true,showRange:true};
    if(isTravel(id))return {distance:travelRange(id,upgrades,awakenings),variable:false,showRange:true};
    const upgrade=key=>Number.isFinite(upgrades[key])?Math.max(0,upgrades[key]):0;
    const enutrofRange=Number(upgrades.enutrofSpell?.[id]?.range)||0;

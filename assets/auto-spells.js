@@ -12,6 +12,7 @@
  }
  function plan(s,spells,mapping,mode='full'){
    if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
+   if(mode==='full'&&s.player.hp/s.player.maxHp<=.35){const heal=spells.find(spell=>spell.id==='cawotte'&&spell.ready);if(heal)return {spell:heal,target:{x:s.player.x,y:s.player.y},score:1200};}
    if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:allyBuff(s,spells);}
    if(mode!=='full'||!s.enemies.length)return null;
    const p=s.player,enemies=s.enemies.filter(e=>[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
@@ -22,7 +23,7 @@
    const candidates=[];
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
-   for(const spell of spells){if(!spell.ready)continue;const id=spell.id;
+   for(const spell of spells){if(!spell.ready||spell.id==='cawotte')continue;const id=spell.id;
      if(id==='bearCry'||id==='toad'){const action=allyBuff(s,[spell]);if(action)candidates.push(action);continue;}
      if(id==='animatedChest'&&s.summons?.chest)continue;
      if(id in buffs){const timer=p[buffs[id]]??s.buffs[buffs[id]];

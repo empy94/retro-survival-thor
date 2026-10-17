@@ -27,6 +27,11 @@ window.thorAutoSpells.configure('buffs',{feca:['shield','speed']});tick();assert
 window.thorAutoSpells.configure('off',{});assert.equal(tick,null);
 console.log('Per-class spell policy: sanitization, passive exclusion, mode inheritance, isolated preferences and runtime filtering passed');
 
-assert.equal(Object.keys(policy.catalog.spells).length,63);assert.equal(policy.catalog.classes.enutrof.length,16);for(const [id,awakening] of [['shield',2],['vitality',3],['amplification',1]]){assert(policy.isPassive(id,{[id]:awakening}));assert(!policy.allowed(id,id==='shield'?'feca':'iop','full',{}, {[id]:awakening}));}assert(mapping.needsAim('arnaque'));assert(mapping.needsAim('brokle'));assert(mapping.needsAim('brokle',{brokle:1}));assert.equal(mapping.travelRange('dash',{}, {dash:2}),112.5);assert.equal(mapping.travelRange('jump',{}, {jump:1}),270);
+assert.equal(Object.keys(policy.catalog.spells).length,64);assert.equal(policy.catalog.classes.enutrof.length,17);for(const [id,awakening] of [['shield',2],['vitality',3],['amplification',1]]){assert(policy.isPassive(id,{[id]:awakening}));assert(!policy.allowed(id,id==='shield'?'feca':'iop','full',{}, {[id]:awakening}));}assert(mapping.needsAim('arnaque'));assert(mapping.needsAim('brokle'));assert(mapping.needsAim('brokle',{brokle:1}));assert.equal(mapping.travelRange('dash',{}, {dash:2}),112.5);assert.equal(mapping.travelRange('jump',{}, {jump:1}),270);
+for(const characterId of Object.keys(policy.catalog.classes))for(const levelId of ['astrub','wabbit','gelee','litneg','dragoeuf'])assert.equal(policy.classFor({characterId,levelId}),characterId,'class independent of map');
+assert.equal(policy.classFor({characterId:'unknown',levelId:'astrub'}),null,'unknown explicit class fails closed');assert.equal(policy.classFor({levelId:'astrub'}),'feca','older state remains supported');
 
 for(const id of ["shovelKiss","slaughteringShovel","tofuSummon","bouftouSummon"]){assert(policy.isPassive(id));assert(!mapping.needsAim(id));}assert(policy.allowed("crow","osamodas","full",{}));assert(policy.isPassive("crow",{crow:1}));assert(mapping.isHeld("stingingClaw"));assert(mapping.needsAim("cracklerStrike"));
+
+const displayed=[...fs.readFileSync('assets/dashboard.html','utf8').matchAll(/data-class="([^"]+)"/g)].map(m=>m[1]);
+assert.deepEqual(displayed.sort(),Object.keys(policy.catalog.classes).sort(),'each class has a visible selector');

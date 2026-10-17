@@ -56,7 +56,7 @@ assert.equal(mapping.radialSpec('brokle',{},{}).distance,0);
 assert.equal(mapping.radialSpec('brokle',{},{brokle:1}).distance,220);
 controls.button(4,true);assert.deepEqual(received.at(-1),['brokle','pointerdown',179]);
 const beforeRelease=received.length;controls.button(4,false);assert.equal(received.length,beforeRelease+1);assert.deepEqual(received.at(-1),['brokle','pointerup',179]);
-const nativeAimed=['dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','intimidation','cracklerStrike','bearCry','toad','celestialSword','iopSword','brokle','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear','arnaque','shovelJudgment','slaughteringShovel','shovelKiss','mound','animatedChest','shovelThrow','corruption'];
+const nativeAimed=['cawotte','dash','immobilizationGlyph','burningGlyph','staffBoomerang','cut','swordOfFate','jump','intimidation','cracklerStrike','bearCry','toad','celestialSword','iopSword','brokle','lethalAttack','massTrap','repulsiveTrap','sramDouble','fear','arnaque','shovelJudgment','slaughteringShovel','shovelKiss','mound','animatedChest','shovelThrow','corruption'];
 const policy=require('../assets/spell-policy.js');
 for(const id of Object.keys(policy.catalog.spells))for(const evolution of [null,1,2,3]){
  assert.equal(mapping.needsAim(id,{[id]:evolution}),nativeAimed.includes(id)&&!policy.catalog.passive.includes(id)&&!(id==='burningGlyph'&&evolution===2),'Native touch contract: '+id+' evolution '+evolution);
