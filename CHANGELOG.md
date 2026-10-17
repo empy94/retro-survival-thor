@@ -1,3 +1,13 @@
+## 1.23.0 — Manette et fenêtres du multijoueur
+
+- Les fenêtres latérales ne détournent plus automatiquement les joysticks et les boutons du combat.
+- La croix directionnelle prend la sélection des améliorations, objets et marchand ; A valide.
+- Un nouveau mouvement de l’un des joysticks rend les boutons aux sorts sans confirmer le choix. Un stick déjà maintenu peut continuer le déplacement pendant la sélection.
+- Sort maintenu annulé lors du passage aux choix ; aucun lancement différé au relâchement. Un emplacement A vide ne clique plus accidentellement une fenêtre latérale.
+- Croix reconnue sous forme de touches ou d’axes HAT, séparément du joystick gauche.
+- Pause et choix du solo conservés ; aide des commandes actualisée en français, anglais et espagnol.
+- Adaptateurs et graphismes mis à jour pour les deux nouveaux modules officiels vérifiés ; catalogue de 65 sorts et 225 objets.
+
 ## 1.22.0 — Révision officielle et sorts automatiques
 
 - Adaptation au nouveau jeu réparti en deux modules ; vérification exacte des deux fichiers avant adaptation.

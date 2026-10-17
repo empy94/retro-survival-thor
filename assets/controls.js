@@ -3,7 +3,7 @@
  // Keep the site's original Android interface and drive its virtual controls.
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
  let px=0,py=0,aimFrame=null,autoPointer=null,manualUntil=0,foreground=true;const touches=new Set(),padHeld=new Set(),padRoutes=new Map();
- let leftX=0,leftY=0;
+ let leftX=0,leftY=0,rightPrevious={x:0,y:0},hatHeld=false;
  let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true,hideCombatCursor:true,combatHelper:true},pointerUsed=false,cursorPhase=null,cursorScope=null;
  function refreshCursor(){
    const cursor=document.querySelector('#thor-cursor');if(!cursor)return;
@@ -111,7 +111,9 @@
    bindings(){return bindings().map(s=>s?{button:s.button,id:s.id,name:s.name,aimed:s.aimed,travel:window.thorSpellBindings.isTravel(s.id)}:null);},
    helperEnabled(){return settings.combatHelper;},
    pad(){pointerUsed=false;refreshCursor();},
-   rightStick(x,y){if(Math.hypot(x,y)>.16)manual();if(!ability?.radial)return false;const length=Math.hypot(x,y);if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
+   rightStick(x,y){const length=Math.hypot(x,y),choices=window.thorMenu?.active()&&window.thorMenu?.combat?.(),moved=length>.16&&(Math.hypot(rightPrevious.x,rightPrevious.y)<=.16||Math.hypot(x-rightPrevious.x,y-rightPrevious.y)>.04);if(length>.16){manual();if(moved)window.thorMenu?.resumeCombat?.();}if(!choices||moved||length<=.16)rightPrevious={x,y};if(choices&&!moved)return true;if(!ability?.radial)return false;if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
+   menuFocus(){manual();finish('pointercancel');for(const route of padRoutes.values()){route.suppressed=true;route.pending=false;}},
+   dpad(x,y){const held=Math.max(Math.abs(x),Math.abs(y))>=.5;if(held||hatHeld)window.thorMenu?.dpad?.(x,y,performance.now());hatHeld=held;},
    cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();window.thorMenu?.clear();},
    configure(value){if(['full','balanced','minimal','no-spells'].includes(value.graphicsQuality))window.thorGraphicsQuality=value.graphicsQuality;window.thorGraphics?.configure(value.graphicsQuality);if(Object.prototype.hasOwnProperty.call(value,'spellShortcuts')&&JSON.stringify(value.spellShortcuts)!==JSON.stringify(settings.spellShortcuts)){finish('pointercancel');padHeld.clear();padRoutes.clear();}const before=settings.autoSpellMode;settings={...settings,...value};if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
@@ -123,7 +125,9 @@
    stick(x,y,digital=false){
      if(Math.hypot(x,y)>.16)pointerUsed=false;
      refreshCursor();
-     if(digital?window.thorMenu?.active():window.thorMenu?.tick(x,y,performance.now())){x=0;y=0;}
+     const menu=window.thorMenu,now=performance.now();
+     if(digital){menu?.dpad?.(x,y,now);x=0;y=0;}
+     else if(menu?.analog?menu.analog(x,y,now):menu?.tick(x,y,now)){x=0;y=0;}
      leftX=x;leftY=y;
      const next=document.querySelector('.touch-joystick-zone');
      if(!next||document.querySelector('main')?.classList.contains('modal-open')){if(zone&&origin)event(zone,'pointerup',177,lastX,lastY);zone=null;origin=null;return;}
@@ -139,13 +143,13 @@
      // spell list must not release a different spell than the one being held.
      if(!down){padHeld.delete(button);const route=padRoutes.get(button);padRoutes.delete(button);if(!route)return true;if(!route.suppressed){if(route.pending)this.button(route.index,true);this.button(route.index,false);}return true;}
      if(padHeld.has(button))return true;
-     if(window.thorMenu?.active()){if(button==='A')return window.thorMenu.activate();return true;}
+     if(window.thorMenu?.active()){padHeld.add(button);padRoutes.set(button,{suppressed:true});if(button==='A')return window.thorMenu.activate()||!!window.thorMenu.combat?.();return true;}
      manual();const slots=bindings(true),modifiers=['L1','R1','L2','R2'];
      padHeld.add(button);
      const chord=['X','Y','A','B'].includes(button)?modifiers.map(m=>padHeld.has(m)?slots.find(s=>s?.button===m+' + '+button):null).find(Boolean):null;
      if(chord){for(const m of modifiers){const route=padRoutes.get(m);if(route&&!route.suppressed){route.suppressed=true;if(ability?.index===route.index)finish('pointercancel');}}padRoutes.set(button,{index:chord.index});this.button(chord.index,true);return true;}
      const spell=slots.find(s=>s?.button===button);
-     if(!spell)return button!=='A';
+     if(!spell)return button!=='A'||!!window.thorMenu?.combat?.();
      const pending=modifiers.includes(button)&&!spell.aimed&&!window.thorSpellBindings.isHeld?.(spell.id);padRoutes.set(button,{index:spell.index,pending});if(!pending)this.button(spell.index,true);return true;
    },
    button(index,down){

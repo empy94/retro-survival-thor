@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
   try{
    String path=SessionNetworkPolicy.staticPath(request.getUrl().toString());
    if(path==null||!("GET".equals(request.getMethod())||"HEAD".equals(request.getMethod())))return deniedLocal();
-   if(path.equals("/_next/static/chunks/discord-identity-v9Gyhq15.js")){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
+   if((path.equals("/_next/static/chunks/discord-identity-v9Gyhq15.js")||path.equals("/_next/static/chunks/discord-identity-CHytj1vJ.js"))){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
    if(path.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(request);return adapted==null?deniedLocal():adapted;}
    byte[] bytes=localCache.getFrozen(path);if(bytes==null){if(!path.equals("/favicon.ico")&&SystemClock.uptimeMillis()-lastCacheWarning>5000){lastCacheWarning=SystemClock.uptimeMillis();runOnUiThread(()->Toast.makeText(this,"Ressource locale absente. Charge cette carte en mode normal, puis relance le mode local.",Toast.LENGTH_LONG).show());}return deniedLocal();}
    if(path.equals("/"))bytes=injectRoot(new String(bytes,StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
@@ -194,12 +194,8 @@ public class MainActivity extends Activity {
      final long request=controlGate.begin();if(request!=0){
      controlPulse.sent(now,controlInput);
      float mx=lx,my=ly;
-     if(hx!=0)mx=hx;if(hy!=0)my=hy;
-     if(held.contains(KeyEvent.KEYCODE_DPAD_LEFT))mx=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_RIGHT))mx=1;
-     if(held.contains(KeyEvent.KEYCODE_DPAD_UP))my=-1;if(held.contains(KeyEvent.KEYCODE_DPAD_DOWN))my=1;
      final float rightX=rx,rightY=ry,elapsed=dt;
-     boolean digital=held.contains(KeyEvent.KEYCODE_DPAD_LEFT)||held.contains(KeyEvent.KEYCODE_DPAD_RIGHT)||held.contains(KeyEvent.KEYCODE_DPAD_UP)||held.contains(KeyEvent.KEYCODE_DPAD_DOWN);
-     web.evaluateJavascript((localSession?companion.get("frame"):"")+"window.thorControls.stick("+mx+","+my+","+digital+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
+     web.evaluateJavascript((localSession?companion.get("frame"):"")+"window.thorControls.stick("+mx+","+my+");window.thorControls.dpad("+hx+","+hy+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
      if(!controlGate.complete(request))return;
      if(!active||!ready)return;
      if(!"true".equals(radial)&&(Math.abs(rightX)>.16f||Math.abs(rightY)>.16f)){
@@ -247,7 +243,7 @@ public class MainActivity extends Activity {
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
        if(localSession)return localResource(r);
-       if(official&&"GET".equals(r.getMethod())&&"/_next/static/chunks/discord-identity-v9Gyhq15.js".equals(route)){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
+       if(official&&"GET".equals(r.getMethod())&&("/_next/static/chunks/discord-identity-v9Gyhq15.js".equals(route)||"/_next/static/chunks/discord-identity-CHytj1vJ.js".equals(route))){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
        if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
 
        if(!r.isForMainFrame())return cacheOnlineResource(r);
@@ -307,8 +303,8 @@ public class MainActivity extends Activity {
     try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Shared module cache unavailable",cacheError);}
    }
    if(source.length()>8000000)return null;
-   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString()))return null;
-   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open("native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
+   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString()))return null;
+   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open(GameModuleVersions.dockedShared(hash.toString())?"native-shared-hook-docked.js":"native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
   }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedShared.getBytes(StandardCharsets.UTF_8)));}catch(Exception error){android.util.Log.w("ThorRetro","Shared game adapter unavailable",error);return null;}
  }
  private synchronized WebResourceResponse adaptModule(WebResourceRequest request){
@@ -317,6 +313,13 @@ public class MainActivity extends Activity {
      if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
      else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>8000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+     if(GameModuleVersions.docked(hash.toString())&&!localSession){
+      String transformed=GameModuleTransforms.docked(source);if(transformed==null)return null;
+      try(InputStream hook=getAssets().open("native-module-hook-docked.js");InputStream performance=getAssets().open("native-performance-hook-docked.js")){
+       adaptedModule=transformed+"\n"+read(hook)+"\n"+read(performance);adaptedUrl=url;
+      }
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
      if(GameModuleVersions.oct17(hash.toString())){
       String transformed=GameModuleTransforms.oct17(source);if(transformed==null)return null;
       try(InputStream hook=getAssets().open("native-module-hook-oct17.js");InputStream performance=getAssets().open("native-performance-hook-oct17.js")){
@@ -405,7 +408,7 @@ public class MainActivity extends Activity {
    if(k==KeyEvent.KEYCODE_BUTTON_THUMBR||k==KeyEvent.KEYCODE_BUTTON_A){
      if(e.getRepeatCount()==0){if(down){held.add(k);if(ready)web.evaluateJavascript(k==KeyEvent.KEYCODE_BUTTON_A?"window.thorControls.controller(\"A\",true)":"window.thorMenu ? window.thorMenu.activate() : false",used->{if(!active||!ready||!getWindow().getDecorView().hasWindowFocus())return;if(!"true".equals(used)){click(true);if(held.contains(k))nativeClickKey=k;else click(false);}});}else{held.remove(k);if(k==KeyEvent.KEYCODE_BUTTON_A&&ready)web.evaluateJavascript("window.thorControls.controller(\"A\",false)",null);if(nativeClickKey==k){click(false);nativeClickKey=-1;}}}return true;
    }
-   if(k>=KeyEvent.KEYCODE_DPAD_UP&&k<=KeyEvent.KEYCODE_DPAD_RIGHT){if(down){held.add(k);if(ready){int x=k==KeyEvent.KEYCODE_DPAD_LEFT?-1:k==KeyEvent.KEYCODE_DPAD_RIGHT?1:0,y=k==KeyEvent.KEYCODE_DPAD_UP?-1:k==KeyEvent.KEYCODE_DPAD_DOWN?1:0;web.evaluateJavascript("window.thorMenu && window.thorMenu."+(e.getRepeatCount()==0?"step":"tick")+"("+x+","+y+",performance.now())",null);}}else held.remove(k);return true;}
+   if(k>=KeyEvent.KEYCODE_DPAD_UP&&k<=KeyEvent.KEYCODE_DPAD_RIGHT){if(down){held.add(k);if(ready){int x=k==KeyEvent.KEYCODE_DPAD_LEFT?-1:k==KeyEvent.KEYCODE_DPAD_RIGHT?1:0,y=k==KeyEvent.KEYCODE_DPAD_UP?-1:k==KeyEvent.KEYCODE_DPAD_DOWN?1:0;web.evaluateJavascript("window.thorMenu && window.thorMenu."+(e.getRepeatCount()==0?"step":"tick")+"("+x+","+y+",performance.now())",null);}}else{held.remove(k);if(ready&&hx==0&&hy==0&&!held.contains(KeyEvent.KEYCODE_DPAD_LEFT)&&!held.contains(KeyEvent.KEYCODE_DPAD_RIGHT)&&!held.contains(KeyEvent.KEYCODE_DPAD_UP)&&!held.contains(KeyEvent.KEYCODE_DPAD_DOWN))web.evaluateJavascript("window.thorMenu?.dpad(0,0,performance.now())",null);}return true;}
    String[] b=binding(k);if(b!=null){if(e.getRepeatCount()==0){if(k==KeyEvent.KEYCODE_BUTTON_L2||k==KeyEvent.KEYCODE_BUTTON_R2)triggerInput(k,down,false);else if(down){if(held.add(k))key(b[0],b[1],true);}else if(held.remove(k))key(b[0],b[1],false);}return true;}
    return super.dispatchKeyEvent(e);
  }
@@ -419,7 +422,7 @@ public class MainActivity extends Activity {
    web.dispatchTouchEvent(event);event.recycle();
  }
  private void help(){reset();new AlertDialog.Builder(this).setTitle(ui("Commandes de jeu et manette"))
-   .setMessage(ui("Stick gauche / croix : déplacement\nStick droit : pointeur\nR3 : clic ; A : valider dans les menus\nL1, R1, L2, R2 : priorité aux sorts à viser\nX, Y, puis A, B : sorts en combat\nCombinaisons : maintenir L1/R1/L2/R2 puis X/Y/A/B\nStart : pause / reprendre ; B : sort attribué\nSelect ou ⚙ APK : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres. Les raccourcis se modifient dans Raccourcis des sorts ou sur la page Sorts du second écran ; ils sont sauvegardés par classe.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Dans les menus et les choix, stick gauche / croix pour sélectionner, R3 ou A pour valider. Le stick droit permet toujours de choisir au pointeur.\n\nVisée radiale : direction du stick gauche par défaut, stick droit pour choisir la direction. Pour les sorts à placer, incliner le stick pour régler la distance. Relâcher la touche du sort pour lancer.\n\nLa portée suit les améliorations du sort. La visée au pointeur reste disponible dans les paramètres ; Téléportation et Bond restent radiaux.\n\nAndroid 9 ou plus : manette USB ou Bluetooth reconnue automatiquement après connexion dans Android. Les repères suivent les noms de boutons Android. Le second écran est utilisé uniquement si Android le détecte comme écran compatible.\n\nLa sauvegarde de cette application est distincte de Chrome."))
+   .setMessage(ui("Stick gauche : déplacement en combat\nCroix : choix, objets et marchand ; A : valider\nStick droit : visée / pointeur\nR3 : clic ; A : valider dans les menus\nL1, R1, L2, R2 : priorité aux sorts à viser\nX, Y, puis A, B : sorts en combat\nCombinaisons : maintenir L1/R1/L2/R2 puis X/Y/A/B\nStart : pause / reprendre ; B : sort attribué\nSelect ou ⚙ APK : paramètres\n\nLe joystick de déplacement apparaît en bas à gauche. Les touches sur les sorts et leur opacité se règlent dans les paramètres. Les raccourcis se modifient dans Raccourcis des sorts ou sur la page Sorts du second écran ; ils sont sauvegardés par classe.\n\nPour les sorts à viser, maintiens le bouton, vise avec le stick droit puis relâche. Fenêtres latérales : la croix prend la sélection en main, A valide. Bouger à nouveau un joystick rend les boutons aux sorts sans valider le choix. Le combat continue avec les fenêtres latérales. Dans les menus bloquants et la pause, stick gauche / croix pour sélectionner, R3 ou A pour valider.\n\nVisée radiale : direction du stick gauche par défaut, stick droit pour choisir la direction. Pour les sorts à placer, incliner le stick pour régler la distance. Relâcher la touche du sort pour lancer.\n\nLa portée suit les améliorations du sort. La visée au pointeur reste disponible dans les paramètres ; Téléportation et Bond restent radiaux.\n\nAndroid 9 ou plus : manette USB ou Bluetooth reconnue automatiquement après connexion dans Android. Les repères suivent les noms de boutons Android. Le second écran est utilisé uniquement si Android le détecte comme écran compatible.\n\nLa sauvegarde de cette application est distincte de Chrome."))
    .setPositiveButton(ui("Jouer"),(d,w)->{if(web!=null)web.requestFocus();immersive();}).setNeutralButton(ui("Ajouter à l’accueil"),(d,w)->pin()).show();}
  private String autoMode(){String mode=getPreferences(0).getString("autoSpellMode",getPreferences(0).getBoolean("autoSpells",false)?"full":"off");return Arrays.asList("off","buffs","full").contains(mode)?mode:"off";}
  private JSONObject spellShortcuts(){try{return new JSONObject(getPreferences(0).getString("spellShortcuts","{}"));}catch(Exception ignored){return new JSONObject();}}

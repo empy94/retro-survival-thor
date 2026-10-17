@@ -9,7 +9,7 @@ const cursor=element();cursor.style.display='block';
 const button={isConnected:true,closest:()=>surface,setPointerCapture(){},getAttribute:k=>k==='aria-label'?id:null,
  getBoundingClientRect:()=>({left:750,top:450,width:50,height:50}),querySelector:()=>({style:{},textContent:'L1'}),
  dispatchEvent:e=>events.push({type:e.type,x:e.clientX,y:e.clientY}),get __reactFiberTest(){return {key:id};}};
-const context={window:{thorSpellBindings:mapping,thorDashboard:{abilities:()=>({awakenings:{}}),playerPosition:()=>player,travelState:()=>({...player,...travel})}},
+const context={performance:{now:()=>0},window:{thorSpellBindings:mapping,thorDashboard:{abilities:()=>({awakenings:{}}),playerPosition:()=>player,travelState:()=>({...player,...travel})}},
  document:{head:{append(){}},body:{append(){}},querySelector:s=>s==='#thor-cursor'?cursor:s==='main'?{className:phase,classList:{contains:c=>phase.includes(c)}}:null,querySelectorAll:()=>[button],createElement:element,
  elementFromPoint:()=>null,addEventListener:(name,callback)=>{if(name==='DOMContentLoaded')domReady=callback;}},
  innerWidth:1000,innerHeight:600,MutationObserver:function(){this.observe=()=>{};},getComputedStyle:()=>({position:'relative'}),

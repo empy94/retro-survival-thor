@@ -80,3 +80,6 @@ const wounded={...base,enemies:[],player:{...base.player,hp:1}};
 assert.deepEqual(choose(wounded,['cawotte']).target,{x:350,y:220});
 assert.equal(buffPlan(wounded,['cawotte']),null);
 assert.equal(plan(wounded,[{...spell('cawotte'),ready:false}],mapping),null);
+
+assert.equal(choose(base,['chaferfu']),null,'single-use summon is retained away from danger');
+assert.equal(choose(danger,['chaferfu']).spell.id,'chaferfu');

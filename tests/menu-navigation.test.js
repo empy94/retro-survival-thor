@@ -36,3 +36,23 @@ const nav=win.thorMenu;dialogs=[loot];nav.step(1,0,0);assert(selected(equip));na
 dialogs=[shop];nav.step(1,0,2);nav.step(1,0,3);assert(selected(shop2));nav.activate();nav.step(-1,0,4);assert(selected(shop1),'offer inspection preserves position');nav.step(1,0,5);assert(selected(shop2));
 dialogs=[shop,confirm];nav.step(1,0,6);assert(selected(equip));dialogs=[shop];nav.tick(0,0,7);assert(selected(shop2),'closing confirmation restores originating shop offer');
 console.log('Loot outer scope, shop inspection position and nested dialog return passed');
+
+// Side panels leave the native simulation running: only the D-pad owns choices.
+let docked=true,hard=false,focusChanges=0;
+const reward1=item('Damage',20),reward2=item('Speed',150),side=panel([reward1,reward2]);
+const liveMain={classList:{contains:k=>k==='phase-playing'||k==='modal-open'&&hard},querySelector:()=>null,querySelectorAll:s=>s==='[role="dialog"]'&&docked?[side]:[]};
+const liveWindow={thorControls:{pad(){},menuFocus(){focusChanges++;}}};
+vm.runInNewContext(fs.readFileSync('assets/menu-navigation.js','utf8'),{window:liveWindow,document:{querySelector:()=>liveMain,addEventListener(){}},innerWidth:500,innerHeight:500,getComputedStyle:()=>({display:'block',visibility:'visible'})});
+const liveNav=liveWindow.thorMenu;
+assert.equal(liveNav.active(),false,'a docked panel cannot steal combat');
+assert.equal(liveNav.analog(1,0,0),false);liveNav.step(0,1,1);assert(liveNav.active());assert(selected(reward1));assert.equal(focusChanges,1);
+assert.equal(liveNav.analog(1,0,2),false,'previously held movement continues');assert(liveNav.active(),'unchanged stick does not reclaim buttons');
+assert(liveNav.activate());liveNav.analog(.5,.8,3);assert(!liveNav.active());assert(!selected(reward1));assert(!liveNav.activate(),'no queued confirmation after switching to combat');
+liveNav.dpad(0,1,4);assert(!liveNav.active(),'a previously held D-pad cannot immediately steal focus again');liveNav.dpad(0,0,5);liveNav.dpad(0,1,6);assert(liveNav.active());assert(selected(reward2),'new direction continues from the remembered selection');
+liveNav.analog(0,0,7);assert(liveNav.active(),'neutral does not switch modes');liveNav.analog(-1,0,8);assert(!liveNav.active());
+hard=true;assert(liveNav.active());assert(liveNav.analog(1,0,9),'real pause/modal remains navigable with a stick');
+hard=false;docked=false;assert(!liveNav.active());liveNav.step(1,0,10);assert(!liveNav.active(),'D-pad never moves character without a choice');
+docked=true;assert(!liveNav.active(),'new docked window starts in combat');
+console.log('Live side panels: D-pad ownership, analog movement, held-input priority, confirmation and real modal fallback passed');
+
+liveNav.analog(1,0,11);liveNav.step(0,1,12);liveNav.analog(.98,.02,13);assert(liveNav.active());liveNav.analog(.96,.04,14);assert(!liveNav.active(),'slow accumulated stick movement also reclaims combat');

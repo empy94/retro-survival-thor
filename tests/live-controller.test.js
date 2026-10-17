@@ -1,0 +1,28 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),mapping=require('../assets/spell-bindings.js');
+const set=()=>{const s=new Set();return{add:x=>s.add(x),remove:x=>s.delete(x),contains:x=>s.has(x)}};
+let now=0,clicks=0,ids=['shield','liberation','stingingClaw'];const events=[];
+const rect=()=>({left:10,top:20,width:80,height:50,right:90,bottom:70});
+const reward={isConnected:true,disabled:false,classList:set(),getAttribute:()=>null,matches:()=>false,closest:()=>null,getBoundingClientRect:rect,scrollIntoView(){},click(){clicks++}};
+const side={isConnected:true,getBoundingClientRect:rect,querySelectorAll:()=>[reward]};
+const main={classList:{contains:k=>k==='phase-playing'},querySelector:()=>null,querySelectorAll:s=>s==='[role="dialog"]'?[side]:[]};
+const zone={style:{},getBoundingClientRect:()=>({left:0,top:0,width:200,height:400,right:200,bottom:400}),dispatchEvent:e=>events.push(['move',e.type])};
+const spells=()=>ids.map(id=>({__reactFiberTest:{key:id},isConnected:true,setPointerCapture(){},getAttribute:()=>null,getBoundingClientRect:rect,querySelector:()=>({style:{}}),dispatchEvent:e=>events.push([id,e.type])}));
+let elements=spells();
+const document={querySelector:s=>s==='main'?main:s==='.touch-joystick-zone'?zone:null,querySelectorAll:()=>elements,addEventListener(){}};
+const window={thorSpellBindings:mapping,thorDashboard:{character:()=> 'feca',abilities:()=>({awakenings:{}})}};
+const context={window,document,innerWidth:800,innerHeight:450,getComputedStyle:()=>({display:'block',visibility:'visible'}),performance:{now:()=>now},PointerEvent:function(type,props){this.type=type;Object.assign(this,props);},cancelAnimationFrame(){}};
+vm.createContext(context);for(const f of ['menu-navigation','controls'])vm.runInContext(fs.readFileSync('assets/'+f+'.js','utf8'),context);
+const c=window.thorControls,n=window.thorMenu,press=b=>{c.controller(b,true);c.controller(b,false)};
+c.configure({spellShortcuts:{feca:{shield:'B',liberation:'A',stingingClaw:'L1'}}});
+press('B');assert.deepEqual(events,[['shield','pointerdown'],['shield','pointerup']]);events.length=0;
+c.stick(1,0);assert(events.some(([id,t])=>id==='move'&&t==='pointermove'));events.length=0;
+n.step(0,1,++now);assert(n.active());c.stick(1,0);assert(n.active(),'unchanged movement allows choice navigation');press('A');assert.equal(clicks,1);assert(!events.some(([id])=>id==='liberation'));
+c.stick(.5,.8);assert(!n.active());press('A');assert(events.some(([id,t])=>id==='liberation'&&t==='pointerdown'));
+events.length=0;c.controller('L1',true);n.step(0,1,++now);c.controller('L1',false);assert.deepEqual(events.filter(([id])=>id==='stingingClaw'),[['stingingClaw','pointerdown'],['stingingClaw','pointercancel']],'a held cast is cancelled rather than released into the choices');
+n.dpad(0,0,++now);c.stick(-1,0);c.dpad(0,1);assert(n.active());c.stick(.8,.5);assert(!n.active());c.dpad(0,1);assert(!n.active(),'held hat does not reclaim focus');c.dpad(0,0);c.dpad(0,1);assert(n.active());
+assert.equal(c.rightStick(1,0),false);assert(!n.active());n.step(0,1,++now);assert.equal(c.rightStick(1,0),true,'old right-stick position cannot clear a new selection through cursor fallback');assert(n.active());assert.equal(c.rightStick(-1,0),false);assert(!n.active());
+reward.disabled=true;n.step(0,1,++now);assert.equal(c.controller('A',true),true,'unavailable choice cannot fall through to a cursor click');c.controller('A',false);reward.disabled=false;c.stick(.5,-.5);
+ids=['shield'];elements=spells();c.configure({spellShortcuts:{}});events.length=0;assert.equal(c.controller('A',true),true,'empty combat slot must not click the side panel');c.controller('A',false);assert.equal(events.length,0);
+console.log('Live controller: combat/choice routing, both sticks, key/hat D-pad, A ownership, channel cancellation and empty-slot click protection passed.');
+
+c.rightStick(1,0);n.step(0,1,++now);assert.equal(c.rightStick(.98,.02),true);assert.equal(c.rightStick(.96,.04),false);assert(!n.active(),'slow right-stick tilt reclaims combat');

@@ -34,7 +34,7 @@ Le mode Buffs ne lit pas les listes de monstres/pièges. Les deux modes utilisen
 
 | Commande | Action |
 |---|---|
-| Stick gauche / croix | Déplacement ; sélection dans les menus |
+| Stick gauche (combat) / croix (choix) | Déplacement ; sélection dans les menus |
 | Stick droit | Visée radiale ou pointeur |
 | A / R3 | Valider dans les menus ; R3 sert aussi de clic au pointeur |
 | L1 / R1 / L2 / R2 | Priorité aux sorts à viser |
@@ -95,3 +95,12 @@ Avec Node.js, `node tests/telemetry.test.js` vérifie le contrat de lecture des 
 `node tests/auto-spells.test.js` vérifie les priorités du mode intelligent, les buffs seuls sans monstre, le respect des effets actifs, les changements de mode et la suspension des lancers.
 
 `node tests/controller-shortcuts.test.js` couvre le septième sort sur A, la validation contextuelle et les combinaisons sans double lancer. `node tests/menu-navigation.test.js` couvre les comparaisons de butin et le retour à une offre de boutique.
+
+
+## Fenêtres latérales en multijoueur — 1.23.0
+
+Le jeu continue pendant les améliorations, objets et achats affichés sur le côté. Ces fenêtres ne détournent plus automatiquement la manette : le joystick déplace le personnage et les boutons lancent les sorts assignés.
+
+Appuie sur la croix pour sélectionner les choix, puis sur A pour confirmer. Bouger à nouveau un joystick retire la sélection et rend les boutons au combat, sans confirmer. La position d’un stick déjà maintenu peut continuer à déplacer le personnage pendant la navigation ; un nouveau mouvement reprend la priorité. La croix ne sert plus à déplacer le personnage.
+
+En solo, les choix continuent de mettre le jeu en pause. Les menus qui bloquent le combat restent navigables avec le stick gauche ou la croix. Start garde sa fonction de pause.

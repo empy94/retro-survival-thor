@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.22.0 :** Compatibilité avec la révision officielle du 17 octobre. L’assistance reconnaît désormais la classe indépendamment de la carte ; portées et aperçus suivent les calculs actuels du jeu. Cawotte est disponible dans les réglages et réservée aux PV bas en assistance complète. Les cinq classes ont leur bouton sur l’écran inférieur. Trois choix dans **Options → Graphismes** ou **⚙ APK** : **Qualité complète**, **Fluidité — objectif 60 FPS** et **Sans animations de sorts**. Ce dernier garde les acteurs, repères au sol et projectiles simplifiés. Les 60 FPS constants ne sont pas garantis dans toutes les scènes.
+**Mise à jour 1.23.0 :** Commandes adaptées aux fenêtres latérales du multijoueur. Le joystick garde le combat actif ; la croix prend la sélection des améliorations, objets ou achats, puis **A** valide. Bouger à nouveau un joystick rend les boutons aux sorts sans valider le choix. En solo, les choix restent en pause comme dans le jeu officiel. Compatibilité avec la nouvelle révision vérifiée, 65 sorts et trois réglages graphiques conservés.
 
 ## Trois façons de jouer
 
@@ -36,12 +36,15 @@ L’alerte ouvre le téléchargement de l’APK officielle ; Android te demande 
 
 ## Une manette, une visée simple
 
-- **Stick gauche / croix** : déplacement et sélection dans les menus.
+- **Stick gauche** : déplacement en combat ; navigation dans les menus bloquants.
+- **Croix directionnelle** : sélectionner les choix, objets et achats ; **A** valide.
 - **Stick droit** : direction et distance de visée ; pointeur si nécessaire.
 - **L1 / R1 / L2 / R2** : maintenir un sort à viser, orienter, relâcher.
 - **X / Y puis A / B** : sorts en combat. **A / R3** : valider dans les menus. **Start** : pause.
 
 **Tes raccourcis, par classe :** choisis une touche ou une combinaison comme **L1 + Y**, sous chaque icône dans **Sorts** ou **⚙ APK → Raccourcis des sorts**. Disponible aussi sur téléphone ; sauvegarde automatique.
+
+**Fenêtres latérales du multijoueur :** elles ne prennent pas automatiquement les boutons du combat. Appuie sur la croix pour sélectionner un choix ; son contour jaune indique la sélection. **A** confirme. Si tu bouges à nouveau un joystick avant de valider, la sélection se retire et **A/B/X/Y/L1/R1/L2/R2** retrouvent leurs sorts assignés. La croix ne déplace plus le personnage. Les vrais menus et la pause gardent leur navigation habituelle.
 
 Le rayon suit le personnage et les améliorations de portée. Le curseur se masque quand il est inutile. Le tactile et les manettes USB/Bluetooth reconnues par Android restent disponibles.
 

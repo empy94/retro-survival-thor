@@ -24,6 +24,7 @@
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
    for(const spell of spells){if(!spell.ready||spell.id==='cawotte')continue;const id=spell.id;
+     if(id==='chaferfu'){if(urgent)add(spell,null,600);continue;}
      if(id==='bearCry'||id==='toad'){const action=allyBuff(s,[spell]);if(action)candidates.push(action);continue;}
      if(id==='animatedChest'&&s.summons?.chest)continue;
      if(id in buffs){const timer=p[buffs[id]]??s.buffs[buffs[id]];
