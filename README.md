@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.23.0 :** Commandes adaptées aux fenêtres latérales du multijoueur. Le joystick garde le combat actif ; la croix prend la sélection des améliorations, objets ou achats, puis **A** valide. Bouger à nouveau un joystick rend les boutons aux sorts sans valider le choix. En solo, les choix restent en pause comme dans le jeu officiel. Compatibilité avec la nouvelle révision vérifiée, 65 sorts et trois réglages graphiques conservés.
+**Mise à jour 1.23.1 :** Correction des déplacements en rafale à la croix directionnelle. Un appui bref avance d’un seul choix ; un maintien répète après 500 ms, puis toutes les 200 ms. Les signaux de touche et d’axe du même appui sont regroupés. La bascule joystick/croix du multijoueur et la pause du solo sont conservées. Compatibilité actualisée avec la révision officielle du 18 octobre.
 
 ## Trois façons de jouer
 

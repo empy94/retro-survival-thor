@@ -3,7 +3,7 @@
  // Keep the site's original Android interface and drive its virtual controls.
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
  let px=0,py=0,aimFrame=null,autoPointer=null,manualUntil=0,foreground=true;const touches=new Set(),padHeld=new Set(),padRoutes=new Map();
- let leftX=0,leftY=0,rightPrevious={x:0,y:0},hatHeld=false;
+ let leftX=0,leftY=0,rightPrevious={x:0,y:0},directionHeld=false,hat={x:0,y:0};const directionKeys=new Set();
  let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true,hideCombatCursor:true,combatHelper:true},pointerUsed=false,cursorPhase=null,cursorScope=null;
  function refreshCursor(){
    const cursor=document.querySelector('#thor-cursor');if(!cursor)return;
@@ -44,6 +44,13 @@
  function event(el,type,id,x,y){el.dispatchEvent(new PointerEvent(type,{pointerId:id,pointerType:'touch',isPrimary:id===177,clientX:x,clientY:y,pageX:x,pageY:y,buttons:type==='pointerup'||type==='pointercancel'?0:1,button:0,bubbles:true,cancelable:true}));}
  function cancelAuto(){const held=autoPointer;autoPointer=null;if(held)event(held.el,'pointercancel',182,held.x,held.y);}
  function manual(){manualUntil=Date.now()+700;cancelAuto();}
+ function updateDpad(){
+   const x=directionKeys.size?Number(directionKeys.has('right'))-Number(directionKeys.has('left')):hat.x;
+   const y=directionKeys.size?Number(directionKeys.has('down'))-Number(directionKeys.has('up')):hat.y;
+   const held=Math.max(Math.abs(x),Math.abs(y))>=.5;
+   if(held||directionHeld)window.thorMenu?.dpad?.(x,y,performance.now());
+   directionHeld=held;
+ }
  function capture(el){if(el.__thorCapture)return;const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179&&id!==182&&id!==183)real(id);};el.__thorCapture=true;}
  function aimPoint(held){
    const player=window.thorDashboard?.playerPosition();if(!player)return null;
@@ -113,8 +120,9 @@
    pad(){pointerUsed=false;refreshCursor();},
    rightStick(x,y){const length=Math.hypot(x,y),choices=window.thorMenu?.active()&&window.thorMenu?.combat?.(),moved=length>.16&&(Math.hypot(rightPrevious.x,rightPrevious.y)<=.16||Math.hypot(x-rightPrevious.x,y-rightPrevious.y)>.04);if(length>.16){manual();if(moved)window.thorMenu?.resumeCombat?.();}if(!choices||moved||length<=.16)rightPrevious={x,y};if(choices&&!moved)return true;if(!ability?.radial)return false;if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
    menuFocus(){manual();finish('pointercancel');for(const route of padRoutes.values()){route.suppressed=true;route.pending=false;}},
-   dpad(x,y){const held=Math.max(Math.abs(x),Math.abs(y))>=.5;if(held||hatHeld)window.thorMenu?.dpad?.(x,y,performance.now());hatHeld=held;},
-   cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();window.thorMenu?.clear();},
+   dpad(x,y){hat={x,y};updateDpad();},
+   dpadKey(direction,down){if(!['up','down','left','right'].includes(direction))return;if(down)directionKeys.add(direction);else directionKeys.delete(direction);updateDpad();},
+   cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();directionKeys.clear();hat={x:0,y:0};updateDpad();window.thorMenu?.clear();},
    configure(value){if(['full','balanced','minimal','no-spells'].includes(value.graphicsQuality))window.thorGraphicsQuality=value.graphicsQuality;window.thorGraphics?.configure(value.graphicsQuality);if(Object.prototype.hasOwnProperty.call(value,'spellShortcuts')&&JSON.stringify(value.spellShortcuts)!==JSON.stringify(settings.spellShortcuts)){finish('pointercancel');padHeld.clear();padRoutes.clear();}const before=settings.autoSpellMode;settings={...settings,...value};if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
    endPreferences(){if(document.querySelector('.pause-panel'))this.pause();},

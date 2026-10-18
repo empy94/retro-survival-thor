@@ -2,6 +2,8 @@ package fr.thor.retrosurvival;
 
 /** Only audited game builds may receive native adapters. */
 final class GameModuleVersions {
+ static boolean oct18(String hash){return "0ece8d95aeb0e97879c45350227ceb83ff10b7788a9802de4a6b208c5c64bcf5".equals(hash);}
+ static boolean oct18Shared(String hash){return "a161ca10ffe43612c1b8015e4b03fca63d6c5425430793b7388a4de3206d1eb4".equals(hash);}
  static boolean docked(String hash){return "707fcdf646b13f086b261af84039a2bf517a1f656352b8a18e13ef19b2b7518b".equals(hash);}
  static boolean dockedShared(String hash){return "147bdcf4f603c279dbd38995aa3a4b137e592d3f2f6cd6d49c82d57db6156f6c".equals(hash);}
  static boolean oct17(String hash){return "1b97b721d070bcbe2f280813318d5b59605a4a0863d13a73db302e49f348c9a3".equals(hash);}

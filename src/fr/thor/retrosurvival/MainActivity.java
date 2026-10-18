@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
   try{
    String path=SessionNetworkPolicy.staticPath(request.getUrl().toString());
    if(path==null||!("GET".equals(request.getMethod())||"HEAD".equals(request.getMethod())))return deniedLocal();
-   if((path.equals("/_next/static/chunks/discord-identity-v9Gyhq15.js")||path.equals("/_next/static/chunks/discord-identity-CHytj1vJ.js"))){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
+   if((path.equals("/_next/static/chunks/discord-identity-v9Gyhq15.js")||path.equals("/_next/static/chunks/discord-identity-CHytj1vJ.js")||path.equals("/_next/static/chunks/discord-identity-fyQiljmH.js"))){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
    if(path.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(request);return adapted==null?deniedLocal():adapted;}
    byte[] bytes=localCache.getFrozen(path);if(bytes==null){if(!path.equals("/favicon.ico")&&SystemClock.uptimeMillis()-lastCacheWarning>5000){lastCacheWarning=SystemClock.uptimeMillis();runOnUiThread(()->Toast.makeText(this,"Ressource locale absente. Charge cette carte en mode normal, puis relance le mode local.",Toast.LENGTH_LONG).show());}return deniedLocal();}
    if(path.equals("/"))bytes=injectRoot(new String(bytes,StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
        if(localSession)return localResource(r);
-       if(official&&"GET".equals(r.getMethod())&&("/_next/static/chunks/discord-identity-v9Gyhq15.js".equals(route)||"/_next/static/chunks/discord-identity-CHytj1vJ.js".equals(route))){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
+       if(official&&"GET".equals(r.getMethod())&&("/_next/static/chunks/discord-identity-v9Gyhq15.js".equals(route)||"/_next/static/chunks/discord-identity-CHytj1vJ.js".equals(route)||"/_next/static/chunks/discord-identity-fyQiljmH.js".equals(route))){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
        if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
 
        if(!r.isForMainFrame())return cacheOnlineResource(r);
@@ -302,9 +302,9 @@ public class MainActivity extends Activity {
     HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}
     try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Shared module cache unavailable",cacheError);}
    }
-   if(source.length()>8000000)return null;
-   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString()))return null;
-   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open(GameModuleVersions.dockedShared(hash.toString())?"native-shared-hook-docked.js":"native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
+   if(source.length()>12000000)return null;
+   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString())&&!GameModuleVersions.oct18Shared(hash.toString()))return null;
+   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open(GameModuleVersions.oct18Shared(hash.toString())?"native-shared-hook-oct18.js":GameModuleVersions.dockedShared(hash.toString())?"native-shared-hook-docked.js":"native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
   }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedShared.getBytes(StandardCharsets.UTF_8)));}catch(Exception error){android.util.Log.w("ThorRetro","Shared game adapter unavailable",error);return null;}
  }
  private synchronized WebResourceResponse adaptModule(WebResourceRequest request){
@@ -313,6 +313,13 @@ public class MainActivity extends Activity {
      if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
      else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>8000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+     if(GameModuleVersions.oct18(hash.toString())&&!localSession){
+      String transformed=GameModuleTransforms.oct18(source);if(transformed==null)return null;
+      try(InputStream hook=getAssets().open("native-module-hook-oct18.js");InputStream performance=getAssets().open("native-performance-hook-oct18.js")){
+       adaptedModule=transformed+"\n"+read(hook)+"\n"+read(performance);adaptedUrl=url;
+      }
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
      if(GameModuleVersions.docked(hash.toString())&&!localSession){
       String transformed=GameModuleTransforms.docked(source);if(transformed==null)return null;
       try(InputStream hook=getAssets().open("native-module-hook-docked.js");InputStream performance=getAssets().open("native-performance-hook-docked.js")){
@@ -408,7 +415,11 @@ public class MainActivity extends Activity {
    if(k==KeyEvent.KEYCODE_BUTTON_THUMBR||k==KeyEvent.KEYCODE_BUTTON_A){
      if(e.getRepeatCount()==0){if(down){held.add(k);if(ready)web.evaluateJavascript(k==KeyEvent.KEYCODE_BUTTON_A?"window.thorControls.controller(\"A\",true)":"window.thorMenu ? window.thorMenu.activate() : false",used->{if(!active||!ready||!getWindow().getDecorView().hasWindowFocus())return;if(!"true".equals(used)){click(true);if(held.contains(k))nativeClickKey=k;else click(false);}});}else{held.remove(k);if(k==KeyEvent.KEYCODE_BUTTON_A&&ready)web.evaluateJavascript("window.thorControls.controller(\"A\",false)",null);if(nativeClickKey==k){click(false);nativeClickKey=-1;}}}return true;
    }
-   if(k>=KeyEvent.KEYCODE_DPAD_UP&&k<=KeyEvent.KEYCODE_DPAD_RIGHT){if(down){held.add(k);if(ready){int x=k==KeyEvent.KEYCODE_DPAD_LEFT?-1:k==KeyEvent.KEYCODE_DPAD_RIGHT?1:0,y=k==KeyEvent.KEYCODE_DPAD_UP?-1:k==KeyEvent.KEYCODE_DPAD_DOWN?1:0;web.evaluateJavascript("window.thorMenu && window.thorMenu."+(e.getRepeatCount()==0?"step":"tick")+"("+x+","+y+",performance.now())",null);}}else{held.remove(k);if(ready&&hx==0&&hy==0&&!held.contains(KeyEvent.KEYCODE_DPAD_LEFT)&&!held.contains(KeyEvent.KEYCODE_DPAD_RIGHT)&&!held.contains(KeyEvent.KEYCODE_DPAD_UP)&&!held.contains(KeyEvent.KEYCODE_DPAD_DOWN))web.evaluateJavascript("window.thorMenu?.dpad(0,0,performance.now())",null);}return true;}
+   if(k>=KeyEvent.KEYCODE_DPAD_UP&&k<=KeyEvent.KEYCODE_DPAD_RIGHT){
+    boolean changed=down?held.add(k):held.remove(k);
+    if(changed&&ready){String direction=k==KeyEvent.KEYCODE_DPAD_LEFT?"left":k==KeyEvent.KEYCODE_DPAD_RIGHT?"right":k==KeyEvent.KEYCODE_DPAD_UP?"up":"down";web.evaluateJavascript("window.thorControls.dpadKey("+quote(direction)+","+down+")",null);}
+    return true;
+   }
    String[] b=binding(k);if(b!=null){if(e.getRepeatCount()==0){if(k==KeyEvent.KEYCODE_BUTTON_L2||k==KeyEvent.KEYCODE_BUTTON_R2)triggerInput(k,down,false);else if(down){if(held.add(k))key(b[0],b[1],true);}else if(held.remove(k))key(b[0],b[1],false);}return true;}
    return super.dispatchKeyEvent(e);
  }

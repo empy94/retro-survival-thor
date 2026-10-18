@@ -13,9 +13,9 @@ assert.equal(measurements,idleMeasurements,'unchanged menu does not remeasure ev
 menu.tick(1,0,10);assert(selected(first));
 assert.equal(padCalls,1,'menu direction explicitly switches away from pointer mode');
 menu.tick(1,0,30);assert(selected(first),'held direction does not immediately repeat');
-menu.tick(1,0,410);assert(selected(second));
-menu.tick(1,0,560);assert(selected(first),'wraps and skips disabled choices');
-menu.tick(0,0,600);menu.tick(-1,0,620);assert(selected(second));
+menu.tick(1,0,510);assert(selected(second));
+menu.tick(1,0,710);assert(selected(first),'wraps and skips disabled choices');
+menu.tick(0,0,720);menu.tick(-1,0,740);assert(selected(second));
 assert.equal(menu.activate(),true);assert.equal(clicked,1);assert(selected(second),'activation keeps the inspected offer selected');menu.step(-1,0,640);assert(selected(first),'next direction continues from the inspected offer');
 phase='phase-playing';assert.equal(menu.tick(1,0,700),false);assert(!selected(second));
 phase='phase-playing modal-open';menu.tick(1,0,800);assert(selected(first));

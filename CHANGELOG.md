@@ -1,3 +1,11 @@
+## 1.23.1 — Croix directionnelle contrôlable
+
+- Correction d’une régression : le joystick au repos réinitialisait à chaque image le délai de répétition de la croix, provoquant des déplacements en rafale.
+- Appui bref : un déplacement. Maintien : premier déplacement répété après 500 ms, puis une répétition toutes les 200 ms.
+- Signaux de touches Android et d’axes HAT réunis en une seule direction ; répétitions de touches dédoublonnées, appuis courts entre deux images conservés.
+- Relâchement et perte de focus réinitialisent les sources de la croix. La priorité combat/choix du multijoueur est conservée.
+- Adaptation aux nouveaux modules officiels du 18 octobre ; catalogues et trois choix graphiques conservés.
+
 ## 1.23.0 — Manette et fenêtres du multijoueur
 
 - Les fenêtres latérales ne détournent plus automatiquement les joysticks et les boutons du combat.

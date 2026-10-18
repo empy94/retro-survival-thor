@@ -35,7 +35,7 @@
    const items=sync();
    root.thorControls?.pad();
    if(direction===lastDirection&&now<nextRepeat)return true;
-   nextRepeat=now+(direction===lastDirection?150:400);lastDirection=direction;
+   nextRepeat=now+(direction===lastDirection?200:500);lastDirection=direction;
    if(!items.length)return true;
    if(!selected){choose(items[0]);return true;}
    let next;
@@ -55,7 +55,7 @@
    return tick(x,y,now);
  }
  root.thorMenu={tick,activate,clear,active:menu,combat:playing,resumeCombat,dpad,
-   analog(x,y,now){const moved=Math.hypot(x,y)>.16&&(Math.hypot(lastAnalog.x,lastAnalog.y)<=.16||Math.hypot(x-lastAnalog.x,y-lastAnalog.y)>.04);if(!choiceFocus||moved||Math.hypot(x,y)<=.16)lastAnalog={x,y};if(playing()){if(moved)resumeCombat();return false;}return tick(x,y,now);},
+   analog(x,y,now){const moved=Math.hypot(x,y)>.16&&(Math.hypot(lastAnalog.x,lastAnalog.y)<=.16||Math.hypot(x-lastAnalog.x,y-lastAnalog.y)>.04);if(!choiceFocus||moved||Math.hypot(x,y)<=.16)lastAnalog={x,y};if(playing()){if(moved)resumeCombat();return false;}if(lastPad)return true;return tick(x,y,now);},
    step(x,y,now){lastDirection='';return dpad(x,y,now,true);}};
  document.addEventListener('DOMContentLoaded',()=>{
    const style=document.createElement('style');style.textContent='.thor-menu-selected{outline:3px solid #ffc348!important;outline-offset:-4px;box-shadow:0 0 0 2px #544e42,0 0 16px #ffc34888!important}';document.head.append(style);
