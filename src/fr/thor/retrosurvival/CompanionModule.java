@@ -18,7 +18,7 @@ final class CompanionModule {
    ProviderInfo provider=manager.resolveContentProvider(authority,0);if(provider==null||!provider.packageName.equals(service.packageName))continue;
    Bundle result=context.getContentResolver().call(Uri.parse("content://"+authority),"load",null,null);
    if(result==null||result.getInt("protocol")!=1||!result.getBoolean("enabled"))continue;
-   for(String key:new String[]{"bootstrap","panelScript","panelStyle","moduleHook","moduleHookOct17","moduleHookCurrent","moduleHookPrevious9","moduleHookPrevious8","moduleHookPrevious7","moduleHookPrevious6","moduleHookPrevious4","moduleHookPrevious5","moduleHookPrevious3","moduleHookPrevious","moduleHookPrevious2","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
+   for(String key:new String[]{"runtimeBootstrap","runtimeHook","runtimeSnapshot","runtimeCommand","runtimeGameHash","bootstrap","panelScript","panelStyle","moduleHook","moduleHookOct17","moduleHookCurrent","moduleHookPrevious9","moduleHookPrevious8","moduleHookPrevious7","moduleHookPrevious6","moduleHookPrevious4","moduleHookPrevious5","moduleHookPrevious3","moduleHookPrevious","moduleHookPrevious2","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
    String manifest=result.getString("resourceManifest","");if(manifest.length()>220000)throw new IllegalArgumentException("Manifest too large");
    String envelope=result.getString("localUpdateEnvelope","");
    if(!envelope.isEmpty())try{
@@ -35,6 +35,8 @@ final class CompanionModule {
  boolean supportsGameModule(String hash){return GameModuleVersions.companionSupports(get("gameModuleSha256"),hash);}
  boolean enabled(){return data.getBoolean("enabled",false);}
  String get(String key){return data.getString(key,"");}
- String snapshot(boolean local,String expression){return enabled()?"(()=>{const data=("+expression+");data.companion="+(local?"("+get("snapshot")+")":"{available:false}")+";if(data.companion)data.companion.localSession="+local+";return data;})()":expression;}
+ String runtimeHook(String hash){return enabled()&&hash.equals(get("runtimeGameHash"))?get("runtimeHook"):"";}
+ String runtimeCommand(String json){return get("runtimeCommand").isEmpty()?"false":"("+get("runtimeCommand")+")("+json+")";}
+ String snapshot(boolean local,String expression){return enabled()?"(()=>{const data=("+expression+");data.companion="+(local?"("+get("snapshot")+")":get("runtimeSnapshot").isEmpty()?"{available:false}":"("+get("runtimeSnapshot")+")")+";if(data.companion)data.companion.localSession="+local+";return data;})()":expression;}
  String command(String json){return "("+get("command")+")("+json+")";}
 }

@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
   try{JSONObject request=new JSONObject(json);String kind=request.optString("kind");
    if("session-online".equals(kind)){if(localSession)leaveLocalSession();return;}
    if("save".equals(kind)||"load".equals(kind))return;
-   if(!localSession){if("session-local".equals(kind))activateLocalSession();return;}
+   if(!localSession){if("session-local".equals(kind))activateLocalSession();else web.evaluateJavascript(companion.runtimeCommand(request.toString()),null);return;}
    if(!"session-local".equals(kind))web.evaluateJavascript(companion.command(request.toString()),null);
   }catch(Exception ignored){}
  }
@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
    prefix="<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'\">"+prefix;
    html=html.replace("https://retrosurvival.online", "https://"+SessionNetworkPolicy.LOCAL_HOST);
   }
-  return html.replace("<head>","<head>"+prefix+"<script>"+bootstrap+(localSession?"\n"+companion.get("bootstrap"):"")+"</script>");
+  return html.replace("<head>","<head>"+prefix+"<script>"+bootstrap+(localSession?"\n"+companion.get("bootstrap"):"\n"+companion.get("runtimeBootstrap"))+"</script>");
  }
  private WebResourceResponse localResource(WebResourceRequest request){
   try{
@@ -322,7 +322,7 @@ public class MainActivity extends Activity {
      if(GameModuleVersions.oct19(hash.toString())){
       String transformed=GameModuleTransforms.oct19(source);if(transformed==null)return null;
       try(InputStream hook=getAssets().open("native-module-hook-oct19.js");InputStream performance=getAssets().open("native-performance-hook-oct19.js")){
-       adaptedModule=transformed+"\n"+(localSession&&companion.supportsLocalGame(hash.toString())?companion.localMainHook():read(hook))+"\n"+read(performance)+(localSession&&companion.supportsLocalGame(hash.toString())?"\n"+companion.localRulesHook():"");adaptedUrl=url;
+       adaptedModule=transformed+"\n"+(localSession&&companion.supportsLocalGame(hash.toString())?companion.localMainHook():read(hook))+"\n"+read(performance)+(localSession&&companion.supportsLocalGame(hash.toString())?"\n"+companion.localRulesHook():!localSession?"\n"+companion.runtimeHook(hash.toString()):"");adaptedUrl=url;
       }
       return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
      }

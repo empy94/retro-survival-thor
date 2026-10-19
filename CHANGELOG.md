@@ -1,3 +1,7 @@
+## 1.24.1
+
+Amélioration de compatibilité des composants signés et des commandes pendant une partie.
+
 ## 1.24.0 — Révision officielle du 19 octobre
 
 - Reconnaissance exacte des nouveaux modules officiels et réactivation des adaptations graphiques : résolution adaptative, cache des animations, cache de carte et option sans animations de sorts.
