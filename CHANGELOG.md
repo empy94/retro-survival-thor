@@ -1,3 +1,9 @@
+## 1.24.2 — Nouvelle révision officielle du 19 octobre
+
+- Reconnaissance exacte des nouveaux modules officiels ; rendu, zones de danger et sorts auto adaptés.
+- Actualisation de la page principale sans réutiliser une ancienne réponse HTML après un déploiement.
+- Vérification du module partagé lors de la préparation des ressources.
+
 ## 1.24.1
 
 Amélioration de compatibilité des composants signés et des commandes pendant une partie.
