@@ -50,6 +50,9 @@
  window.thorHideCosmeticClip=(id,state)=>combat(state)&&quality==='minimal'&&cosmetic.has(id);
  tP=(...args)=>{const api=original(...args),draw=api.renderGame,canvas=args[1],viewport=args[4],paused=args[0].pausedRef;
  api.renderGame=state=>{
+  // Keep the last image while an Android dialog covers the game. Simulation
+  // and multiplayer networking remain entirely owned by the native game.
+  if(!measuring)return;
   const now=performance.now();
   if(measuring&&state.phase==='playing'&&!paused.current&&!(typeof document==='object'&&document.hidden)){
    if(last!==null&&Number.isFinite(now-last)&&now>last){elapsed+=now-last;frames++;}

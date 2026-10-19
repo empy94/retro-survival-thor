@@ -6,7 +6,7 @@ import java.util.List;
 final class WebAccessibilityPolicy {
  static boolean expose(boolean touchExploration,List<String> packages){
   if(touchExploration||packages==null)return true;
-  for(String name:packages)if(!"com.aure.clustertune".equals(name)&&!"com.odin.gameassistant".equals(name)&&!"com.mastercook777.heimdall".equals(name)&&!"com.moonbench.bifrost".equals(name))return true;
+  for(String name:packages)if(!"com.aure.clustertune".equals(name)&&!"com.odin.gameassistant".equals(name)&&!"com.mastercook777.heimdall".equals(name)&&!"com.moonbench.bifrost".equals(name)&&!"com.example.ayn_thor_bottom_screen_power_tool".equals(name))return true;
   return false;
  }
 }

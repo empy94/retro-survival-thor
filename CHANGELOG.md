@@ -1,3 +1,20 @@
+## 1.24.0 — Révision officielle du 19 octobre
+
+- Reconnaissance exacte des nouveaux modules officiels et réactivation des adaptations graphiques : résolution adaptative, cache des animations, cache de carte et option sans animations de sorts.
+- Zones au sol et projectiles de danger conservés dans le mode sans animations.
+- Corbeau : portée native de 650 utilisée à la place d’une référence erronée à la table des recharges ; rayon des ennemis et cible encore valide vérifiés avant lancement.
+- Catalogue actualisé depuis les définitions officielles : 65 sorts et 225 équipements.
+- Un changement de mode des sorts auto conserve les exceptions manuelles lorsqu’aucun nouveau profil n’est fourni.
+- Conservation des corrections de charge d’affichage, des deux écrans et de la navigation à la croix.
+
+## 1.23.2 — Charge d’affichage et fenêtres Android
+
+- Les fenêtres Android qui retirent le focus suspendent le rendu du canevas du jeu ; retour immédiat au rendu lorsque le jeu reprend le focus. La simulation et le réseau restent gérés par le jeu officiel.
+- La fiche du second écran ne reçoit qu’une exécution en cours et conserve uniquement les dernières données en attente. Ses rafraîchissements sont suspendus pendant la perte de focus.
+- Les changements de FPS ou de PV ne reconstruisent plus l’en-tête de niveau/vague ; les textes inchangés de la fiche sont conservés.
+- TrackPadDS rejoint les outils de console qui n’ont pas besoin d’explorer tous les éléments web du jeu. Les lecteurs d’écran, l’exploration tactile et les services inconnus conservent leur accès.
+- Correction ciblée après un ANR réel pendant l’attente du rendu WebView. La disparition durable du problème nécessite encore une validation de longue durée sur appareil.
+
 ## 1.23.1 — Croix directionnelle contrôlable
 
 - Correction d’une régression : le joystick au repos réinitialisait à chaque image le délai de répétition de la croix, provoquant des déplacements en rafale.

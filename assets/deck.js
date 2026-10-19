@@ -48,7 +48,7 @@
   for(const [key,label,min,max] of [['cursorSensitivity','Sensibilité du curseur : ',25,250],['labelOpacity','Opacité des touches : ',15,85]]){const input=document.createElement('input');input.type='range';input.min=min;input.max=max;input.value=controls[key]??(key==='cursorSensitivity'?100:45);const out=card('output',input.value+' %');input.oninput=()=>out.textContent=input.value+' %';input.onchange=()=>saveOption(key,input.value);row(label,input).append(out);}
   el('deck-options').replaceChildren(...rows);
  }
- window.thorDeckUI={page:showPage,render(next){data=next;if(data.character&&!chosenClass)character=data.character;renderSpells();renderOptions();const fps=data.phase==='playing'?data.performance?.observedFps:0;el('deck-save').textContent=text('Sauvegarde auto')+(Number.isFinite(fps)&&fps>0?' · '+Math.round(fps)+' FPS':'');}};
+ window.thorDeckUI={page:showPage,render(next){data=next;if(data.character&&!chosenClass)character=data.character;renderSpells();renderOptions();const fps=data.phase==='playing'?data.performance?.observedFps:0;const label=text('Sauvegarde auto')+(Number.isFinite(fps)&&fps>0?' · '+Math.round(fps)+' FPS':'');if(el('deck-save').textContent!==label)el('deck-save').textContent=label;}};
  document.querySelectorAll('[data-page]').forEach(n=>n.onclick=()=>showPage(Number(n.dataset.page)));
  document.querySelectorAll('[data-class]').forEach(n=>n.onclick=()=>{character=n.dataset.class;chosenClass=true;renderSpells();});
  const sheet=document.querySelector('.sheet');sheet.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.target.closest('input,.deck-choice,.deck-choice-layer'))return;start={id:e.pointerId,x:e.clientX,y:e.clientY};},{passive:true});

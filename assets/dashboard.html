@@ -15,17 +15,19 @@ let previous='',selected=null,statsSignature='',equipmentSignature='',collection
 const text=value=>window.thorLocale?.text(value)||value;
 const el=id=>document.getElementById(id);
 function node(tag,text,className){const n=document.createElement(tag);n.textContent=text;if(className)n.className=className;return n;}
+function setText(id,value){const target=el(id);if(target.textContent!==String(value))target.textContent=value;}
 window.renderThorDashboard=function(data){
  window.thorLocale?.setLanguage(data.locale||'fr',false);document.documentElement.lang=data.locale||'fr';
  window.thorDeckUI?.render(data);
  const serialized=JSON.stringify(data);if(previous===serialized)return;previous=serialized;
- document.querySelectorAll('[data-i18n]').forEach(n=>{n.textContent=text(n.dataset.i18n);});
+ document.querySelectorAll('[data-i18n]').forEach(n=>{const value=text(n.dataset.i18n);if(n.textContent!==value)n.textContent=value;});
  renderCollection(data.collection);
  const running=data.status==='run';el('run').hidden=!running;el('empty-state').hidden=running;
  if(!running){el('phase').textContent='Retro Survival';el('empty-state').replaceChildren(node('strong',data.status==='title'?text('À l’aventure !'):text('Personnage indisponible')),node('div',data.status==='title'?text('Lance une partie sur l’écran du haut. Ton personnage et son équipement apparaîtront ici.'):text('Les informations du jeu ne sont pas disponibles pour le moment.')));selected=null;statsSignature=equipmentSignature='';return;}
- el('phase').replaceChildren(node('div',text('Niv. ')+data.level+text(' · Vague ')+data.wave+(data.phase==='paused'?text(' · Pause'):data.phase==='gameover'?text(' · Partie terminée'):'')));
- el('run').className=data.helper?.lowHealth?'danger':'';el('health-label').textContent=text('Points de vie')+(data.helper?.lowHealth?text(' · Danger'):'');
- el('hp').textContent=data.hp+' / '+data.maxHp;el('hp-current').textContent=data.hp;el('hp-max').textContent=data.maxHp;el('hp-meter').setAttribute('aria-label',text('Points de vie'));el('hp-meter').setAttribute('aria-valuenow',data.hp);el('hp-meter').setAttribute('aria-valuemax',data.maxHp);el('health').style.height=Math.max(0,Math.min(100,data.hp/Math.max(1,data.maxHp)*100))+'%';el('kamas').textContent=Number(data.kamas).toLocaleString(data.locale||'fr');
+ const phaseLabel=text('Niv. ')+data.level+text(' · Vague ')+data.wave+(data.phase==='paused'?text(' · Pause'):data.phase==='gameover'?text(' · Partie terminée'):'');
+ if(el('phase').firstChild?.textContent!==phaseLabel)el('phase').replaceChildren(node('div',phaseLabel));
+ el('run').className=data.helper?.lowHealth?'danger':'';setText('health-label',text('Points de vie')+(data.helper?.lowHealth?text(' · Danger'):''));
+ setText('hp',data.hp+' / '+data.maxHp);setText('hp-current',data.hp);setText('hp-max',data.maxHp);el('hp-meter').setAttribute('aria-label',text('Points de vie'));el('hp-meter').setAttribute('aria-valuenow',data.hp);el('hp-meter').setAttribute('aria-valuemax',data.maxHp);el('health').style.height=Math.max(0,Math.min(100,data.hp/Math.max(1,data.maxHp)*100))+'%';setText('kamas',Number(data.kamas).toLocaleString(data.locale||'fr'));
  const nextStats=JSON.stringify([data.locale,data.stats]);if(nextStats!==statsSignature){statsSignature=nextStats;el('stats').replaceChildren(...data.stats.map(s=>{const row=node('div','','stat');row.append(node('dt',s.name));const value=node('dd',s.value??'—');if(s.gear)row.title=text('Bonus équipement : ')+s.gear;row.append(value);return row;}));}
  const nextEquipment=JSON.stringify([data.locale,data.slots,data.items]);if(nextEquipment!==equipmentSignature){equipmentSignature=nextEquipment;const rows=[];for(const [key,label] of ['hat','cape','amulet','weapon','shield','belt','boots','ring'].map(key=>[key,data.slots[key]])){const items=data.items.filter(i=>i.slot===key);for(const item of items){const row=node('div','','slot'+(item?' item':'')+(item?.radiant?' radiant':''));const icon=node('span',item?'':'◇','icon'+(item?' filled':''));if(item?.icon){const img=document.createElement('img');img.src=item.icon;img.alt='';icon.append(img);}const description=node('div','');description.append(node('small',label),node(item?'b':'span',(item?.name||text('Non équipé'))+(item?.radiant?' ★':''),item?'':'empty'));row.append(icon,description);if(item){row.tabIndex=0;row.setAttribute('role','button');row.onclick=()=>{selected=item.name;showDetail(item)};row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();row.click();}};}rows.push(row);}}
  el('equipment').replaceChildren(...(rows.length?rows:[node('div',text('Non équipé'),'empty')]));}const item=data.items.find(i=>i.name===selected);if(item)showDetail(item);else el('detail').hidden=true;

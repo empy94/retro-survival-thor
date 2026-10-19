@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-class Node {constructor(){this.style={};this.children=[];this.dataset={};this.replacements=0;}append(...n){this.children.push(...n)}replaceChildren(...n){this.children=n;this.replacements++}setAttribute(){}}
+class Node {constructor(){this.style={};this.children=[];this.dataset={};this.replacements=0;}get firstChild(){return this.children[0]}append(...n){this.children.push(...n)}replaceChildren(...n){this.children=n;this.replacements++}setAttribute(){}}
 const ids=new Map(),fixed=['Personnage','♥ Points de vie','Caractéristiques','Équipement'].map(s=>{const n=new Node();n.dataset.i18n=s;return n;});
 let code='fr';const notified=[];
 const document={documentElement:{},querySelector:()=>({lang:code}),querySelectorAll:()=>fixed,getElementById:id=>{if(!ids.has(id))ids.set(id,new Node());return ids.get(id)},createElement:()=>new Node()};
@@ -14,6 +14,7 @@ render({status:'title',locale:'en'});assert.equal(fixed[0].textContent,'Characte
 const data={status:'run',locale:'en',phase:'playing',hp:4,maxHp:5,kamas:100,level:2,wave:1,stats:[{name:'Damage',value:'+15 %'}],slots:{hat:'Hat'},items:[]};
 render(data);assert.equal(fixed[1].textContent,'♥ Health');const statUpdates=ids.get('stats').replacements,equipmentUpdates=ids.get('equipment').replacements;
 render({...data,hp:3});assert.equal(ids.get('hp').textContent,'3 / 5');assert.equal(ids.get('stats').replacements,statUpdates);assert.equal(ids.get('equipment').replacements,equipmentUpdates,'health updates do not rebuild equipment');
+const phaseWrites=ids.get('phase').replacements;render({...data,hp:3,performance:{observedFps:42}});assert.equal(ids.get('phase').replacements,phaseWrites,'FPS-only changes do not rebuild the phase header');
 assert.equal(ids.get('health').style.height,'60%');assert.equal(ids.get('hp-current').textContent,3);assert.equal(ids.get('hp-max').textContent,5);
 render({...data,locale:'es'});assert.equal(fixed[0].textContent,'Personaje');assert.equal(fixed[3].textContent,'Equipo');assert.equal(ids.get('equipment').replacements,equipmentUpdates+1);
 render({status:'title',locale:'fr'});assert.equal(fixed[0].textContent,'Personnage');

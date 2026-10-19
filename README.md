@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.23.1 :** Correction des déplacements en rafale à la croix directionnelle. Un appui bref avance d’un seul choix ; un maintien répète après 500 ms, puis toutes les 200 ms. Les signaux de touche et d’axe du même appui sont regroupés. La bascule joystick/croix du multijoueur et la pause du solo sont conservées. Compatibilité actualisée avec la révision officielle du 18 octobre.
+**Mise à jour 1.24.0 :** Compatibilité actualisée avec le jeu officiel du 19 octobre. Les trois options graphiques, les ressources mobiles et les caches de rendu sont rétablis sur cette révision. Corbeau utilise la vraie portée du jeu pour vérifier ses cibles. Les commandes joystick/croix et les réglages des sorts auto sont conservés.
 
 ## Trois façons de jouer
 
