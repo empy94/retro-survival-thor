@@ -12,7 +12,7 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
-**Mise à jour 1.24.3 :** Compatibilité avec la version officielle du 20 octobre : commandes, fiche du personnage, sorts auto et trois réglages graphiques. Vérification des aperçus de sorts pour les cinq classes et les cinq cartes, de Brokle, du ciblage de Corbeau et du rendu natif. Les versions antérieures reconnues restent prises en charge.
+**Mise à jour 1.25.0 :** Compatibilité avec le Crâ et les Égouts de Brâkmar, sorts auto adaptés, Dofus de la Gardienne dans la collection permanente et marqueurs d’attaque conservés dans les réglages graphiques allégés. Les versions antérieures reconnues restent prises en charge.
 
 **Mise à jour 1.24.2 :** Compatibilité actualisée avec le jeu officiel du 19 octobre. Les trois options graphiques, les ressources mobiles et les caches de rendu sont rétablis sur cette révision. Corbeau utilise la vraie portée du jeu pour vérifier ses cibles. Les commandes joystick/croix et les réglages des sorts auto sont conservés.
 

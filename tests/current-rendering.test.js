@@ -1,0 +1,13 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const state={phase:'playing',width:742,height:432,particles:[],enemies:[],osamodas:{summons:[]},player:{hp:15,maxHp:15},wave:1,level:1,kamas:0};
+const context={window:{thorGameData:{version:'cd3ea78d85b12946c572a5098d452ae134d876cd326d48ce8d42c969748b2ed2',enemyDefs:{guardian:{clips:{cast:'sewerGuardianCast'}}},summonDefs:{}},thorNativeContext:{gameRef:{current:state}}},ro:1.2,XR:()=>({renderGame(){}}),devicePixelRatio:2,performance:{now:()=>0}};
+vm.runInNewContext(fs.readFileSync('assets/native-performance-hook-oct20c.js','utf8'),context);
+context.window.thorGraphics.configure('no-spells');
+const paint={save(){},restore(){},beginPath(){},moveTo(){},lineTo(){},closePath(){},fill(){},stroke(){},arc(){}};
+const marker=id=>context.window.thorRenderSpellMarker(paint,id,100,100,1,1,1,1,{frameWidth:60,frameHeight:30},1.2);
+for(const id of ['fighterCraRun','sewerGuardianCast','sewerGuardianWarning','sewerGuardianTargetZone','ratPoisonMarker'])assert.equal(marker(id),false,'essential actor/telegraph retained: '+id);
+assert(marker('craExplosiveImpact'),'decorative spell impact removed');
+assert(marker('sewerGuardianPoisonProjectile'));assert.equal(paint.strokeStyle,'#ff654c','hostile projectile remains red');
+context.window.thorGraphics.configure('balanced');assert.equal(marker('craExplosiveImpact'),false);
+console.log('Current graphics: Crâ/guardian actors and Brâkmar warnings retained; decorative effects suppressed; hostile projectiles remain red.');

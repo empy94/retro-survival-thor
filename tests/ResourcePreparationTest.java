@@ -17,6 +17,7 @@ public final class ResourcePreparationTest {
   String packed="{\"gzip\":\""+java.util.Base64.getEncoder().encodeToString(bytes.toByteArray())+"\"}";
   if(ResourcePreparation.paths(packed,hash).size()!=1)throw new AssertionError("Packed resource manifest");
   rejects(()->ResourcePreparation.paths("{\"gzip\":\"invalid\"}",hash));
+  if(args.length==2){java.util.List<String> actual=ResourcePreparation.paths(java.nio.file.Files.readString(java.nio.file.Path.of(args[0])),args[1]);if(actual.isEmpty()||actual.stream().noneMatch(p->p.contains("rat-noir")))throw new AssertionError("Current resources missing");System.out.println("Current manifest: "+actual.size()+" validated static resources");}
   System.out.println("Resource preparation: static paths only, exact version, no API/external/traversal/query requests and deduplication passed");
  }
 }

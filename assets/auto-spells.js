@@ -1,7 +1,7 @@
 (function(root){'use strict';
  // Heuristic planner in game coordinates. Original touch handlers remain the
  // sole authority for cooldowns, terrain, damage and valid placements.
- const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration'};
+ const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration',powerfulShot:'powerfulShotTimer',bowMastery:'bowMasteryTimer'};
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
  function allyBuff(s,spells){
   const allies=(s.allies||[]).filter(a=>a.hp>0&&[a.x,a.y].every(Number.isFinite));
@@ -45,7 +45,7 @@
      }
      if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&['enutrof','osamodas'].includes(s.character)&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
-     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow'].includes(id);
+     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow','burningArrow','recoilArrow','lashingArrow'].includes(id);
      const enutrofRadius={shovelJudgment:85,slaughteringShovel:100,shovelKiss:50,mound:195,corruption:100};
      const radius=id in enutrofRadius?enutrofRadius[id]*(1+(Number(s.upgrades.enutrofSpell?.[id]?.radius)||0)*.1)*(id==='mound'&&s.awakenings.mound===1?1.5:1):id==='massTrap'?57.5:id==='celestialSword'?105:id==='lethalAttack'?80:id==='immobilizationGlyph'||id==='burningGlyph'?100:60;
      let best=null,bestScore=0;

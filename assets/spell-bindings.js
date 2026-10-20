@@ -12,7 +12,8 @@
    if(id==='jump')return 270*(1+upgrade('jumpRange')/3);
    return null;
  }
- function needsAim(id,awakenings={}){return aimed.has(id)&&!(id==='burningGlyph'&&awakenings.burningGlyph===2);}
+ const craAimed=new Set(['burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow']);
+ function needsAim(id,awakenings={}){return (aimed.has(id)||craAimed.has(id)||id==='arakne')&&!(id==='burningGlyph'&&awakenings.burningGlyph===2)&&!(id==='explosiveArrow'&&awakenings.explosiveArrow===2);}
  function radialSpec(id,upgrades={},awakenings={}){
    if(!needsAim(id,awakenings))return null;
    const native=root.thorGameAdapter?.radialSpec?.(id);if(native)return native;
