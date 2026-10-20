@@ -319,6 +319,15 @@ public class MainActivity extends Activity {
      if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
      else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>8000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
+     if(!localSession&&!GameModuleVersions.supported(hash.toString())){
+      ModuleCompatibility.Match compatible;
+      try(InputStream profile=getAssets().open("module-contract-oct20.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      if(compatible==null)return null;
+      String transformed=GameModuleTransforms.oct20(source);if(transformed==null)return null;
+      transformed=transformed.replace("m??a.current[e],mp,u))", "m??a.current[e],"+compatible.symbol("mp")+",u))");
+      adaptedModule=transformed+"\n"+compatible.hook()+"\n;window.thorModuleCompatibility={mode:'compatible',sourceVersion:'"+hash+"',family:'"+compatible.family+"'};\n"+companion.compatibleRuntimeHook(source,compatible);adaptedUrl=url;
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
      if(GameModuleVersions.oct20(hash.toString())){
       String transformed=GameModuleTransforms.oct20(source);if(transformed==null)return null;
       try(InputStream hook=getAssets().open("native-module-hook-oct20.js");InputStream performance=getAssets().open("native-performance-hook-oct20.js")){

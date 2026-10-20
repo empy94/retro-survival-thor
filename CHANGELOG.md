@@ -1,3 +1,10 @@
+## 1.24.4 — Compatibilité des petites mises à jour
+
+- Reconnaissance des fonctions utilisées même lorsque leurs noms internes changent.
+- Une modification sans rapport avec ces fonctions ne désactive plus systématiquement les adaptations.
+- Vérification uniquement au chargement ; aucun traitement ajouté à chaque image.
+- Maintien des vérifications des ressources partagées et des points de transformation du rendu.
+
 ## 1.24.2 â€” Nouvelle rÃ©vision officielle du 19 octobre
 
 - Reconnaissance exacte des nouveaux modules officiels ; rendu, zones de danger et sorts auto adaptÃ©s.

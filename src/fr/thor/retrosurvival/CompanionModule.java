@@ -20,6 +20,7 @@ final class CompanionModule {
    if(result==null||result.getInt("protocol")!=1||!result.getBoolean("enabled"))continue;
    for(String key:new String[]{"runtimeBootstrap","runtimeHook","runtimeSnapshot","runtimeCommand","runtimeGameHash","bootstrap","panelScript","panelStyle","moduleHook","moduleHookOct17","moduleHookCurrent","moduleHookPrevious9","moduleHookPrevious8","moduleHookPrevious7","moduleHookPrevious6","moduleHookPrevious4","moduleHookPrevious5","moduleHookPrevious3","moduleHookPrevious","moduleHookPrevious2","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
    String manifest=result.getString("resourceManifest","");if(manifest.length()>220000)throw new IllegalArgumentException("Manifest too large");
+   if(result.getString("runtimeContract","").length()>220000)throw new IllegalArgumentException("Contract too large");
    String envelope=result.getString("localUpdateEnvelope","");
    if(!envelope.isEmpty())try{
     String key;try(java.io.InputStream in=context.getAssets().open("local-update-public-key.txt")){key=LocalUpdate.read(in);}
@@ -36,6 +37,13 @@ final class CompanionModule {
  boolean enabled(){return data.getBoolean("enabled",false);}
  String get(String key){return data.getString(key,"");}
  String runtimeHook(String hash){return enabled()&&hash.equals(get("runtimeGameHash"))?get("runtimeHook"):"";}
+ String compatibleRuntimeHook(String source,ModuleCompatibility.Match host){
+  if(!enabled()||!host.family.equals(get("runtimeGameHash")))return "";
+  ModuleCompatibility.Match module=ModuleCompatibility.resolve(source,get("runtimeContract"));
+  if(module==null||!host.family.equals(module.family))return "";
+  for(java.util.Map.Entry<String,String> binding:module.names.entrySet())if(!binding.getKey().startsWith("@")&&host.names.containsKey(binding.getKey())&&!host.names.get(binding.getKey()).equals(binding.getValue()))return "";
+  return module.hook();
+ }
  String runtimeCommand(String json){return get("runtimeCommand").isEmpty()?"false":"("+get("runtimeCommand")+")("+json+")";}
  String snapshot(boolean local,String expression){return enabled()?"(()=>{const data=("+expression+");data.companion="+(local?"("+get("snapshot")+")":get("runtimeSnapshot").isEmpty()?"{available:false}":"("+get("runtimeSnapshot")+")")+";if(data.companion)data.companion.localSession="+local+";return data;})()":expression;}
  String command(String json){return "("+get("command")+")("+json+")";}
