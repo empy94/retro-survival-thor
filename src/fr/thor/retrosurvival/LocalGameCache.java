@@ -49,12 +49,12 @@ final class LocalGameCache {
   if(!module.find()){if(marker.isFile())return;throw new IOException("No module");}byte[] bytes=get(module.group());if(bytes==null){if(marker.isFile())return;throw new IOException("No module data");}
   StringBuilder hash=new StringBuilder();for(byte b:MessageDigest.getInstance("SHA-256").digest(bytes))hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
   if(!GameModuleVersions.supported(hash.toString())){if(marker.isFile())return;throw new IOException("Unknown game module");}
-  if(GameModuleVersions.oct17(hash.toString())||GameModuleVersions.oct19(hash.toString())||GameModuleVersions.oct19b(hash.toString())){
+  if(GameModuleVersions.oct17(hash.toString())||GameModuleVersions.oct19(hash.toString())||GameModuleVersions.oct19b(hash.toString())||GameModuleVersions.oct20(hash.toString())){
    boolean recent=GameModuleVersions.oct19(hash.toString());
-   boolean latest=GameModuleVersions.oct19b(hash.toString());
-   byte[] shared=get(latest?"/_next/static/chunks/discord-identity-CVs6hEgK.js":recent?"/_next/static/chunks/discord-identity-Df3soPjP.js":"/_next/static/chunks/discord-identity-v9Gyhq15.js");if(shared==null)throw new IOException("Shared game module not cached");
+   boolean latest=GameModuleVersions.oct19b(hash.toString());boolean current=GameModuleVersions.oct20(hash.toString());
+   byte[] shared=get(current?"/_next/static/chunks/discord-identity-mqIdrlji.js":latest?"/_next/static/chunks/discord-identity-CVs6hEgK.js":recent?"/_next/static/chunks/discord-identity-Df3soPjP.js":"/_next/static/chunks/discord-identity-v9Gyhq15.js");if(shared==null)throw new IOException("Shared game module not cached");
    StringBuilder sharedHash=new StringBuilder();for(byte b:MessageDigest.getInstance("SHA-256").digest(shared))sharedHash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
-   if(!(latest?GameModuleVersions.oct19bShared(sharedHash.toString()):recent?GameModuleVersions.oct19Shared(sharedHash.toString()):GameModuleVersions.oct17Shared(sharedHash.toString())))throw new IOException("Shared game module mismatch");
+   if(!(current?GameModuleVersions.oct20Shared(sharedHash.toString()):latest?GameModuleVersions.oct19bShared(sharedHash.toString()):recent?GameModuleVersions.oct19Shared(sharedHash.toString()):GameModuleVersions.oct17Shared(sharedHash.toString())))throw new IOException("Shared game module mismatch");
   }
   if(marker.isFile()&&hash.toString().equals(new String(java.nio.file.Files.readAllBytes(marker.toPath()),StandardCharsets.UTF_8)))return;
   // Refresh complete resources without changing the local storage origin or its save.
