@@ -3,6 +3,15 @@ import java.util.Arrays;
 
 /** Raster and UI work only; caller first verifies the complete official module hash. */
 final class GameModuleTransforms {
+ static String oct22(String source){String transformed=oct21(source);return transformed==null?null:hud(transformed.replace("m??a.current[e],Et,u))","m??a.current[e],kn,u))"));}
+ static String hud(String source){String anchor="de=e=>{M({pet:e.pet?";if(source.indexOf(anchor)<0||source.indexOf(anchor)!=source.lastIndexOf(anchor))return source;return source.replace(anchor,"de=e=>{if(window.thorHudDue?.(e)===false)return;M({pet:e.pet?");}
+ static String oct21(String source){
+  String[] before={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);c.width=", "let c=e.localeRef?.current??`fr`,l=Math.min(devicePixelRatio,2);", "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:o.particles)", "n.drawImage(r,0,0,t.width,t.height)"};
+  String[] after={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,window.thorRenderScale??2);c.width=", "let c=e.localeRef?.current??`fr`,l=Math.min(devicePixelRatio,window.thorRenderScale??2);", "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{if(window.thorRenderSpellMarker?.(n,e,t,r,s,c,d,f,m??a.current[e],Et,u))return;let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:(window.thorVisualParticles?.(o)??o.particles))", "(window.thorDrawMap?.(n,r,t.width,t.height)||n.drawImage(r,0,0,t.width,t.height))"};
+  for(String anchor:before)if(source.indexOf(anchor)<0||source.indexOf(anchor)!=source.lastIndexOf(anchor))return null;
+  for(int i=0;i<before.length;i++)source=source.replace(before[i],after[i]);
+  return source.replaceAll("n\\.shadowBlur=([0-9]+(?:\\.[0-9]+)?)","n.shadowBlur=(window.thorDecorativeBlur?.($1)??$1)");
+ }
  static String oct20c(String source){
   String[] before={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);l.width=", "let c=e.localeRef?.current??`fr`,l=Math.min(devicePixelRatio,2);", "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:o.particles)", "n.drawImage(r,0,0,t.width,t.height)"};
   String[] after={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,window.thorRenderScale??2);l.width=", "let c=e.localeRef?.current??`fr`,l=Math.min(devicePixelRatio,window.thorRenderScale??2);", "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{if(window.thorRenderSpellMarker?.(n,e,t,r,s,c,d,f,m??a.current[e],ro,u))return;let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:(window.thorVisualParticles?.(o)??o.particles))", "(window.thorDrawMap?.(n,r,t.width,t.height)||n.drawImage(r,0,0,t.width,t.height))"};

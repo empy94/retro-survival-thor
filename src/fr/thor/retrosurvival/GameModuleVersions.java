@@ -2,6 +2,16 @@ package fr.thor.retrosurvival;
 
 /** Only audited game builds may receive native adapters. */
 final class GameModuleVersions {
+ static boolean oct24(String hash){return "05a3de5ec6d741ca5ba39c034cde29876c10f83cf817ef01136309cf4c27ac46".equals(hash);}
+ static boolean sharedPath(String path){return path!=null&&path.matches("/_next/static/chunks/discord-identity-[A-Za-z0-9_-]+\\.js");}
+ static boolean oct22(String hash){return "fc2c0e3e3bc60df5ae464ce53a88d798f4da8fb5975d56df9c97f4ec934671f0".equals(hash);}
+ static boolean oct22Shared(String hash){return "1dd7f9facf3a3a87da6c1b3e71c5d20e5d0b9095bfecc321144b2db154a72f98".equals(hash);}
+ static boolean oct21c(String hash){return "3fa14e69936de4f7d17314731b869240a406688f8ba5be7c61ea2fb98c4b23da".equals(hash);}
+ static boolean oct21cShared(String hash){return "8b4385222d15257b1ac6256ee5c03cf1780d0f58d1c964aa0b95cab2006e48a5".equals(hash);}
+ static boolean oct21b(String hash){return "0332b462a33fc0cb692b532e209b269826d5294bfd30a0d6a63fff45edd296d3".equals(hash);}
+ static boolean oct21bShared(String hash){return "d8d1203c56505d5e535831a6fcea928046f4f59e08dc305c5de00b06d949623b".equals(hash);}
+ static boolean oct21(String hash){return "257fef2cedf1d5f0f065a026da1dad8a729fe38b9fe7965a80bda2ffed85c66b".equals(hash);}
+ static boolean oct21Shared(String hash){return "5bcd46ed7a03fa4e2252ded4083159b10306c4c75de6d77990c47252d720ac8d".equals(hash);}
  static boolean oct20c(String hash){return "03e4768020c7b58114b82b628526f4313739e3eb3f29219748de338ad203ae4c".equals(hash);}
  static boolean oct20cShared(String hash){return "cd3ea78d85b12946c572a5098d452ae134d876cd326d48ce8d42c969748b2ed2".equals(hash);}
  static boolean oct20(String hash){return "511ac6afd270438a8011f12e228269868dbb8ae176a8ae9c1a9a7032a94f27c1".equals(hash);}
@@ -30,7 +40,7 @@ final class GameModuleVersions {
  static boolean previous2(String hash){return "a14150ba87429dbc69ff354a7de00274f356148304deb74d54d6760e780a63e7".equals(hash);}
  static boolean previous(String hash){return "fbe576762c5685fcd399a879391b29a8b5b62106fac1664ab16bacc2246fe677".equals(hash);}
  static boolean supported(String hash){
-  return oct20c(hash)||oct20(hash)||oct19b(hash)||oct19(hash)||oct17(hash)||live(hash)||newest(hash)||latest(hash)||current(hash)||previous9(hash)||previous8(hash)||previous7(hash)||previous6(hash)||previous5(hash)||previous4(hash)||previous3(hash)||previous2(hash)||previous(hash)||"67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2".equals(hash)
+  return oct24(hash)||oct22(hash)||oct21c(hash)||oct21b(hash)||oct21(hash)||oct20c(hash)||oct20(hash)||oct19b(hash)||oct19(hash)||oct17(hash)||live(hash)||newest(hash)||latest(hash)||current(hash)||previous9(hash)||previous8(hash)||previous7(hash)||previous6(hash)||previous5(hash)||previous4(hash)||previous3(hash)||previous2(hash)||previous(hash)||"67677958563db3126df72cb8c8dda684d3bff8256de0e4e15ca7adede66870e2".equals(hash)
     || "5a385b4cf6390e0b0713dab4effab3c322d177a148776472743fd38546a4d6a6".equals(hash)
     || "4a9870e8c536ce968ed85b7074d133cd3e3ba40a3b145e86ad5857470cd229ca".equals(hash);
  }

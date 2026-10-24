@@ -1,0 +1,11 @@
+'use strict';
+const assert=require('node:assert/strict'),{plan,predict}=require('../assets/auto-spells.js'),mapping=require('../assets/spell-bindings.js');
+const s={phase:'playing',busy:false,width:1500,height:875,player:{x:500,y:400,hp:10,maxHp:10},buffs:{},upgrades:{},awakenings:{},castTimes:{shovelThrow:.25,shovelJudgment:.2,burningGlyph:.4},enemies:[{x:700,y:400,r:15,hp:5,vx:0,vy:100}]};
+const shot=(id,state=s)=>plan(state,[{id,ready:true,aimed:true}],mapping);
+assert(shot('shovelThrow').target.y>430,'lateral moving target: shovel leads');assert(shot('shovelJudgment').target.y>=480,'delayed judgment leads');assert(shot('burningGlyph').target.y>440,'other classes use their actual cast delay');
+assert.equal(shot('shovelThrow',{...s,enemies:[{...s.enemies[0],vx:0,vy:0}]}).target.y,400,'stationary has no artificial lead');
+const towards=shot('shovelThrow',{...s,enemies:[{...s.enemies[0],vx:-100,vy:0}]});assert(towards.target.x<700,'towards player');
+const away=shot('shovelThrow',{...s,enemies:[{...s.enemies[0],vx:100,vy:0}]});assert(away.target.x>700,'away from player');
+const q=predict({x:1490,y:860,vx:500,vy:500},s.player,5,1500,875);assert(q.x<=1500&&q.y<=875);assert(Math.hypot(q.x-1490,q.y-860)<=100);
+const frozen=JSON.stringify(s);shot('shovelThrow');assert.equal(JSON.stringify(s),frozen,'prediction does not mutate the game');
+console.log('Predictive aim: lateral, approaching, departing, stationary, class cast delays, arena and 100-unit lead limit passed.');

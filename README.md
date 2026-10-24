@@ -1,5 +1,30 @@
 # Retro Survival — Android & manettes
 
+## 1.25.9
+
+Compatibilité actualisée avec le jeu officiel et correction du chargement des ressources. Amélioration des transitions de sauvegarde avec copie de secours.
+
+## 1.25.5
+
+Compatibilité avec le dernier correctif officiel du 21 octobre : adaptation du chargement, du ciblage et des réglages graphiques aux nouveaux fichiers du jeu. Données conservées.
+
+## 1.25.4
+
+Compatibilité avec la version officielle du 21 octobre. Visée automatique : anticipation bornée du mouvement, délais natifs d'incantation et règles actuelles de vulnérabilité. Les réglages graphiques existants restent disponibles.
+
+## 1.25.3
+
+Les sorts automatiques ignorent désormais Oto Mustam, qui est invulnérable. Les fenêtres de vulnérabilité des Boos restent respectées.
+
+## 1.25.2
+
+Correction du ciblage automatique des Boos pendant leurs phases invulnérables. Cela évite que Flèche Glacée entretienne une bulle qui les bloque sous forme de flaque. Les attaques reprennent lorsqu'ils deviennent vulnérables ; les autres ennemis restent ciblés normalement.
+
+## 1.25.1
+
+Correction du ciblage des sorts automatiques : les apparitions invulnérables du Rat Noir dans les salles de transition ne sont plus prises pour cibles. Le Rat Noir de la salle du boss reste ciblable.
+
+
 **Au tactile ou à la manette. À toi de choisir ton aide.**
 
 Joue à [Retro Survival](https://retrosurvival.online/) sur téléphone, tablette ou console Android, dont l’**AYN Thor**.

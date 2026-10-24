@@ -17,8 +17,8 @@ public final class LocalUpdate {
   version=payload.getString("version");gameHash=payload.getString("gameModuleSha256");
   if(!version.matches("[0-9]{1,5}\\.[0-9]{1,5}\\.[0-9]{1,5}")||!gameHash.matches("[a-f0-9]{64}"))throw new IOException("Version ou compatibilité invalide.");
   scripts=payload.getJSONObject("scripts");int total=0;
-  for(String key:SCRIPTS){String script=scripts.getString(key);total+=script.length();if(script.trim().isEmpty()||script.length()>60000)throw new IOException("Contenu de mise à jour invalide.");}
-  if(total>110000)throw new IOException("Mise à jour trop volumineuse.");
+  for(String key:SCRIPTS){String script=scripts.getString(key);total+=script.length();if(script.trim().isEmpty()||script.length()>80000)throw new IOException("Contenu de mise à jour invalide.");}
+  if(total>160000)throw new IOException("Mise à jour trop volumineuse.");
  }
  public String script(String key){return scripts.optString(key,"");}
  public static String read(InputStream input)throws IOException{

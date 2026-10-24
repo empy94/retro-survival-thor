@@ -3,6 +3,14 @@
  const labels={'damage':'Dommages','spell-damage':'Dommages des sorts','basic-damage':'Dommages attaque','basic-speed':'Vitesse d’attaque','critical':'Critique','critical-damage':'Dégâts critiques','move-speed':'Vitesse','evasion':'Esquive','cooldown':'Vitesse récup.','effect-duration':'Durée des effets','spell-size':'Taille des sorts','experience-gain':'XP reçue','prospection':'Prospection'};
  const slots={hat:'Coiffe',cape:'Cape',amulet:'Amulette',weapon:'Arme',shield:'Bouclier',belt:'Ceinture',boots:'Bottes',ring:'Anneaux',dofus:'Dofus'};
  let liveRef=null,liveCanvas=null,abilityCache=null,abilityAt=0;
+ const motion=new WeakMap();
+ function enemyMotion(s,e){
+  const time=Number(s.time),key=[s.levelId,s.width,s.height,s.ratNoir?.mapId,s.dragoeufRoute?.mapId].join(':');
+  const old=motion.get(e),dt=time-(old?.time??time);let vx=0,vy=0;
+  if(old?.state===s&&old.key===key&&dt===0)return {...old.value};
+  if(old?.state===s&&old.key===key&&dt>=.025&&dt<=.4){vx=(e.x-old.x)/dt;vy=(e.y-old.y)/dt;if(Math.hypot(vx,vy)>650)vx=vy=0;}
+  const value={vx,vy};motion.set(e,{state:s,key,time,x:e.x,y:e.y,value});return value;
+ }
  const text=value=>window.thorLocale?.text(value)||value;
  function cardItem(card){
    const fiber=card[Object.keys(card).find(k=>k.startsWith('__reactFiber'))];
@@ -41,7 +49,7 @@
      allies:(s.osamodas?.summons||[]).filter(a=>a.hp>0).slice(0,64).map(a=>copy(a,['x','y','hp','maxHp','toadTimer','bearCryTimer'])),
      double:s.sram?.double?.hp>0&&s.sram.double.life>0?copy(s.sram.double,['x','y','swapCooldown']):null,
      traps:includeTargets?(s.sram?.traps||[]).filter(t=>t.life>0).slice(0,72).map(t=>copy(t,['x','y'])):[],
-     enemies:includeTargets?(s.enemies||[]).filter(e=>e.hp>0&&e.state!=='dead'&&!(e.invisibleTimer>0)&&!(e.arrival>0)).slice(0,128).map(e=>copy(e,['x','y','r','hp'])):[]};
+     enemies:includeTargets?(s.enemies||[]).filter(e=>e.hp>0&&e.state!=='dead'&&e.kind!=='oto-mustam'&&!e.ratRaid&&!(e.invisibleTimer>0)&&!(e.arrival>0)&&(window.thorGameData?.canTargetEnemy?window.thorGameData.canTargetEnemy(e):!(e.kind==='boo'&&(!e.boo||e.boo.phase==='puddle'||e.boo.phase==='emerge'&&e.boo.age<.06||e.boo.phase==='attack'&&e.boo.age>=1.74)))).slice(0,128).map(e=>({...copy(e,['x','y','r','hp']),kind:e.kind,...enemyMotion(s,e)})):[]};
  },
  travelState(){
    const position=this.playerPosition();if(!position)return null;

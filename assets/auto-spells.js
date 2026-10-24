@@ -10,12 +10,23 @@
    const target=allies.find(a=>!(a[timer]>0));if(target)return {spell,target:{x:target.x,y:target.y},score:250};
   }return null;
  }
+ // Prediction is bounded: sampled velocities never change native enemy state.
+ function predict(enemy,player,seconds,width,height){
+  const vx=Number(enemy.vx)||0,vy=Number(enemy.vy)||0,speed=Math.hypot(vx,vy);
+  const dt=Math.max(0,Math.min(.9,Number(seconds)||0)),scale=speed>0?Math.min(dt,100/speed):0;
+  return {...enemy,x:Math.max(0,Math.min(width,enemy.x+vx*scale)),y:Math.max(0,Math.min(height,enemy.y+vy*scale))};
+ }
+ function delay(id,d,cast){
+  // Official Enutrof timings; other spells use the audited native cast delay.
+  const flight=id==='shovelThrow'?d/800:id==='shovelJudgment'?.9:id==='mound'?Math.max(.2,Math.min(.55,d/900)):0;
+  return Math.max(0,Math.min(.9,(Number(cast)||0)+flight+.08));
+ }
  function plan(s,spells,mapping,mode='full'){
    if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
    if(mode==='full'&&s.player.hp/s.player.maxHp<=.35){const heal=spells.find(spell=>spell.id==='cawotte'&&spell.ready);if(heal)return {spell:heal,target:{x:s.player.x,y:s.player.y},score:1200};}
    if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:allyBuff(s,spells);}
    if(mode!=='full'||!s.enemies.length)return null;
-   const p=s.player,enemies=s.enemies.filter(e=>[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
+   const p=s.player,enemies=s.enemies.filter(e=>e.kind!=='oto-mustam'&&!e.ratRaid&&[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
    const distances=enemies.map(e=>distance(e,p));
    const nearest=Math.min(...enemies.map((e,i)=>distances[i]-e.r)),urgent=nearest<65;
    // Reuse the same native distances and stable target order across spells.
@@ -46,15 +57,17 @@
      if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&['enutrof','osamodas'].includes(s.character)&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
      const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow','burningArrow','recoilArrow','lashingArrow'].includes(id);
-     const enutrofRadius={shovelJudgment:85,slaughteringShovel:100,shovelKiss:50,mound:195,corruption:100};
+     const enutrofRadius={shovelJudgment:85,slaughteringShovel:125,shovelKiss:50,mound:195,corruption:100};
      const radius=id in enutrofRadius?enutrofRadius[id]*(1+(Number(s.upgrades.enutrofSpell?.[id]?.radius)||0)*.1)*(id==='mound'&&s.awakenings.mound===1?1.5:1):id==='massTrap'?57.5:id==='celestialSword'?105:id==='lethalAttack'?80:id==='immobilizationGlyph'||id==='burningGlyph'?100:60;
      let best=null,bestScore=0;
      // Limit quadratic cluster work: 24 nearest candidate centers, up to 128
      // monsters. No canvas/image analysis, networking, or React tree traversal.
      const targets=ordered.filter(t=>t.distance<=range+t.enemy.r).slice(0,24);
-     for(const {enemy:target,distance:d} of targets){const ratio=Math.min(1,range/Math.max(1,d));const q={x:p.x+(target.x-p.x)*ratio,y:p.y+(target.y-p.y)*ratio};
+     const cast=s.castTimes?.[id]??root?.thorGameAdapter?.aimTiming?.(id)??0;
+     const predicted=enemies.map(e=>predict(e,p,delay(id,distance(e,p),cast),s.width,s.height));
+     for(const {enemy:current} of targets){const target=predict(current,p,delay(id,distance(current,p),cast),s.width,s.height),d=distance(target,p);const ratio=Math.min(1,range/Math.max(1,d));const q={x:p.x+(target.x-p.x)*ratio,y:p.y+(target.y-p.y)*ratio};
        let score=0;const length=distance(q,p)||1,vx=(q.x-p.x)/length,vy=(q.y-p.y)/length;
-       for(let i=0;i<enemies.length;i++){const enemy=enemies[i];let hit;
+       for(let i=0;i<enemies.length;i++){const enemy=predicted[i];let hit;
          if(directional){const ex=enemy.x-p.x,ey=enemy.y-p.y,along=ex*vx+ey*vy;hit=along>=0&&along<=range+enemy.r&&Math.abs(ex*vy-ey*vx)<=35+enemy.r;}
          else{const reach=radius+enemy.r;hit=Math.abs(enemy.x-q.x)<=reach&&Math.abs(enemy.y-q.y)<=reach&&distance(enemy,q)<=reach;}
          if(hit)score+=100+(distances[i]<85?25:0);}
@@ -66,7 +79,7 @@
    }
    candidates.sort((a,b)=>b.score-a.score);return candidates[0]||null;
  }
- const api={plan};if(typeof module==='object')module.exports=api;
+ const api={plan,predict,delay};if(typeof module==='object')module.exports=api;
  if(!root?.document)return;
  let manual={},enabled=false,mode='off',timer=null,lastAttempt=new Map(),casts=0,lastSpell=null,lastMs=0,badge=null;
  function tick(){

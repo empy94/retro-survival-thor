@@ -18,6 +18,7 @@ final class CompanionModule {
    ProviderInfo provider=manager.resolveContentProvider(authority,0);if(provider==null||!provider.packageName.equals(service.packageName))continue;
    Bundle result=context.getContentResolver().call(Uri.parse("content://"+authority),"load",null,null);
    if(result==null||result.getInt("protocol")!=1||!result.getBoolean("enabled"))continue;
+   if(result.getBoolean("runtimePart")){Bundle runtime=context.getContentResolver().call(Uri.parse("content://"+authority),"load-runtime",null,null);if(runtime==null||runtime.getInt("protocol")!=1||!runtime.getBoolean("enabled"))continue;result.putAll(runtime);}
    for(String key:new String[]{"runtimeBootstrap","runtimeHook","runtimeSnapshot","runtimeCommand","runtimeGameHash","bootstrap","panelScript","panelStyle","moduleHook","moduleHookOct17","moduleHookCurrent","moduleHookPrevious9","moduleHookPrevious8","moduleHookPrevious7","moduleHookPrevious6","moduleHookPrevious4","moduleHookPrevious5","moduleHookPrevious3","moduleHookPrevious","moduleHookPrevious2","snapshot","frame","command","gameModuleSha256"}){String value=result.getString(key,"");if(value.length()>200000)throw new IllegalArgumentException("Module too large");}
    String manifest=result.getString("resourceManifest","");if(manifest.length()>220000)throw new IllegalArgumentException("Manifest too large");
    if(result.getString("runtimeContract","").length()>220000)throw new IllegalArgumentException("Contract too large");

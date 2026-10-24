@@ -27,11 +27,11 @@ public class MainActivity extends Activity {
  private boolean updateStarted;
  private String pendingBackup;
  private static final int EXPORT_PROGRESS=410,IMPORT_PROGRESS=411;
- private String adaptedModule,adaptedUrl;
+ private String adaptedModule,adaptedUrl,progressTransfer;
  private void companionCall(String json){
   if(companion==null||!companion.enabled()||!ready||!active||json==null||json.length()>2048)return;
   try{JSONObject request=new JSONObject(json);String kind=request.optString("kind");
-   if("session-online".equals(kind)){if(localSession)leaveLocalSession();return;}
+   if("session-online".equals(kind)){if(localSession)leaveLocalSession(request.optBoolean("transferProgress",false));return;}
    if("save".equals(kind)||"load".equals(kind))return;
    if(!localSession){if("session-local".equals(kind))activateLocalSession();else web.evaluateJavascript(companion.runtimeCommand(request.toString()),null);return;}
    if(!"session-local".equals(kind))web.evaluateJavascript(companion.command(request.toString()),null);
@@ -58,9 +58,23 @@ public class MainActivity extends Activity {
   web.evaluateJavascript("window.thorControls?.beginPreferences()",null);progress.show();
   new Thread(()->{try{ResourcePreparation.prepare(localCache,getFilesDir(),companion.get("resourceManifest"),localCache.currentModuleHash(),agent,cancelled,(done,total)->runOnUiThread(()->{if(!isFinishing()&&!isDestroyed()&&progress.isShowing())progress.setMessage("Ressources : "+done+" / "+total);}));if(cancelled.get())throw new IOException("Cancelled");localCache.freeze();runOnUiThread(()->{if(isFinishing()||isDestroyed())return;progress.dismiss();resourceProgress=null;resourceCancellation=null;restartSession(true);});}catch(Exception error){android.util.Log.w("ThorRetro","Resource preparation incomplete",error);runOnUiThread(()->{if(isFinishing()||isDestroyed())return;progress.dismiss();resourceProgress=null;resourceCancellation=null;switchingSession=false;web.evaluateJavascript("window.thorControls?.endPreferences()",null);Toast.makeText(this,cancelled.get()?"Préparation interrompue. Aucune session locale n’a été ouverte.":"Ressources indisponibles. Réessaie leur préparation avec une connexion au site.",Toast.LENGTH_LONG).show();});}},"LocalGameSnapshot").start();
  }
- private void leaveLocalSession(){
+ private void leaveLocalSession(boolean transfer){
   if(switchingSession)return;
   switchingSession=true;
+  if(transfer){
+   web.evaluateJavascript("(()=>{try{return window.thorGameAdapter.cleanProgress(JSON.parse(localStorage.getItem('retro-survival.progress.v1')||'null'));}catch(e){return null;}})()",result->{
+    try{
+     if(result==null||result.length()>100000||new JSONObject(result).optJSONObject("waveRecords")==null)throw new IOException("Invalid progression");
+     String envelope=new JSONObject().put("id",UUID.randomUUID().toString()).put("progress",new JSONObject(result)).toString();
+     if(!getSharedPreferences("local-session",0).edit().putString("pendingProgressTransfer",envelope).commit())throw new IOException("Transfer preparation failed");
+     clearLocalSession();
+    }catch(Exception error){switchingSession=false;Toast.makeText(this,"La progression n’a pas pu être préparée. La copie est conservée.",Toast.LENGTH_LONG).show();}
+   });return;
+  }
+  getSharedPreferences("local-session",0).edit().remove("pendingProgressTransfer").commit();
+  clearLocalSession();
+ }
+ private void clearLocalSession(){
   web.evaluateJavascript("(()=>{try{localStorage.clear();sessionStorage.clear();return true;}catch(e){return false;}})()",result->{
    if(!"true".equals(result)){switchingSession=false;Toast.makeText(this,"La session locale n’a pas pu être effacée. Réessaie avant de quitter ce mode.",Toast.LENGTH_LONG).show();return;}
    if(!getSharedPreferences("local-session",0).edit().remove("seed").remove("seedRevision").remove("onlineTransfer").commit()){switchingSession=false;Toast.makeText(this,"La session locale n’a pas pu être réinitialisée.",Toast.LENGTH_LONG).show();return;}
@@ -84,6 +98,9 @@ public class MainActivity extends Activity {
   String seed=localSession?getSharedPreferences("local-session",0).getString("seed","null"):"null";
   String revision=localSession?getSharedPreferences("local-session",0).getString("seedRevision",""):"";
   String prefix="<script>window.thorLocalSeed="+seed.replace("<","\\u003c")+";window.thorLocalSeedRevision="+JSONObject.quote(revision)+";"+localGuard+"</script>";
+  if(!localSession&&companion.enabled()&&progressTransfer!=null){
+   try(InputStream transfer=getAssets().open("progress-transfer.js")){prefix+="<script>window.thorProgressTransfer="+progressTransfer.replace("<","\\u003c")+";"+read(transfer)+"</script>";}catch(Exception error){android.util.Log.w("ThorRetro","Progression preparation unavailable",error);}
+  }
   if(localSession){
    // No connections, frames, workers, forms or remote images can escape the local origin.
    prefix="<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'self'\">"+prefix;
@@ -95,7 +112,7 @@ public class MainActivity extends Activity {
   try{
    String path=SessionNetworkPolicy.staticPath(request.getUrl().toString());
    if(path==null||!("GET".equals(request.getMethod())||"HEAD".equals(request.getMethod())))return deniedLocal();
-   if((path.equals("/_next/static/chunks/discord-identity-v9Gyhq15.js")||path.equals("/_next/static/chunks/discord-identity-CHytj1vJ.js")||path.equals("/_next/static/chunks/discord-identity-fyQiljmH.js")||path.equals("/_next/static/chunks/discord-identity-Df3soPjP.js")||path.equals("/_next/static/chunks/discord-identity-CVs6hEgK.js")||path.equals("/_next/static/chunks/discord-identity-mqIdrlji.js")||path.equals("/_next/static/chunks/discord-identity-BofEmv2P.js"))){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
+   if(GameModuleVersions.sharedPath(path)){WebResourceResponse adapted=adaptSharedModule(request);if(adapted!=null)return adapted;}
    if(path.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(request);return adapted==null?deniedLocal():adapted;}
    byte[] bytes=localCache.getFrozen(path);if(bytes==null){if(!path.equals("/favicon.ico")&&SystemClock.uptimeMillis()-lastCacheWarning>5000){lastCacheWarning=SystemClock.uptimeMillis();runOnUiThread(()->Toast.makeText(this,"Ressource locale absente. Charge cette carte en mode normal, puis relance le mode local.",Toast.LENGTH_LONG).show());}return deniedLocal();}
    if(path.equals("/"))bytes=injectRoot(new String(bytes,StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8);
@@ -218,6 +235,8 @@ public class MainActivity extends Activity {
  public void onCreate(Bundle state){
    super.onCreate(state);
    companion=new CompanionModule(this);
+   progressTransfer=companion.enabled()?getSharedPreferences("local-session",0).getString("pendingProgressTransfer",null):null;
+   getSharedPreferences("local-session",0).edit().remove("pendingProgressTransfer").commit();
    // Remove obsolete transfer instructions before any game document can load.
    getSharedPreferences("local-session",0).edit().remove("onlineTransfer").commit();
    localSession=companion.enabled()&&state==null&&getIntent().getBooleanExtra("localSession",false);getIntent().removeExtra("localSession");localCache=new LocalGameCache(getFilesDir());
@@ -249,7 +268,7 @@ public class MainActivity extends Activity {
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
        if(localSession)return localResource(r);
-       if(official&&"GET".equals(r.getMethod())&&("/_next/static/chunks/discord-identity-v9Gyhq15.js".equals(route)||"/_next/static/chunks/discord-identity-CHytj1vJ.js".equals(route)||"/_next/static/chunks/discord-identity-fyQiljmH.js".equals(route)||"/_next/static/chunks/discord-identity-Df3soPjP.js".equals(route)||"/_next/static/chunks/discord-identity-CVs6hEgK.js".equals(route)||"/_next/static/chunks/discord-identity-mqIdrlji.js".equals(route)||"/_next/static/chunks/discord-identity-BofEmv2P.js".equals(route))){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
+       if(official&&"GET".equals(r.getMethod())&&GameModuleVersions.sharedPath(route)){WebResourceResponse adapted=adaptSharedModule(r);if(adapted!=null)return adapted;}
        if(official&&"GET".equals(r.getMethod())&&route!=null&&route.matches("/_next/static/chunks/page-[A-Za-z0-9_-]+\\.js")){WebResourceResponse adapted=adaptModule(r);if(adapted!=null)return adapted;}
 
        if(!r.isForMainFrame())return cacheOnlineResource(r);
@@ -309,8 +328,13 @@ public class MainActivity extends Activity {
     try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Shared module cache unavailable",cacheError);}
    }
    if(source.length()>12000000)return null;
-   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString())&&!GameModuleVersions.oct18Shared(hash.toString())&&!GameModuleVersions.oct19Shared(hash.toString())&&!GameModuleVersions.oct19bShared(hash.toString())&&!GameModuleVersions.oct20Shared(hash.toString())&&!GameModuleVersions.oct20cShared(hash.toString()))return null;
-   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open(GameModuleVersions.oct20cShared(hash.toString())?"native-shared-hook-oct20c.js":GameModuleVersions.oct20Shared(hash.toString())?"native-shared-hook-oct20.js":GameModuleVersions.oct19bShared(hash.toString())?"native-shared-hook-oct19b.js":GameModuleVersions.oct19Shared(hash.toString())?"native-shared-hook-oct19.js":GameModuleVersions.oct18Shared(hash.toString())?"native-shared-hook-oct18.js":GameModuleVersions.dockedShared(hash.toString())?"native-shared-hook-docked.js":"native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
+   byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString())&&!GameModuleVersions.oct18Shared(hash.toString())&&!GameModuleVersions.oct19Shared(hash.toString())&&!GameModuleVersions.oct19bShared(hash.toString())&&!GameModuleVersions.oct20Shared(hash.toString())&&!GameModuleVersions.oct20cShared(hash.toString())&&!GameModuleVersions.oct21Shared(hash.toString())&&!GameModuleVersions.oct21bShared(hash.toString())&&!GameModuleVersions.oct21cShared(hash.toString())&&!GameModuleVersions.oct22Shared(hash.toString())){
+    ModuleCompatibility.Match compatible;try(InputStream profile=getAssets().open("shared-contract-oct22.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
+    if(compatible==null)return null;
+    try(InputStream work=getAssets().open("native-work-cache.js")){adaptedShared=source+"\n"+read(work)+"\n"+compatible.hook()+"\n;window.thorSharedCompatibility={mode:'compatible',family:'"+compatible.family+"'};";adaptedSharedUrl=url;}
+    return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedShared.getBytes(StandardCharsets.UTF_8)));
+   }
+   try(InputStream work=getAssets().open("native-work-cache.js");InputStream hook=getAssets().open(GameModuleVersions.oct22Shared(hash.toString())?"native-shared-hook-oct22.js":GameModuleVersions.oct21cShared(hash.toString())?"native-shared-hook-oct21c.js":GameModuleVersions.oct21bShared(hash.toString())?"native-shared-hook-oct21b.js":GameModuleVersions.oct21Shared(hash.toString())?"native-shared-hook-oct21.js":GameModuleVersions.oct20cShared(hash.toString())?"native-shared-hook-oct20c.js":GameModuleVersions.oct20Shared(hash.toString())?"native-shared-hook-oct20.js":GameModuleVersions.oct19bShared(hash.toString())?"native-shared-hook-oct19b.js":GameModuleVersions.oct19Shared(hash.toString())?"native-shared-hook-oct19.js":GameModuleVersions.oct18Shared(hash.toString())?"native-shared-hook-oct18.js":GameModuleVersions.dockedShared(hash.toString())?"native-shared-hook-docked.js":"native-shared-hook-oct17.js")){adaptedShared=source+"\n"+read(work)+"\n"+read(hook);adaptedSharedUrl=url;}
   }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedShared.getBytes(StandardCharsets.UTF_8)));}catch(Exception error){android.util.Log.w("ThorRetro","Shared game adapter unavailable",error);return null;}
  }
  private synchronized WebResourceResponse adaptModule(WebResourceRequest request){
@@ -319,14 +343,40 @@ public class MainActivity extends Activity {
      if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
      else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>8000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
-     if(!localSession&&!GameModuleVersions.supported(hash.toString())){
-      ModuleCompatibility.Match compatible;boolean currentFamily;
-      try(InputStream profile=getAssets().open("module-contract-oct20c.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}currentFamily=compatible!=null;
+     if((!localSession&&!GameModuleVersions.supported(hash.toString()))||GameModuleVersions.oct24(hash.toString())){
+      if(localSession&&!companion.supportsLocalGame(hash.toString()))return null;
+      ModuleCompatibility.Match compatible;boolean currentFamily,newFamily;
+      try(InputStream profile=getAssets().open("module-contract-oct22.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      if(compatible==null)try(InputStream profile=getAssets().open("module-contract-oct21c.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      if(compatible==null)try(InputStream profile=getAssets().open("module-contract-oct21b.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      if(compatible==null)try(InputStream profile=getAssets().open("module-contract-oct21.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}newFamily=compatible!=null;
+      if(compatible==null)try(InputStream profile=getAssets().open("module-contract-oct20c.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}currentFamily=compatible!=null;
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-oct20.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)return null;
-      String transformed=currentFamily?GameModuleTransforms.oct20c(source):GameModuleTransforms.oct20(source);if(transformed==null)return null;
-      if(currentFamily)transformed=transformed.replace("m??a.current[e],ro,u))", "m??a.current[e],"+compatible.symbol("ro")+",u))");else transformed=transformed.replace("m??a.current[e],mp,u))", "m??a.current[e],"+compatible.symbol("mp")+",u))");
-      adaptedModule=transformed+"\n"+compatible.hook()+"\n;window.thorModuleCompatibility={mode:'compatible',sourceVersion:'"+hash+"',family:'"+compatible.family+"'};\n"+companion.compatibleRuntimeHook(source,compatible);adaptedUrl=url;
+      String transformed=newFamily?GameModuleTransforms.oct21(source):currentFamily?GameModuleTransforms.oct20c(source):GameModuleTransforms.oct20(source);if(transformed==null)return null;
+      if(newFamily)transformed=GameModuleTransforms.hud(transformed).replace("m??a.current[e],Et,u))", "m??a.current[e],"+compatible.symbol(compatible.raster)+",u))");else if(currentFamily)transformed=transformed.replace("m??a.current[e],ro,u))", "m??a.current[e],"+compatible.symbol("ro")+",u))");else transformed=transformed.replace("m??a.current[e],mp,u))", "m??a.current[e],"+compatible.symbol("mp")+",u))");
+      adaptedModule=transformed+"\n"+compatible.hook()+"\n;window.thorModuleCompatibility={mode:'compatible',sourceVersion:'"+hash+"',family:'"+compatible.family+"'};\n"+(localSession?companion.localMainHook()+"\n"+companion.localRulesHook():companion.compatibleRuntimeHook(source,compatible));adaptedUrl=url;
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
+     if(GameModuleVersions.oct22(hash.toString())){
+      String transformed=GameModuleTransforms.oct22(source);if(transformed==null)return null;
+      try(InputStream hook=getAssets().open("native-module-hook-oct22.js");InputStream performance=getAssets().open("native-performance-hook-oct22.js")){
+       adaptedModule=transformed+"\n"+read(hook)+"\n"+read(performance)+(!localSession?"\n"+companion.runtimeHook(hash.toString()):"");adaptedUrl=url;
+      }
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
+     if(GameModuleVersions.oct21c(hash.toString())||GameModuleVersions.oct21b(hash.toString())){
+      String transformed=GameModuleTransforms.oct21(source);if(transformed==null)return null;
+      try(InputStream hook=getAssets().open(GameModuleVersions.oct21c(hash.toString())?"native-module-hook-oct21c.js":"native-module-hook-oct21b.js");InputStream performance=getAssets().open(GameModuleVersions.oct21c(hash.toString())?"native-performance-hook-oct21c.js":"native-performance-hook-oct21b.js")){
+       adaptedModule=transformed+"\n"+(localSession&&companion.supportsLocalGame(hash.toString())?companion.localMainHook():read(hook))+"\n"+read(performance)+(localSession&&companion.supportsLocalGame(hash.toString())?"\n"+companion.localRulesHook():!localSession?"\n"+companion.runtimeHook(hash.toString()):"");adaptedUrl=url;
+      }
+      return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
+     }
+     if(GameModuleVersions.oct21(hash.toString())){
+      String transformed=GameModuleTransforms.oct21(source);if(transformed==null)return null;
+      try(InputStream hook=getAssets().open("native-module-hook-oct21.js");InputStream performance=getAssets().open("native-performance-hook-oct21.js")){
+       adaptedModule=transformed+"\n"+(localSession&&companion.supportsLocalGame(hash.toString())?companion.localMainHook():read(hook))+"\n"+read(performance)+(localSession&&companion.supportsLocalGame(hash.toString())?"\n"+companion.localRulesHook():!localSession?"\n"+companion.runtimeHook(hash.toString()):"");adaptedUrl=url;
+      }
       return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));
      }
      if(GameModuleVersions.oct20c(hash.toString())){

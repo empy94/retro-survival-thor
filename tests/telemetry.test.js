@@ -55,3 +55,27 @@ assert.equal(context.window.thorDashboard.character(),'osamodas');
 assert.equal(sample().character,'osamodas');
 assert.equal(context.window.thorDashboard.combatState().character,'osamodas');
 live.characterId='futureClass';assert.equal(context.window.thorDashboard.character(),null);
+
+const savedEnemies=live.enemies;
+live.enemies=[{x:300,y:100,r:25,hp:1e12,kind:'oto-mustam',state:'chase'}];
+assert.equal(context.window.thorDashboard.combatState().enemies.length,0,'Oto is excluded from offensive spell targets');
+live.enemies=[{id:1,x:300,y:100,r:25,hp:140,kind:'black-rat',state:'chase',ratRaid:{phase:'approach'}},{id:2,x:400,y:100,r:25,hp:140,kind:'black-rat',state:'chase'}];
+const targetSnapshot=context.window.thorDashboard.combatState();
+assert.equal(targetSnapshot.enemies.length,1,'observer removes invulnerable RN raid from automatic spell targets');
+assert.equal(targetSnapshot.enemies[0].x,400,'real RN boss stays in spell targets');
+live.enemies=savedEnemies;
+live.enemies=[
+ {x:100,y:100,r:18,hp:20,state:'chase',kind:'boo',boo:{phase:'puddle',age:.5}},
+ {x:200,y:100,r:18,hp:20,state:'chase',kind:'boo',boo:{phase:'emerge',age:.04}},
+ {x:300,y:100,r:18,hp:20,state:'chase',kind:'boo',boo:{phase:'emerge',age:.1}},
+ {x:400,y:100,r:18,hp:20,state:'attack',kind:'boo',boo:{phase:'attack',age:1.8}},
+ {x:500,y:100,r:18,hp:20,state:'chase',kind:'sewer-rat'}
+];
+assert.deepEqual(Array.from(context.window.thorDashboard.combatState().enemies,e=>e.x),[300,500],'auto spells only consider vulnerable Boo phases and ordinary enemies');
+live.enemies=savedEnemies;
+// Motion samples reset on teleport/map changes; official targeting is authoritative.
+context.window.thorGameData={canTargetEnemy:e=>e.kind==='boo'&&e.boo?.phase==='attack'};
+live.time=10;live.enemies=[{kind:'boo',x:500,y:180,r:20,hp:5,state:'attack',boo:{phase:'attack',age:2}}];live.phase='playing';
+let moving=context.window.thorDashboard.combatState().enemies;assert.equal(moving.length,1,'latest native vulnerable attack remains targetable');
+live.time=10.1;live.enemies[0].x+=10;moving=context.window.thorDashboard.combatState().enemies;assert(Math.abs(moving[0].vx-100)<.01);assert.equal(context.window.thorDashboard.combatState().enemies[0].vx,moving[0].vx,'same frame reuses sample');
+live.time=10.2;live.enemies[0].x+=500;assert.equal(context.window.thorDashboard.combatState().enemies[0].vx,0,'teleport never leads');live.enemies[0].boo.phase='puddle';assert.equal(context.window.thorDashboard.combatState().enemies.length,0,'native invulnerable phase excluded');

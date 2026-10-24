@@ -3,6 +3,7 @@ const assert=require('node:assert/strict'),{plan}=require('../assets/auto-spells
 const base={phase:'playing',busy:false,width:742,height:432,player:{x:350,y:220,hp:5,maxHp:5},buffs:{},upgrades:{},awakenings:{},enemies:[{x:430,y:220,r:12,hp:5}]};
 const spell=id=>({id,ready:true,aimed:mapping.needsAim(id)});
 const choose=(s,ids)=>plan(s,ids.map(spell),mapping);
+assert.equal(choose({...base,enemies:[{...base.enemies[0],kind:'oto-mustam'}]},['burningGlyph']),null,'do not cast attacks at the invulnerable pursuer');
 assert.equal(choose({...base,phase:'dying'},['shield']),null);
 assert.equal(choose({...base,busy:true},['shield']),null);
 assert.equal(choose({...base,enemies:[]},['shield']),null);
@@ -83,3 +84,8 @@ assert.equal(plan(wounded,[{...spell('cawotte'),ready:false}],mapping),null);
 
 assert.equal(choose(base,['chaferfu']),null,'single-use summon is retained away from danger');
 assert.equal(choose(danger,['chaferfu']).spell.id,'chaferfu');
+
+const raid={x:370,y:220,r:25,hp:140,kind:'black-rat',ratRaid:{phase:'approach'}};
+assert.equal(choose({...base,enemies:[raid]},['burningGlyph']),null,'invulnerable transition RN never gets an aimed spell');
+assert.equal(choose({...base,enemies:[{...raid,ratRaid:undefined}]},['burningGlyph']).target.x,370,'real RN boss remains targetable');
+assert.equal(choose({...base,enemies:[raid,{x:450,y:220,r:12,hp:5}]},['burningGlyph']).target.x,450,'fight surrounding monsters instead');
