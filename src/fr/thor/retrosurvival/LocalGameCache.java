@@ -39,6 +39,10 @@ final class LocalGameCache {
   if(!source.isFile()&&!"/".equals(path)){
    byte[] cached=get(path);if(cached!=null)try(FileOutputStream out=new FileOutputStream(source)){out.write(cached);}
   }
+  // Older prepared packs contain the original map but may lack its SD variant.
+  // Reuse only this same map from disk; a local session never fetches a fallback.
+  if(!source.isFile()&&path.matches("/assets/(?:[A-Za-z0-9_-]+/)?map-[0-9]+(?:-mirror)?-sd\\.webp"))
+   return getFrozen(path.substring(0,path.length()-8)+".webp");
   if(!source.isFile()||source.length()>64000000)return null;
   return java.nio.file.Files.readAllBytes(source.toPath());
  }

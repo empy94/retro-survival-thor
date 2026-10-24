@@ -1,5 +1,9 @@
 # Retro Survival — Android & manettes
 
+## 1.25.10
+
+Chargement des cartes corrigé avec les réglages graphiques allégés. Les préférences du clavier et de l’apparence sont conservées lors des changements de session.
+
 ## 1.25.9
 
 Compatibilité actualisée avec le jeu officiel et correction du chargement des ressources. Amélioration des transitions de sauvegarde avec copie de secours.

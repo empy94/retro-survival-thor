@@ -19,9 +19,12 @@
  if(seed&&typeof seed==='object'&&!Array.isArray(seed)&&seed.waveRecords&&typeof seed.waveRecords==='object'&&!Array.isArray(seed.waveRecords)){
   const existing=localStorage.getItem(key);
   if(typeof revision==='string'&&revision&&revision!==localStorage.getItem(revisionKey)){
+   const preferenceKeys=['retro-survival.settings.v1','retro-survival.character-genders.v1','retro-survival.character-colors.v1'];
+   const preferences=preferenceKeys.map(name=>[name,localStorage.getItem(name)]).filter(([,value])=>value!==null);
    // A new session starts clean: no progression, pending scores or checkpoints survive.
    localStorage.clear();
    sessionStorage.clear();
+   for(const [name,value] of preferences)localStorage.setItem(name,value);
    localStorage.setItem(key,JSON.stringify(seed));
    localStorage.setItem(revisionKey,revision);
   }else if(!existing)localStorage.setItem(key,JSON.stringify(seed));
