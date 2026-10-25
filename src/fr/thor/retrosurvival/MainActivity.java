@@ -188,7 +188,7 @@ public class MainActivity extends Activity {
  }
  private final Runnable characterTick=new Runnable(){public void run(){
    if(!active)return;
-   if(ready&&hasWindowFocus()&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript(companion.snapshot(localSession,"(window.thorSalePolicy?.tick(),window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'})"),result->{
+   if(ready&&gameFocused()&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0)web.evaluateJavascript(companion.snapshot(localSession,"(window.thorSalePolicy?.tick(),window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'})"),result->{
      if(!dashboardGate.complete(request)||!active||!ready||!hasWindowFocus())return;
      try{if(result.length()>65536)return;String next=new JSONObject(result).toString();if(!next.equals(characterData)){characterData=next;if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}}catch(Exception ignored){}
    });}
@@ -213,7 +213,7 @@ public class MainActivity extends Activity {
    if(!active)return;
    long now=SystemClock.uptimeMillis();float dt=Math.min(.05f,(now-previousTick)/1000f);previousTick=now;
    boolean controlInput=localSession||!held.isEmpty()||lx!=0||ly!=0||rx!=0||ry!=0||hx!=0||hy!=0;
-   if(ready&&getWindow().getDecorView().hasWindowFocus()&&controlPulse.due(now,controlInput)){
+   if(ready&&gameFocused()&&controlPulse.due(now,controlInput)){
      final long request=controlGate.begin();if(request!=0){
      controlPulse.sent(now,controlInput);
      float mx=lx,my=ly;
@@ -443,7 +443,9 @@ public class MainActivity extends Activity {
    }return new WebResourceResponse("text/javascript","UTF-8",new ByteArrayInputStream(adaptedModule.getBytes(StandardCharsets.UTF_8)));}catch(Exception ex){android.util.Log.w("ThorRetro","Game adapter unavailable",ex);return null;}
  }
  private String read(InputStream in)throws IOException{ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int count;while((count=in.read(buf))!=-1)out.write(buf,0,count);return new String(out.toByteArray(),StandardCharsets.UTF_8);}
- private void syncActive(){boolean foreground=active&&hasWindowFocus();if(ready&&web!=null)web.evaluateJavascript("window.thorControls.setActive("+foreground+");window.thorGraphicsActive="+foreground+";window.thorGraphics?.setActive("+foreground+")",null);}
+ private static boolean emulatorKeyboardDevice(){return "ranchu".equals(Build.HARDWARE)||"goldfish".equals(Build.HARDWARE);}
+ private boolean gameFocused(){return hasWindowFocus()||(emulatorKeyboardDevice()&&characterScreen!=null&&characterScreen.getWindow().getDecorView().hasWindowFocus());}
+ private void syncActive(){boolean foreground=active&&gameFocused();if(ready&&web!=null)web.evaluateJavascript("window.thorControls.setActive("+foreground+");window.thorGraphicsActive="+foreground+";window.thorGraphics?.setActive("+foreground+")",null);}
  public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus){immersive();if(characterScreen!=null)characterScreen.flush();}else reset();syncActive();}
  protected void onResume(){super.onResume();if(!localSession&&!updateStarted){updateStarted=true;UpdateChecker.schedule(this);new Thread(()->{String tag=UpdateChecker.check(this,false);UpdateChecker.notifyAvailable(this,tag);if(!tag.isEmpty())runOnUiThread(()->{if(active)Toast.makeText(this,"Nouvelle APK "+tag+" disponible dans ⚙ APK → Mises à jour.",Toast.LENGTH_LONG).show();});},"RetroUpdateStartup").start();}active=true;previousTick=SystemClock.uptimeMillis();handler.post(tick);handler.post(characterTick);if(web!=null)web.onResume();syncActive();showCharacterScreen();}
  protected void onPause(){reset();active=false;syncActive();handler.removeCallbacks(tick);handler.removeCallbacks(characterTick);closeCharacterScreen();if(web!=null)web.onPause();super.onPause();}
@@ -463,17 +465,29 @@ public class MainActivity extends Activity {
    private String pendingData;
    CharacterPresentation(Context context,Display display){super(context,display);}
    protected void onCreate(Bundle state){super.onCreate(state);
-     getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+     if(!emulatorKeyboardDevice())getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
      getWindow().getDecorView().setSystemUiVisibility(5894);
      panel=new GameWebView(getContext());setContentView(panel);fitModernWindow(getWindow(),panel);panel.getSettings().setJavaScriptEnabled(true);panel.getSettings().setBlockNetworkLoads(localSession);panel.getSettings().setAllowFileAccess(false);panel.getSettings().setAllowContentAccess(false);
      panel.addJavascriptInterface(new Object(){@JavascriptInterface public void companionCall(String json){runOnUiThread(()->MainActivity.this.companionCall(json));}@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
      panel.setWebViewClient(new RecoveringWebViewClient(){public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return localSession?localResource(r):cacheOnlineResource(r);}public void onPageFinished(WebView v,String url){loaded=true;update(characterData);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return true;}});
      try(InputStream in=getAssets().open("dashboard.html")){String html=read(in);try(InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js")){html=html.replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"</script>");}try(InputStream locale=getAssets().open("locale.js")){html=html.replace("<head>","<head><script>"+read(locale)+"</script>");}try(InputStream deck=getAssets().open("deck.js")){html=html.replace("</body>","<script>"+read(deck)+"</script></body>");}html=html.replace("</head>","<style>"+companion.get("panelStyle")+"</style></head>").replace("</body>","<script>"+companion.get("panelScript")+"</script></body>");panel.loadDataWithBaseURL(gameUrl(),html,"text/html","UTF-8",null);}catch(Exception ex){android.util.Log.e("ThorRetro","Character screen",ex);}
    }
+   @Override public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);MainActivity.this.syncActive();if(!focus&&emulatorKeyboardDevice()&&ready)web.evaluateJavascript("window.thorEmulatorKeyboard?.release()",null);}
+   @Override public boolean dispatchKeyEvent(KeyEvent event){
+     int code=event.getKeyCode();
+     if(emulatorKeyboardDevice()&&ready&&(code==KeyEvent.KEYCODE_Z||code==KeyEvent.KEYCODE_Q||code==KeyEvent.KEYCODE_S||code==KeyEvent.KEYCODE_D||code==KeyEvent.KEYCODE_W||code==KeyEvent.KEYCODE_A)){
+       if(event.getAction()!=KeyEvent.ACTION_DOWN&&event.getAction()!=KeyEvent.ACTION_UP)return true;
+       char letter=Character.toLowerCase((char)event.getUnicodeChar());if(letter==0)letter=(char)('a'+code-KeyEvent.KEYCODE_A);
+       String key=String.valueOf(letter),physical="Key"+Character.toUpperCase((char)('a'+code-KeyEvent.KEYCODE_A));
+       web.evaluateJavascript("window.thorControls.key("+quote(key)+","+quote(physical)+","+(event.getAction()==KeyEvent.ACTION_DOWN)+")",null);return true;
+     }
+     return super.dispatchKeyEvent(event);
+   }
    protected void onStop(){renderGate.invalidate();pendingData=null;if(panel!=null){panel.destroy();panel=null;}super.onStop();}
    void update(String json){pendingData=json;flush();}
    private void flush(){
-     if(!loaded||panel==null||pendingData==null||!active||!hasWindowFocus())return;
+     if(!loaded||panel==null||pendingData==null||!active||!gameFocused())return;
      final long request=renderGate.begin();if(request==0)return;
      String json=pendingData;pendingData=null;
      try{JSONObject data=new JSONObject(json);data.put("controls",panelOptions());panel.evaluateJavascript("window.renderThorDashboard("+data.toString()+");window.thorCompanionPanel?.render("+data.opt("companion")+")",result->{if(renderGate.complete(request))flush();});}catch(Exception ignored){renderGate.complete(request);}
