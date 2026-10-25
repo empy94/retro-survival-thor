@@ -1,0 +1,7 @@
+# Clavier de l’émulateur — 1.25.11
+
+Les émulateurs Android ranchu/goldfish disposent désormais d’un adaptateur clavier dédié. Les touches AZERTY ou QWERTY alimentent l’ensemble de touches de déplacement natif du jeu, y compris lorsque le joystick tactile est masqué. Les maintiens, diagonales et relâchements sont conservés ; la perte de focus libère les touches. La saisie de texte et les fenêtres de choix ne sont pas interceptées. Le joystick physique reprend la priorité quand il est utilisé. Cette adaptation n’est pas chargée sur le matériel Thor.
+
+Vérifications : tests du clavier et de ses gardes, compilation et signature de l’APK, installation sur l’émulateur. Dans un combat Féca/Astrub, des événements clavier Android ont produit : Z : déplacement vertical de −73,61 ; Q : déplacement horizontal de −67,94 ; S : déplacement vertical de +28,81 avec contrainte du terrain ; D : déplacement horizontal de +70,83 ; Z+Q : déplacement diagonal de −48,91 sur chaque axe. Aucune touche de déplacement ne restait active après les relâchements. Ces mesures vérifient les directions, pas un benchmark de vitesse.
+
+Les données locales antérieures au test ont été sauvegardées puis restaurées ; le personnage sélectionné est de nouveau le Sram et l’application est à l’accueil. Le Thor n’a pas été modifié. La validation en combat concerne le Féca sur Astrub dans l’émulateur ; elle ne constitue pas un parcours complet de toutes les classes et cartes.
