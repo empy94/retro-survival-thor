@@ -71,7 +71,7 @@ L’alerte ouvre le téléchargement de l’APK officielle ; Android te demande 
 - **Croix directionnelle** : sélectionner les choix, objets et achats ; **A** valide.
 - **Stick droit** : direction et distance de visée ; pointeur si nécessaire.
 - **L1 / R1 / L2 / R2** : maintenir un sort à viser, orienter, relâcher.
-- **X / Y puis A / B** : sorts en combat. **A / R3** : valider dans les menus. **Start** : pause.
+- **X / Y puis A / B** : sorts en combat. **R3** : couper/rétablir les sorts auto en combat (buffs seuls ou tous les sorts selon le mode précédent). **A / R3** : valider dans les menus. **Start** : pause.
 
 **Tes raccourcis, par classe :** choisis une touche ou une combinaison comme **L1 + Y**, sous chaque icône dans **Sorts** ou **⚙ APK → Raccourcis des sorts**. Disponible aussi sur téléphone ; sauvegarde automatique.
 

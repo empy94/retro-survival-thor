@@ -31,3 +31,15 @@ console.log('Controller shortcuts: seventh spell, contextual A, aimed/instant ch
 ids=["stingingClaw"];elements=buttons();controls.configure({spellShortcuts:{feca:{stingingClaw:"X"}}});events.length=0;controls.controller("X",true);assert.deepEqual(events,[["stingingClaw","pointerdown"]]);controls.controller("X",false);assert.deepEqual(events.at(-1),["stingingClaw","pointerup"]);events.length=0;controls.controller("X",true);controls.cancel();assert.deepEqual(events.at(-1),["stingingClaw","pointercancel"]);
 
 let releaseChannel;context.setTimeout=fn=>{releaseChannel=fn;};controls.configure({autoSpells:true});clock.value+=1000;events.length=0;assert(controls.autoCast({id:"stingingClaw",aimed:false,el:elements[0]},null));assert.deepEqual(events,[["stingingClaw","pointerdown"]]);releaseChannel();assert.deepEqual(events.at(-1),["stingingClaw","pointerup"]);clock.value+=1000;assert(controls.autoCast({id:"stingingClaw",aimed:false,el:elements[0]},null));controls.cancel();const ended=events.length;releaseChannel();assert.equal(events.length,ended);assert.deepEqual(events.at(-1),["stingingClaw","pointercancel"]);
+
+// R3 must suspend committed automatic casts and restore the exact previous mode.
+const autoModes=[];window.thorAutoSpells={refreshLabel(){},configure:mode=>autoModes.push(mode)};
+controls.configure({autoSpells:true,autoSpellMode:'full'});
+assert.equal(controls.toggleAutoSpells(),'off');assert.equal(autoModes.at(-1),'off');
+assert.equal(controls.toggleAutoSpells(),'full');assert.equal(autoModes.at(-1),'full');
+controls.configure({autoSpells:true,autoSpellMode:'buffs'});
+assert.equal(controls.toggleAutoSpells(),'off');assert.equal(controls.toggleAutoSpells(),'buffs');
+inMenu=true;const modeCount=autoModes.length;assert.equal(controls.toggleAutoSpells(),false);assert.equal(autoModes.length,modeCount);inMenu=false;
+context.document.hidden=true;assert.equal(controls.toggleAutoSpells(),false);context.document.hidden=false;
+controls.setActive(false);assert.equal(controls.toggleAutoSpells(),false);controls.setActive(true);
+console.log('R3: exact full/buffs restoration and menu/background guards passed');

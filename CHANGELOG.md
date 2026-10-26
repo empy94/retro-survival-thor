@@ -1,5 +1,11 @@
 ## 1.24.4 — Compatibilité des petites mises à jour
 
+## 1.25.14
+
+- Compatibilite avec la mise a jour officielle du 26 octobre.
+- R3 : sorts auto ON/OFF en combat ; reprise du mode precedent, validation des menus conservee.
+
+
 - Reconnaissance des fonctions utilisées même lorsque leurs noms internes changent.
 - Une modification sans rapport avec ces fonctions ne désactive plus systématiquement les adaptations.
 - Vérification uniquement au chargement ; aucun traitement ajouté à chaque image.

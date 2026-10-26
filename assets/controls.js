@@ -4,6 +4,7 @@
  let zone=null,origin=null,lastX=0,lastY=0,ability=null;
  let px=0,py=0,aimFrame=null,autoPointer=null,manualUntil=0,foreground=true;const touches=new Set(),padHeld=new Set(),padRoutes=new Map();
  let leftX=0,leftY=0,rightPrevious={x:0,y:0},directionHeld=false,hat={x:0,y:0};const directionKeys=new Set();
+ let resumeAutoMode='buffs';
  let settings={showLabels:true,labelOpacity:.45,showJoystick:true,radialAim:true,hideCombatCursor:true,combatHelper:true},pointerUsed=false,cursorPhase=null,cursorScope=null;
  function refreshCursor(){
    const cursor=document.querySelector('#thor-cursor');if(!cursor)return;
@@ -123,7 +124,14 @@
    dpad(x,y){hat={x,y};updateDpad();},
    dpadKey(direction,down){if(!['up','down','left','right'].includes(direction))return;if(down)directionKeys.add(direction);else directionKeys.delete(direction);updateDpad();},
    cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();directionKeys.clear();hat={x:0,y:0};updateDpad();window.thorMenu?.clear();},
-   configure(value){if(['full','balanced','minimal','no-spells'].includes(value.graphicsQuality))window.thorGraphicsQuality=value.graphicsQuality;window.thorGraphics?.configure(value.graphicsQuality);if(Object.prototype.hasOwnProperty.call(value,'spellShortcuts')&&JSON.stringify(value.spellShortcuts)!==JSON.stringify(settings.spellShortcuts)){finish('pointercancel');padHeld.clear();padRoutes.clear();}const before=settings.autoSpellMode;settings={...settings,...value};if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
+   configure(value){if(['full','balanced','minimal','no-spells'].includes(value.graphicsQuality))window.thorGraphicsQuality=value.graphicsQuality;window.thorGraphics?.configure(value.graphicsQuality);if(Object.prototype.hasOwnProperty.call(value,'spellShortcuts')&&JSON.stringify(value.spellShortcuts)!==JSON.stringify(settings.spellShortcuts)){finish('pointercancel');padHeld.clear();padRoutes.clear();}const before=settings.autoSpellMode;settings={...settings,...value};if(settings.autoSpells&&['buffs','full'].includes(settings.autoSpellMode))resumeAutoMode=settings.autoSpellMode;if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
+   toggleAutoSpells(){
+     const main=document.querySelector('main');
+     if(!foreground||document.hidden||!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel')||window.thorMenu?.active())return false;
+     const mode=settings.autoSpells===true&&settings.autoSpellMode!=='off'?'off':resumeAutoMode;
+     this.configure({autoSpellMode:mode,autoSpells:mode!=='off'});
+     return mode;
+   },
    beginPreferences(){const main=document.querySelector('main');const shouldPause=main?.classList.contains('phase-playing')&&!main.classList.contains('modal-open');if(shouldPause)this.pause();return !!shouldPause;},
    endPreferences(){if(document.querySelector('.pause-panel'))this.pause();},
    key(key,code,down){
