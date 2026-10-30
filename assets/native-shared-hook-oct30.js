@@ -7,7 +7,7 @@
 ;hc=level=>{if(!thorRegistries.has(level))thorRegistries.set(level,thorRegistrySource(level));return thorRegistries.get(level);};
 ;window.thorAnimationRegistryCached=true;
 ;window.thorMobileAssetsEnabled=true;
-;const thorGearWork=window.thorWorkCache.install({slots:Nm,items:Am,radiant:Lm,target:oF,taunts:UZ,summonTargetable:rF});
+;const thorGearWork=window.thorWorkCache.install({slots:Nm,items:Am,radiant:Lm,target:oF,taunts:UZ,fixedBonuses:{'sram-hat':{'sram-trap-size':50}},summonTargetable:rF});
 ;Vm=thorGearWork.bonus;ph=thorGearWork.total;
 ;window.thorGameData={version:'415982b2dfdca8716165280d62adf2d34710b6f65209766d2af025631a1fc30b',attackRange:uI,getClass:T,classes:ta,enemyDefs:A,summonDefs:IZ,items:Am,spells:ka,awakenings:Aa,normalizeProgress:pn,summonState:hP,createState:b1,statDescriptors:Xg,statCurrent:i_,statNext:a_,makeItem:Um,makeRadiant:Wm,abilityClips:Tc,mapClips:Wc,loadClips:yc,clipDirection:O,crow:O_};
 ;window.thorGameData.petRules={maximumXp:ee,definitions:x,level:oe,bonus:se};

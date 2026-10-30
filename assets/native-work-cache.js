@@ -4,10 +4,11 @@
 ;(function(){
  'use strict';
  window.thorWorkCache={
-  install({slots,items,radiant,target,taunts,summonTargetable=summon=>summon.state!=='appear'&&!(summon.invisibleTimer>0)}){
+  install({slots,items,radiant,target,taunts,fixedBonuses={},summonTargetable=summon=>summon.state!=='appear'&&!(summon.invisibleTimer>0)}){
    const indices=new Map();
    const bonus=(item,stat)=>{
     if(!item)return 0;
+    const fixed=fixedBonuses[item.id];if(fixed&&Object.prototype.hasOwnProperty.call(fixed,stat))return fixed[stat];
     let byStat=indices.get(item.id);
     if(!byStat){byStat=new Map();indices.set(item.id,byStat);}
     let index=byStat.get(stat);
