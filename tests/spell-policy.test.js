@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const policy=require('../assets/spell-policy.js'),mapping=require('../assets/spell-bindings.js');
-assert.deepEqual(policy.sanitize({feca:['shield','shield','area','bad'],iop:['shield','jump'],sram:'bad'}),{feca:['shield'],iop:['jump'],sram:[],enutrof:[],osamodas:[],cra:[]});
+assert.deepEqual(policy.sanitize({feca:['shield','shield','area','bad'],iop:['shield','jump'],sram:'bad'}),{feca:['shield'],iop:['jump'],sram:[],enutrof:[],osamodas:[],cra:[],sadida:[]});
 for(const [level,character] of Object.entries({astrub:'feca',litneg:'iop',wabbit:'sram',gelee:'enutrof',dragoeuf:'osamodas'}))assert.equal(policy.classFor(level),character);
 const manual={feca:['shield','staffBoomerang'],iop:['jump'],sram:['invisibility']};
 assert.equal(policy.allowed('shield','feca','full',manual),false);
@@ -27,7 +27,7 @@ window.thorAutoSpells.configure('buffs',{feca:['shield','speed']});tick();assert
 window.thorAutoSpells.configure('off',{});assert.equal(tick,null);
 console.log('Per-class spell policy: sanitization, passive exclusion, mode inheritance, isolated preferences and runtime filtering passed');
 
-assert.equal(Object.keys(policy.catalog.spells).length,79);assert.equal(policy.catalog.classes.enutrof.length,19);for(const [id,awakening] of [['shield',2],['vitality',3],['amplification',1]]){assert(policy.isPassive(id,{[id]:awakening}));assert(!policy.allowed(id,id==='shield'?'feca':'iop','full',{}, {[id]:awakening}));}assert(mapping.needsAim('arnaque'));assert(mapping.needsAim('brokle'));assert(mapping.needsAim('brokle',{brokle:1}));assert.equal(mapping.travelRange('dash',{}, {dash:2}),112.5);assert.equal(mapping.travelRange('jump',{}, {jump:1}),270);
+assert.equal(Object.keys(policy.catalog.spells).length,90);assert.equal(policy.catalog.classes.enutrof.length,19);for(const [id,awakening] of [['shield',2],['vitality',3],['amplification',1]]){assert(policy.isPassive(id,{[id]:awakening}));assert(!policy.allowed(id,id==='shield'?'feca':'iop','full',{}, {[id]:awakening}));}assert(mapping.needsAim('arnaque'));assert(mapping.needsAim('brokle'));assert(mapping.needsAim('brokle',{brokle:1}));assert.equal(mapping.travelRange('dash',{}, {dash:2}),112.5);assert.equal(mapping.travelRange('jump',{}, {jump:1}),270);
 for(const characterId of Object.keys(policy.catalog.classes))for(const levelId of ['astrub','wabbit','gelee','litneg','dragoeuf'])assert.equal(policy.classFor({characterId,levelId}),characterId,'class independent of map');
 assert.equal(policy.classFor({characterId:'unknown',levelId:'astrub'}),null,'unknown explicit class fails closed');assert.equal(policy.classFor({levelId:'astrub'}),'feca','older state remains supported');
 

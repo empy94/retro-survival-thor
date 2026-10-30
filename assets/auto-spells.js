@@ -24,6 +24,7 @@
  function plan(s,spells,mapping,mode='full'){
    if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
    if(mode==='full'&&s.player.hp/s.player.maxHp<=.35){const heal=spells.find(spell=>spell.id==='cawotte'&&spell.ready);if(heal)return {spell:heal,target:{x:s.player.x,y:s.player.y},score:1200};}
+   if(mode==='buffs'&&s.character==='sadida'&&s.player.hp/s.player.maxHp<=.35){const spell=spells.find(spell=>spell.id==='sylvanPower'&&spell.ready);if(spell)return {spell,target:null,score:1100};}
    if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:allyBuff(s,spells);}
    if(mode!=='full'||!s.enemies.length)return null;
    const p=s.player,enemies=s.enemies.filter(e=>e.kind!=='oto-mustam'&&!e.ratRaid&&[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
@@ -35,6 +36,11 @@
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
    for(const spell of spells){if(!spell.ready||spell.id==='cawotte')continue;const id=spell.id;
+     if(s.character==='sadida'){
+       if(id==='sylvanPower'){if(urgent||p.hp/p.maxHp<=.35)add(spell,null,1100);continue;}
+       if(['blockerDoll','madDoll','sacrificialDoll'].includes(id)){add(spell,null,200);continue;}
+       if(['tear','soothingBramble','madGrass'].includes(id)&&root?.thorGameAdapter?.sadidaTarget){const target=root.thorGameAdapter.sadidaTarget(id);if(target&&Number.isFinite(target.x)&&Number.isFinite(target.y))add(spell,target,id==='tear'?220:urgent?800:200);continue;}
+     }
      if(id==='chaferfu'){if(urgent)add(spell,null,600);continue;}
      if(id==='bearCry'||id==='toad'){const action=allyBuff(s,[spell]);if(action)candidates.push(action);continue;}
      if(id==='animatedChest'&&s.summons?.chest)continue;

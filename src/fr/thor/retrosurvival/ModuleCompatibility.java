@@ -13,7 +13,7 @@ final class ModuleCompatibility {
   String hook(){StringBuilder out=new StringBuilder();try{for(int i=0;i<hooks.length();i++)out.append('\n').append(render(hooks.getJSONArray(i),names));}catch(JSONException error){throw new IllegalArgumentException(error);}return out.toString();}
  }
  static Match resolve(String source,String profile){return resolve(source,profile,8000000);}
- static Match resolveShared(String source,String profile){return resolve(source,profile,12000000);}
+ static Match resolveShared(String source,String profile){return resolve(source,profile,20000000);}
  private static Match resolve(String source,String profile,int sourceLimit){
   if(source==null||source.length()>sourceLimit||profile==null||profile.length()>1000000)return null;
   try{

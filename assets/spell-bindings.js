@@ -12,7 +12,7 @@
    if(id==='jump')return 270*(1+upgrade('jumpRange')/3);
    return null;
  }
- const craAimed=new Set(['burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow']);
+ const craAimed=new Set(['burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass']);
  function needsAim(id,awakenings={}){return (aimed.has(id)||craAimed.has(id)||id==='arakne')&&!(id==='burningGlyph'&&awakenings.burningGlyph===2)&&!(id==='explosiveArrow'&&awakenings.explosiveArrow===2);}
  function radialSpec(id,upgrades={},awakenings={}){
    if(!needsAim(id,awakenings))return null;
