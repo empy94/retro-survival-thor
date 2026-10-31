@@ -6,7 +6,7 @@ Chargement des cartes corrigé avec les réglages graphiques allégés. Les pré
 
 ## 1.25.9
 
-Compatibilité actualisée avec le jeu officiel et correction du chargement des ressources. Amélioration des transitions de sauvegarde avec copie de secours.
+Compatibilité actualisée avec le jeu officiel et correction du chargement des ressources. 
 
 ## 1.25.5
 
