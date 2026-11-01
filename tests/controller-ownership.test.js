@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
+const source=fs.readFileSync('assets/controller-ownership.js','utf8');
+let nativeReads=0,ownCalls=0;const prototype={getGamepads(){nativeReads++;return [{connected:true,axes:[1,-1],buttons:[{pressed:true}]}]}};
+const navigator=Object.create(prototype),window={thorControls:{controller(){ownCalls++}}},ctx={window,navigator};vm.createContext(ctx);
+vm.runInContext(source,ctx);assert.equal(navigator.getGamepads().length,0);assert.equal(nativeReads,0);assert.equal(window.thorControllerOwnership.owner,'android');assert(window.thorControllerOwnership.nativePollingBlocked);
+window.thorControls.controller('A',true);assert.equal(ownCalls,1);assert.equal(prototype.getGamepads().length,1,'other browser contexts keep their native input');
+const owner=window.thorControllerOwnership;vm.runInContext(source,ctx);assert.equal(owner,window.thorControllerOwnership,'idempotent before page startup');
+const nextDocument={window:{},navigator};vm.runInNewContext(source,nextDocument);assert(nextDocument.window.thorControllerOwnership.nativePollingBlocked,'reused Navigator remains correctly owned');
+const withoutApi={window:{},navigator:{}};vm.runInNewContext(source,withoutApi);assert(withoutApi.window.thorControllerOwnership.nativePollingBlocked);
+assert(!source.includes('localStorage'));assert(!source.includes('fetch('));
+console.log('Single Android controller owner: native browser polling suppressed, existing controls and other contexts intact.');

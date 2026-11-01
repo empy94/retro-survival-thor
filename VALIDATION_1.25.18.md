@@ -1,0 +1,15 @@
+# Manette : conserver le pilotage de l’application — 1.25.18
+
+1er novembre 2026. Modules officiels : `page-D9Xo5zuV.js`, SHA-256 `0aad7caa8732a0621137c2481c16a5f4f7a6cc44d3bdc840305e63d5880e233a` ; données `discord-identity-D_O9kMSE.js`, SHA-256 `0f3ad77d5d72296adf269a32d4b8c5da55430fffa245be0ac9fbb61d2decd73b`.
+
+Le jeu propose désormais une lecture directe des boutons, des deux sticks et de la croix par `navigator.getGamepads()`, ainsi qu’une boucle React de navigation. Cette lecture pourrait traiter une seconde fois les entrées déjà reçues par Android ou remplacer le déplacement virtuel. Le pilotage Android existant reste l’unique pilote dans cette WebView.
+
+Un script exécuté avant les modules du jeu masque cette seconde source de manette dans le document. Le profil courant supprime aussi le hook manette natif avant le premier montage React, afin de ne pas conserver une boucle vide par image. Le choix est stable pendant toute la vie du document ; le nombre de hooks React ne change pas entre rendus. Le prototype du navigateur, les autres contextes et les réglages enregistrés ne sont pas modifiés. Les commandes manette de l’application, les raccourcis de sorts, R3, les déplacements continus et le clavier restent inchangés.
+
+Les contrats courants sont ajoutés aux anciens. La résolution du rendu accepte maintenant les renommages de variables locales dans la seule déclaration native identifiée ; la logique et les références natives sont conservées. Les contrôles d’unicité, d’empreinte et de contrats restent actifs. Les trois réglages graphiques sont conservés.
+
+Vérification : suites de pilotage unique, R3, touches de sorts, répétition de croix, clavier, navigation, panneaux de choix, sorts automatiques, Corbeau, Crâ, collection et graphismes réussies. Tests natifs avec une manette fictive dont les axes et boutons sont tous maintenus : la seconde lecture est vide et le hook du jeu est neutralisé, en ligne comme dans l’origine locale. Tests du rendu actuel et de refus des ancres manquantes/dupliquées réussis.
+
+Sur le Thor, après réveil et contrôle du focus : deux pressions Android sur la croix donnent exactement deux couples appui/relâchement et passent de JOUER à MULTIJOUEUR sans défilement supplémentaire. Dans une partie Sadida à Astrub en mode `arcade-zqsd`, deux pressions Android sur R3 produisent exactement `full → off → full`. Une injection joystick diagonale est reçue dans les deux axes, puis revient à zéro au relâchement ; le déplacement du personnage n’a pas été mesuré, car un passage au niveau 2 a mis la partie solo en pause pendant cet essai. Les essais de touches injectées ont été repris après un premier essai interrompu par la veille de l’appareil et une erreur Android d’absence de fenêtre focalisée.
+
+APK normale 1.25.18/code 76 réinstallée après diagnostic : SHA-256 `176c67d79128dc62148ca37516ec799debef52f927e3b1a6578a9f130f7fd329`, identique sur appareil. UID conservé, débogage désactivé et aucune donnée effacée. Pas de mesure FPS de combat complet dans cette intervention.
