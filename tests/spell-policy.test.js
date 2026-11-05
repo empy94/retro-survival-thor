@@ -35,3 +35,13 @@ for(const id of ["shovelKiss","slaughteringShovel","tofuSummon","bouftouSummon"]
 
 const displayed=[...fs.readFileSync('assets/dashboard.html','utf8').matchAll(/data-class="([^"]+)"/g)].map(m=>m[1]);
 assert.deepEqual(displayed.sort(),Object.keys(policy.catalog.classes).sort(),'each class has a visible selector');
+
+// Android validates both saved manual choices and shortcuts from this JSON.
+const androidCatalog=JSON.parse(fs.readFileSync('assets/spell-catalog.json','utf8'));
+assert.deepEqual(androidCatalog,policy.catalog,'Android and WebView catalogs must agree for every class, spell and native passive');
+for(const [character,id]of [['cra','punitiveArrow'],['sadida','multipleBrambles']]){
+ assert(androidCatalog.classes[character].includes(id));assert(!androidCatalog.passive.includes(id));
+ assert.equal(policy.allowed(id,character,'full',{}),true);
+ assert.equal(policy.allowed(id,character,'full',{[character]:[id]}),false);
+}
+console.log('Android validation and displayed policies share all seven classes and 90 spells; Cra and Sadida manual choices are accepted.');
