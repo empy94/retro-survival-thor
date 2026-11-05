@@ -7,12 +7,12 @@
  let previousRaw,previousLocale,previousSnapshot,previousItems;
  const rollKeys={cawotte:'cawotteRoll',sufokien:'sufokienRoll','dofus-emeraude':'emeraudeRoll','dofus-vulbis':'vulbisRoll','dofus-gardienne':'guardianRoll','dofus-vinaigrette':'vinaigretteRoll'};
  let catalogItems=null,currentCatalogue=catalogue;
- function entries(){const items=root.thorGameData?.items;if(!items)return catalogue;if(items===catalogItems)return currentCatalogue;catalogItems=items;const known=new Map(catalogue.map(item=>[item.id,item]));for(const [id,item]of Object.entries(items))if(item.slot==='dofus')known.set(id,{...(known.get(id)||{id,level:''}),name:item.name,level:known.get(id)?.level||(id==='dofus-arena'?'Arène':''),icon:item.icon?'https://retrosurvival.online'+item.icon:''});return currentCatalogue=[...known.values()];}
+ function entries(){const items=root.thorGameData?.items;if(!items)return catalogue;if(items===catalogItems)return currentCatalogue;catalogItems=items;const known=new Map(catalogue.map(item=>[item.id,item]));for(const [id,item]of Object.entries(items))if(item.slot==='dofus'&&(item.effects?.length||id!=='dofus-arena'))known.set(id,{...(known.get(id)||{id,level:''}),name:item.name,level:known.get(id)?.level||(id==='dofus-arena'?'Arène':''),icon:item.icon?'https://retrosurvival.online'+item.icon:''});return currentCatalogue=[...known.values()];}
  function describe(item){
    const native=root.thorGameData?.items?.[item?.id]?.effects;
-   if(native){const labels={'max-hp':'PV max','global-damage':'tous les dommages',damage:'tous les dommages','spell-damage':'dommages des sorts','basic-damage':'dommages d’autohit','basic-speed':'vitesse d’attaque',critical:'chance de coup critique','critical-damage':'dommages critiques','move-speed':'vitesse de déplacement',evasion:'esquive','cooldown-reduction':'vitesse récup.','drop-rate':'Prospection','experience-gain':'XP reçue','effect-duration':'durée des effets','spell-size':'taille des zones','long-range':'portée des attaques à distance','level-choice-chance':'chances de 4 choix de niveau'};return native.map((e,i)=>({label:text(labels[e.stat]||ranges[item.id]?.[i]?.[0]||'Bonus'),min:e.min,max:e.max,unit:['max-hp','drop-rate'].includes(e.stat)?'':'%',radiant:e.max<=0?e.max:Math.ceil(e.max*1.5)}));}
+   if(native){const labels={'max-hp':'PV max','global-damage':'tous les dommages',damage:'tous les dommages','spell-damage':'dommages des sorts','basic-damage':'dommages d’autohit','basic-speed':'vitesse d’attaque',critical:'chance de coup critique','critical-damage':'dommages critiques','move-speed':'vitesse de déplacement',evasion:'esquive','cooldown-reduction':'vitesse récup.','drop-rate':'Prospection','experience-gain':'XP reçue','effect-duration':'durée des effets','spell-size':'taille des zones','long-range':'portée des attaques à distance','level-choice-chance':'chances de 4 choix de niveau'};return native.map((e,i)=>({label:text(labels[e.stat]||ranges[item.id]?.[i]?.[0]||'Bonus'),min:e.min,max:e.max,unit:['max-hp','drop-rate'].includes(e.stat)?'':'%',radiant:e.max<0?(e.min===e.max?Math.trunc(e.max/1.5):e.max):Math.ceil(e.max*1.5)}));}
    const effects=ranges[item?.id];if(!effects)return null;
-   return effects.map(([label,min,max,unit])=>({label:text(label),min,max,unit,radiant:Math.ceil(max*1.5)}));
+   return effects.map(([label,min,max,unit])=>({label:text(label),min,max,unit,radiant:max<0?(min===max?Math.trunc(max/1.5):max):Math.ceil(max*1.5)}));
  }
  function snapshot(){
    let progress;
@@ -32,7 +32,7 @@
      const bonus=!obtained?'':value===null?text('Jet indisponible'):'+'+value+(spec.unit?' '+spec.unit:'')+' '+spec.label;
      return {...item,name:text(item.name),level:text(item.level),owned:obtained,radiant:isRadiant,bonus,ranges:describe(item)};
    });
-   return previousSnapshot={status:'available',owned:collection.filter(item=>item.owned).length,total:collection.length,entries:collection};
+   return previousSnapshot={status:'available',notice:root.thorGameData?.items?.['dofus-arena']?.effects?.length===0?text('Arène en bêta : pas encore de Dofus à obtenir.'):null,owned:collection.filter(item=>item.owned).length,total:collection.length,entries:collection};
  }
  const api={snapshot,describe};if(typeof module==='object'&&module.exports)module.exports=api;else root.thorCollection=api;
 })(typeof window==='object'?window:globalThis);

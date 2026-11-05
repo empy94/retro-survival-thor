@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const policy=require('../assets/spell-policy.js'),mapping=require('../assets/spell-bindings.js');
+let timer,clock=10000,casts=[];
+const state={character:'sadida',levelId:'arena',arenaSpells:['mound'],phase:'playing',width:1000,height:700,player:{x:400,y:350,hp:10,maxHp:10},enemies:[{x:500,y:350,r:20,hp:10}],buffs:{},upgrades:{},awakenings:{},traps:[]};
+const doc={hidden:false,querySelector:s=>s==='main'?{classList:{contains:c=>c==='phase-playing'}}:null,querySelectorAll:()=>[{__reactFiberTest:{key:'mound'},getAttribute:()=> 'false'}],addEventListener(){}};
+const win={document:doc,thorSpellPolicy:policy,thorSpellBindings:mapping,thorDashboard:{combatState:()=>state,travelState:()=>({x:400,y:350,scaleX:1,scaleY:1})},thorControls:{autoAvailable:()=>true,autoCast:(spell,target)=>{casts.push({id:spell.id,target});return true;}}};
+vm.runInNewContext(fs.readFileSync('assets/auto-spells.js','utf8'),{window:win,document:doc,Date:{now:()=>clock},performance:{now:()=>0},setInterval:f=>{timer=f;return 1},clearInterval(){timer=null}});
+win.thorAutoSpells.configure('full');timer();assert.equal(casts.length,1);assert.equal(casts[0].id,'mound');assert.equal(casts[0].target.x,500);
+clock+=1000;state.levelId='astrub';state.arenaSpells=null;timer();assert.equal(casts.length,1,'normal class restrictions preserved');
+state.levelId='arena';state.arenaSpells=['mound'];win.thorAutoSpells.configure('full',{enutrof:['mound']});clock+=1000;timer();assert.equal(casts.length,1,'manual exclusions use the spell original class');
+win.thorAutoSpells.configure('buffs',{});timer();assert.equal(casts.length,1,'buffs mode never attacks with a cross-class spell');
+win.thorAutoSpells.configure('off');assert.equal(timer,null);
+console.log('Arena scheduler casts learned cross-class spells; ordinary classes, manual exceptions, buffs and OFF remain respected.');

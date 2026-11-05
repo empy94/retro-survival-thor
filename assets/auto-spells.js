@@ -24,7 +24,7 @@
  function plan(s,spells,mapping,mode='full'){
    if(!s||s.phase!=='playing'||s.busy||s.player.hp<=0)return null;
    if(mode==='full'&&s.player.hp/s.player.maxHp<=.35){const heal=spells.find(spell=>spell.id==='cawotte'&&spell.ready);if(heal)return {spell:heal,target:{x:s.player.x,y:s.player.y},score:1200};}
-   if(mode==='buffs'&&s.character==='sadida'&&s.player.hp/s.player.maxHp<=.35){const spell=spells.find(spell=>spell.id==='sylvanPower'&&spell.ready);if(spell)return {spell,target:null,score:1100};}
+   if(mode==='buffs'&&(s.character==='sadida'||s.levelId==='arena')&&s.player.hp/s.player.maxHp<=.35){const spell=spells.find(spell=>spell.id==='sylvanPower'&&spell.ready);if(spell)return {spell,target:null,score:1100};}
    if(mode==='buffs'){const spell=spells.find(spell=>spell.ready&&Object.prototype.hasOwnProperty.call(buffs,spell.id)&&!((s.player[buffs[spell.id]]??s.buffs?.[buffs[spell.id]])>0));return spell?{spell,target:null,score:1}:allyBuff(s,spells);}
    if(mode!=='full'||!s.enemies.length)return null;
    const p=s.player,enemies=s.enemies.filter(e=>e.kind!=='oto-mustam'&&!e.ratRaid&&[e.x,e.y].every(Number.isFinite));if(!enemies.length)return null;
@@ -36,7 +36,7 @@
    const add=(spell,target,score)=>candidates.push({spell,target,score});
    const danger=q=>enemies.reduce((v,e)=>v+Math.max(0,140+e.r-distance(q,e)),0);
    for(const spell of spells){if(!spell.ready||spell.id==='cawotte')continue;const id=spell.id;
-     if(s.character==='sadida'){
+     if((s.character==='sadida'||s.levelId==='arena')){
        if(id==='sylvanPower'){if(urgent||p.hp/p.maxHp<=.35)add(spell,null,1100);continue;}
        if(['blockerDoll','madDoll','sacrificialDoll'].includes(id)){add(spell,null,200);continue;}
        if(['tear','soothingBramble','madGrass'].includes(id)&&root?.thorGameAdapter?.sadidaTarget){const target=root.thorGameAdapter.sadidaTarget(id);if(target&&Number.isFinite(target.x)&&Number.isFinite(target.y))add(spell,target,id==='tear'?220:urgent?800:200);continue;}
@@ -60,7 +60,7 @@
        const range=id==='liberation'?150*(1+(s.upgrades.liberationRadius||0)*.15):id==='intimidation'?125:110;
        if(nearest<=range)add(spell,id==='brokle'?{x:p.x,y:p.y}:null,id==='liberation'&&urgent?850:120);continue;
      }
-     if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&['enutrof','osamodas'].includes(s.character)&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
+     if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&(['enutrof','osamodas'].includes(s.character)||s.levelId==='arena')&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
      const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow','burningArrow','recoilArrow','lashingArrow'].includes(id);
      const enutrofRadius={shovelJudgment:85,slaughteringShovel:125,shovelKiss:50,mound:195,corruption:100};
@@ -93,7 +93,7 @@
    const main=document.querySelector('main');if(!main?.classList.contains('phase-playing')||main.classList.contains('modal-open')||document.querySelector('.pause-panel'))return;
    const start=performance.now(),now=Date.now(),s=root.thorDashboard?.combatState(mode!=='buffs');
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))],id=null;for(let i=0;f&&i<4;i++,f=f.return){if(f.key){id=f.key;break;}}return {el,id,ready:el.getAttribute('aria-disabled')!=='true'&&now-(lastAttempt.get(id)||0)>=800,aimed:root.thorSpellBindings.needsAim(id,s?.awakenings||{})};});
-   const eligible=root.thorSpellPolicy?spells.filter(spell=>root.thorSpellPolicy.allowed(spell.id,s?.character,mode,manual,s?.awakenings)):spells;
+   const eligible=root.thorSpellPolicy?spells.filter(spell=>root.thorSpellPolicy.allowed(spell.id,s?.character,mode,manual,s?.awakenings,s?.arenaSpells)):spells;
    const chosen=plan(s,eligible,root.thorSpellBindings,mode);lastMs=performance.now()-start;if(!chosen)return;
    const travel=chosen.target?root.thorDashboard.travelState():null;if(chosen.target&&!travel)return;
    const target=chosen.target?{x:travel.x+(chosen.target.x-s.player.x)*travel.scaleX,y:travel.y+(chosen.target.y-s.player.y)*travel.scaleY}:null;
