@@ -1,7 +1,8 @@
 // Build-time only: exact function contracts with module-binding renames.
 const fs=require('fs'),path=require('path');
 const root=path.resolve(__dirname,'..'),acorn=require(root+'/build/audit-tools/node_modules/acorn'),scope=require(root+'/build/audit-tools/node_modules/eslint-scope');
-const [sourceFile,output,...scripts]=process.argv.slice(2),source=fs.readFileSync(sourceFile,'utf8');
+// --pin=name anchors an audited non-exported helper whose generic body is ambiguous.
+const [sourceFile,output,...args]=process.argv.slice(2),scripts=args.filter(a=>!a.startsWith('--pin=')),pinned=args.filter(a=>a.startsWith('--pin=')).map(a=>a.slice(6)),source=fs.readFileSync(sourceFile,'utf8');
 function parse(text){return acorn.parse(text,{ecmaVersion:2022,sourceType:'module',ranges:true});}
 const ast=parse(source),analysis=scope.analyze(ast,{ecmaVersion:2022,sourceType:'module'}),mod=analysis.scopes.find(s=>s.type==='module');
 const bindings=new Map(mod.variables.map(v=>[v.name,v])),positions=new Map(),definitions=new Map(),imports={};
@@ -16,5 +17,6 @@ const localPositions=new Map(positions);let counter=0;for(const [scopeIndex,sc] 
 const contracts=[];for(const id of required){if(imports[id])continue;const n=definitions.get(id);if(!n)throw Error('No definition: '+id);contracts.push({symbol:id,parts:template(source,n.start,n.end,localPositions)});}
 const used=new Set(required);for(const c of contracts)for(const p of c.parts)if(typeof p==='object')used.add(p.symbol);
 const nativeExports={};for(const n of ast.body)if(n.type==='ExportNamedDeclaration')for(const entry of n.specifiers){const local=entry.local.name;if(used.has(local))nativeExports[local]=entry.exported.name||entry.exported.value;}
-const result={schema:1,...(sourceFile.includes('discord-identity-')?{exports:nativeExports,fixedNames:[...required].filter(id=>!nativeExports[id]&&definitions.get(id)?.type==='FunctionDeclaration'&&id.length===1)}:{}),...(raster?{raster}:{}),family:require('crypto').createHash('sha256').update(source).digest('hex'),imports:Object.fromEntries([...used].filter(id=>imports[id]).map(id=>[id,imports[id]])),contracts,hooks};
+for(const id of pinned)if(!required.has(id)||definitions.get(id)?.type!=='FunctionDeclaration')throw Error('Invalid pinned function: '+id);
+const result={schema:1,...(sourceFile.includes('discord-identity-')?{exports:nativeExports,fixedNames:[...new Set([...required].filter(id=>!nativeExports[id]&&definitions.get(id)?.type==='FunctionDeclaration'&&id.length===1).concat(pinned))]}:{}),...(raster?{raster}:{}),family:require('crypto').createHash('sha256').update(source).digest('hex'),imports:Object.fromEntries([...used].filter(id=>imports[id]).map(id=>[id,imports[id]])),contracts,hooks};
 fs.writeFileSync(output,JSON.stringify(result));console.log(path.basename(output),contracts.length,'contracts,',Object.keys(result.imports).length,'import bindings,',fs.statSync(output).size,'bytes');
