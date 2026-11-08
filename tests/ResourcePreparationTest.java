@@ -13,6 +13,7 @@ public final class ResourcePreparationTest {
   rejects(()->ResourcePreparation.paths(head+"[\"/assets/../api/profile\"]}",hash));
   rejects(()->ResourcePreparation.paths(head+"[\"/assets/a.webp?x=y\"]}",hash));
   rejects(()->ResourcePreparation.paths(head+"[\"/assets/a.webp\"]}","different"));
+  org.json.JSONArray oversized=new org.json.JSONArray();for(int i=0;i<10001;i++)oversized.put("/assets/a.webp");rejects(()->ResourcePreparation.paths(head+oversized.toString()+"}",hash));
   java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();try(java.util.zip.GZIPOutputStream gzip=new java.util.zip.GZIPOutputStream(bytes)){gzip.write((head+"[\"/assets/map.webp\"]}").getBytes(java.nio.charset.StandardCharsets.UTF_8));}
   String packed="{\"gzip\":\""+java.util.Base64.getEncoder().encodeToString(bytes.toByteArray())+"\"}";
   if(ResourcePreparation.paths(packed,hash).size()!=1)throw new AssertionError("Packed resource manifest");

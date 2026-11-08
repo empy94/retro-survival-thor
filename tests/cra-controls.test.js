@@ -4,7 +4,7 @@ for(const id of ['burningArrow','explosiveArrow','moleEye','dispersingArrow','re
  assert(bindings.needsAim(id),id);assert(policy.allowed(id,'cra','full',{}),id);
 }
 for(const id of ['frozenArrow','harassingArrow','distantShot','criticalShot'])assert(!policy.allowed(id,'cra','full',{}),'native passive: '+id);
-assert(!policy.allowed('explosiveArrow','cra','full',{}, {explosiveArrow:2}));assert(!bindings.needsAim('explosiveArrow',{explosiveArrow:2}));
+assert(policy.allowed('explosiveArrow','cra','full',{}, {explosiveArrow:2}));assert(!bindings.needsAim('explosiveArrow',{explosiveArrow:2}));
 const state={character:'cra',phase:'playing',width:742,height:432,player:{x:200,y:216,hp:15,maxHp:15},buffs:{bowMasteryTimer:4},upgrades:{},awakenings:{},enemies:[]};
 assert.equal(plan(state,[{id:'bowMastery',ready:true}],bindings,'buffs'),null,'do not recast active native buff');
 assert.equal(plan(state,[{id:'powerfulShot',ready:true}],bindings,'buffs').spell.id,'powerfulShot');

@@ -1,5 +1,62 @@
 {
   "classes": {
+    "sadida": [
+      "tremor",
+      "paralysingPoison",
+      "aggressiveBrambles",
+      "multipleBrambles",
+      "tear",
+      "sylvanPower",
+      "soothingBramble",
+      "madGrass",
+      "blockerDoll",
+      "madDoll",
+      "sacrificialDoll",
+      "cawotte",
+      "chaferfu",
+      "arakne",
+      "petitFrere"
+    ],
+    "sacrieur": [
+      "attraction",
+      "sacrieurAssault",
+      "dissolution",
+      "absorption",
+      "punishment",
+      "fury",
+      "cooperation",
+      "sacrieurDodge",
+      "sacrieurDetour",
+      "sacrieurSword",
+      "dancingSword",
+      "forcedPunishment",
+      "agilePunishment",
+      "wisePunishment",
+      "vitalPunishment",
+      "cawotte",
+      "chaferfu",
+      "arakne",
+      "petitFrere"
+    ],
+    "cra": [
+      "burningArrow",
+      "explosiveArrow",
+      "moleEye",
+      "dispersingArrow",
+      "recoilArrow",
+      "lashingArrow",
+      "frozenArrow",
+      "punitiveArrow",
+      "harassingArrow",
+      "distantShot",
+      "powerfulShot",
+      "bowMastery",
+      "criticalShot",
+      "cawotte",
+      "chaferfu",
+      "arakne",
+      "petitFrere"
+    ],
     "osamodas": [
       "tofuSummon",
       "bouftouSummon",
@@ -16,7 +73,8 @@
       "liberation",
       "cawotte",
       "chaferfu",
-      "arakne"
+      "arakne",
+      "petitFrere"
     ],
     "enutrof": [
       "chance",
@@ -37,7 +95,8 @@
       "liberation",
       "cawotte",
       "chaferfu",
-      "arakne"
+      "arakne",
+      "petitFrere"
     ],
     "sram": [
       "invisibility",
@@ -54,7 +113,8 @@
       "moonHammer",
       "cawotte",
       "chaferfu",
-      "arakne"
+      "arakne",
+      "petitFrere"
     ],
     "feca": [
       "shield",
@@ -71,7 +131,8 @@
       "liberation",
       "cawotte",
       "chaferfu",
-      "arakne"
+      "arakne",
+      "petitFrere"
     ],
     "iop": [
       "cut",
@@ -89,406 +150,438 @@
       "brokle",
       "cawotte",
       "chaferfu",
-      "arakne"
-    ],
-    "cra": [
-      "burningArrow",
-      "explosiveArrow",
-      "moleEye",
-      "dispersingArrow",
-      "recoilArrow",
-      "lashingArrow",
-      "frozenArrow",
-      "punitiveArrow",
-      "harassingArrow",
-      "distantShot",
-      "powerfulShot",
-      "bowMastery",
-      "criticalShot",
-      "cawotte",
-      "chaferfu",
-      "arakne"
-    ],
-    "sadida": [
-      "tremor",
-      "paralysingPoison",
-      "aggressiveBrambles",
-      "multipleBrambles",
-      "tear",
-      "sylvanPower",
-      "soothingBramble",
-      "madGrass",
-      "blockerDoll",
-      "madDoll",
-      "sacrificialDoll",
-      "cawotte",
-      "chaferfu",
-      "arakne"
+      "arakne",
+      "petitFrere"
     ]
   },
   "spells": {
+    "petitFrere": {
+      "name": "Petit Frère",
+      "icon": "https://retrosurvival.online/assets/stats/class-enutrof-ui.webp"
+    },
     "cawotte": {
       "name": "Cawotte",
-      "icon": "https://retrosurvival.online/assets/wabbit/cawotte-spell.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/cawotte-spell-ui.webp"
     },
     "chaferfu": {
       "name": "Invocation de Chaferfu",
-      "icon": "https://retrosurvival.online/assets/litneg/chaferfu-spell.webp"
+      "icon": "https://retrosurvival.online/assets/litneg/chaferfu-spell-ui.webp"
+    },
+    "arakne": {
+      "name": "Invocation d'Arakne",
+      "icon": "https://retrosurvival.online/assets/rat-noir/arakne-spell-ui.webp"
     },
     "tofuSummon": {
       "name": "Invocation de Tofu",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/tofuSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/tofuSummon-ui.webp"
     },
     "bouftouSummon": {
       "name": "Invocation de Bouftou",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/bouftouSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/bouftouSummon-ui.webp"
     },
     "prespicSummon": {
       "name": "Invocation de Prespic",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/prespicSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/prespicSummon-ui.webp"
     },
     "bworkMageSummon": {
       "name": "Invocation de Bwork Mage",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/bworkMageSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/bworkMageSummon-ui.webp"
     },
     "cracklerSummon": {
       "name": "Invocation de Craqueleur",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/cracklerSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/cracklerSummon-ui.webp"
     },
     "dragonnetSummon": {
       "name": "Invocation de Dragonnet Rouge",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/dragonnetSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/dragonnetSummon-ui.webp"
     },
     "crow": {
       "name": "Corbeau",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/crow.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/crow-ui.webp"
     },
     "bearCry": {
       "name": "Cri de l’Ours",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/bearCry.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/bearCry-ui.webp"
     },
     "toad": {
       "name": "Crapaud",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/toad.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/toad-ui.webp"
     },
     "cracklerStrike": {
       "name": "Frappe du Craqueleur",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/cracklerStrike.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/cracklerStrike-ui.webp"
     },
     "stingingClaw": {
       "name": "Griffe Cinglante",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/stingingClaw.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/stingingClaw-ui.webp"
     },
     "boarSummon": {
       "name": "Invocation de Sanglier",
-      "icon": "https://retrosurvival.online/assets/dragoeuf/boarSummon.webp"
+      "icon": "https://retrosurvival.online/assets/dragoeuf/boarSummon-ui.webp"
     },
     "corruption": {
       "name": "Corruption",
-      "icon": "https://retrosurvival.online/assets/gelee/corruption.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/corruption-ui.webp"
     },
     "earlyRetreat": {
       "name": "Retraite Anticipée",
-      "icon": "https://retrosurvival.online/assets/gelee/earlyRetreat.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/earlyRetreat-ui.webp"
     },
     "primeOfLife": {
       "name": "Force de l’Âge",
-      "icon": "https://retrosurvival.online/assets/gelee/primeOfLife.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/primeOfLife-ui.webp"
     },
     "animatedBag": {
       "name": "Sac Animé",
-      "icon": "https://retrosurvival.online/assets/gelee/animatedBag.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/animatedBag-ui.webp"
     },
     "animatedShovel": {
       "name": "Pelle Animée",
-      "icon": "https://retrosurvival.online/assets/gelee/animatedShovel.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/animatedShovel-ui.webp"
     },
     "clumsiness": {
       "name": "Maladresse",
-      "icon": "https://retrosurvival.online/assets/gelee/clumsiness.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/clumsiness-ui.webp"
     },
     "shovelThrow": {
       "name": "Lancer de Pelle",
-      "icon": "https://retrosurvival.online/assets/gelee/shovelThrow.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/shovelThrow-ui.webp"
     },
     "animatedChest": {
       "name": "Coffre Animé",
-      "icon": "https://retrosurvival.online/assets/gelee/animatedChest.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/animatedChest-ui.webp"
     },
     "pandorasBox": {
       "name": "Boîte de Pandore",
-      "icon": "https://retrosurvival.online/assets/gelee/pandorasBox.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/pandorasBox-ui.webp"
     },
     "shovelKiss": {
       "name": "Roulage de Pelle",
-      "icon": "https://retrosurvival.online/assets/gelee/shovelKiss.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/shovelKiss-ui.webp"
     },
     "mound": {
       "name": "Remblai",
-      "icon": "https://retrosurvival.online/assets/gelee/mound.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/mound-ui.webp"
     },
     "chance": {
       "name": "Chance",
-      "icon": "https://retrosurvival.online/assets/gelee/chance.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/chance-ui.webp"
     },
     "acceleration": {
       "name": "Accélération",
-      "icon": "https://retrosurvival.online/assets/gelee/acceleration.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/acceleration-ui.webp"
     },
     "shovelJudgment": {
       "name": "Pelle du Jugement",
-      "icon": "https://retrosurvival.online/assets/gelee/shovelJudgment.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/shovelJudgment-ui.webp"
     },
     "slaughteringShovel": {
       "name": "Pelle Massacrante",
-      "icon": "https://retrosurvival.online/assets/gelee/slaughteringShovel.webp"
+      "icon": "https://retrosurvival.online/assets/gelee/slaughteringShovel-ui.webp"
     },
     "invisibility": {
       "name": "Invisibilité",
-      "icon": "https://retrosurvival.online/assets/wabbit/invisibility.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/invisibility-ui.webp"
     },
     "lethalAttack": {
       "name": "Attaque Mortelle",
-      "icon": "https://retrosurvival.online/assets/wabbit/lethalAttack.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/lethalAttack-ui.webp"
     },
     "slyTrap": {
       "name": "Piège Sournois",
-      "icon": "https://retrosurvival.online/assets/wabbit/slyTrap.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/slyTrap-ui.webp"
     },
     "repulsiveTrap": {
       "name": "Piège Répulsif",
-      "icon": "https://retrosurvival.online/assets/wabbit/repulsiveTrap.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/repulsiveTrap-ui.webp"
     },
     "massTrap": {
       "name": "Piège de Masse",
-      "icon": "https://retrosurvival.online/assets/wabbit/massTrap.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/massTrap-ui.webp"
     },
     "sramDouble": {
       "name": "Double",
-      "icon": "https://retrosurvival.online/assets/wabbit/sramDouble.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/sramDouble-ui.webp"
     },
     "insidiousPoison": {
       "name": "Poison insidieux",
-      "icon": "https://retrosurvival.online/assets/wabbit/insidiousPoison.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/insidiousPoison-ui.webp"
     },
     "fear": {
       "name": "Peur",
-      "icon": "https://retrosurvival.online/assets/wabbit/fear.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/fear-ui.webp"
     },
     "fourvoiement": {
       "name": "Fourvoiement",
-      "icon": "https://retrosurvival.online/assets/wabbit/fourvoiement.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/fourvoiement-ui.webp"
     },
     "arnaque": {
       "name": "Arnaque",
-      "icon": "https://retrosurvival.online/assets/wabbit/arnaque.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/arnaque-ui.webp"
     },
     "moonHammer": {
       "name": "Marteau de Moon",
-      "icon": "https://retrosurvival.online/assets/wabbit/moonHammer.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/moonHammer-ui.webp"
     },
     "chakra": {
       "name": "Pulsion de Chakra",
-      "icon": "https://retrosurvival.online/assets/wabbit/chakra.webp"
+      "icon": "https://retrosurvival.online/assets/wabbit/chakra-ui.webp"
     },
     "shield": {
       "name": "Bouclier Féca",
-      "icon": "https://retrosurvival.online/assets/spells/shield.webp"
+      "icon": "https://retrosurvival.online/assets/spells/shield-ui.webp"
     },
     "speed": {
       "name": "Armure Venteuse",
-      "icon": "https://retrosurvival.online/assets/spells/wind-armor.webp"
+      "icon": "https://retrosurvival.online/assets/spells/wind-armor-ui.webp"
     },
     "staffScience": {
       "name": "Science du Bâton",
-      "icon": "https://retrosurvival.online/assets/spells/staff-science.webp"
+      "icon": "https://retrosurvival.online/assets/spells/staff-science-ui.webp"
     },
     "immobilizationGlyph": {
       "name": "Glyphe d’Immobilisation",
-      "icon": "https://retrosurvival.online/assets/spells/immobilization-glyph.webp"
+      "icon": "https://retrosurvival.online/assets/spells/immobilization-glyph-ui.webp"
     },
     "dash": {
       "name": "Téléportation",
-      "icon": "https://retrosurvival.online/assets/spells/dash.webp"
+      "icon": "https://retrosurvival.online/assets/spells/dash-ui.webp"
     },
     "area": {
       "name": "Foudroiement",
-      "icon": "https://retrosurvival.online/assets/spells/area.webp"
+      "icon": "https://retrosurvival.online/assets/spells/area-ui.webp"
     },
     "bubble": {
       "name": "Bulle",
-      "icon": "https://retrosurvival.online/assets/spells/bubble.webp"
+      "icon": "https://retrosurvival.online/assets/spells/bubble-ui.webp"
     },
     "flamiche": {
       "name": "Flamiche",
-      "icon": "https://retrosurvival.online/assets/spells/flamiche.webp"
+      "icon": "https://retrosurvival.online/assets/spells/flamiche-ui.webp"
     },
     "burningGlyph": {
       "name": "Glyphe Enflammé",
-      "icon": "https://retrosurvival.online/assets/spells/burning-glyph.webp"
+      "icon": "https://retrosurvival.online/assets/spells/burning-glyph-ui.webp"
     },
     "aggressiveGlyph": {
       "name": "Glyphe Agressif",
-      "icon": "https://retrosurvival.online/assets/spells/aggressive-glyph.webp"
+      "icon": "https://retrosurvival.online/assets/spells/aggressive-glyph-ui.webp"
     },
     "staffBoomerang": {
       "name": "Retour du Bâton",
-      "icon": "https://retrosurvival.online/assets/spells/staff-boomerang.webp"
+      "icon": "https://retrosurvival.online/assets/spells/staff-boomerang-ui.webp"
     },
     "cut": {
       "name": "Couper",
-      "icon": "https://retrosurvival.online/assets/spells/cut.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cut-ui.webp"
     },
     "swordOfFate": {
       "name": "Épée du Destin",
-      "icon": "https://retrosurvival.online/assets/spells/sword-of-fate.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sword-of-fate-ui.webp"
     },
     "jump": {
       "name": "Bond",
-      "icon": "https://retrosurvival.online/assets/spells/jump.webp"
+      "icon": "https://retrosurvival.online/assets/spells/jump-ui.webp"
     },
     "power": {
       "name": "Puissance",
-      "icon": "https://retrosurvival.online/assets/spells/power.webp"
+      "icon": "https://retrosurvival.online/assets/spells/power-ui.webp"
     },
     "liberation": {
       "name": "Libération",
-      "icon": "https://retrosurvival.online/assets/spells/liberation.webp"
+      "icon": "https://retrosurvival.online/assets/spells/liberation-ui.webp"
     },
     "intimidation": {
       "name": "Intimidation",
-      "icon": "https://retrosurvival.online/assets/spells/intimidation.webp"
+      "icon": "https://retrosurvival.online/assets/spells/intimidation-ui.webp"
     },
     "celestialSword": {
       "name": "Épée Céleste",
-      "icon": "https://retrosurvival.online/assets/spells/celestial-sword.webp"
+      "icon": "https://retrosurvival.online/assets/spells/celestial-sword-ui.webp"
     },
     "divineSword": {
       "name": "Épée Divine",
-      "icon": "https://retrosurvival.online/assets/spells/divine-sword.webp"
+      "icon": "https://retrosurvival.online/assets/spells/divine-sword-ui.webp"
     },
     "iopSword": {
       "name": "Épée de Iop",
-      "icon": "https://retrosurvival.online/assets/spells/iop-sword.webp"
+      "icon": "https://retrosurvival.online/assets/spells/iop-sword-ui.webp"
     },
     "brokle": {
       "name": "Brokle",
-      "icon": "https://retrosurvival.online/assets/spells/brokle.webp"
+      "icon": "https://retrosurvival.online/assets/spells/brokle-ui.webp"
     },
     "vitality": {
       "name": "Vitalité",
-      "icon": "https://retrosurvival.online/assets/spells/vitality.webp"
+      "icon": "https://retrosurvival.online/assets/spells/vitality-ui.webp"
     },
     "mutilation": {
       "name": "Mutilation",
-      "icon": "https://retrosurvival.online/assets/spells/mutilation.webp"
+      "icon": "https://retrosurvival.online/assets/spells/mutilation-ui.webp"
     },
     "amplification": {
       "name": "Amplification",
-      "icon": "https://retrosurvival.online/assets/spells/amplification.webp"
+      "icon": "https://retrosurvival.online/assets/spells/amplification-ui.webp"
     },
     "burningArrow": {
       "name": "Flèche Enflammée",
-      "icon": "https://retrosurvival.online/assets/spells/cra/burningArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/burningArrow-ui.webp"
     },
     "explosiveArrow": {
       "name": "Flèche Explosive",
-      "icon": "https://retrosurvival.online/assets/spells/cra/explosiveArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/explosiveArrow-ui.webp"
     },
     "moleEye": {
       "name": "Oeil de Taupe",
-      "icon": "https://retrosurvival.online/assets/spells/cra/moleEye.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/moleEye-ui.webp"
     },
     "dispersingArrow": {
       "name": "Flèche de dispersion",
-      "icon": "https://retrosurvival.online/assets/spells/cra/dispersingArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/dispersingArrow-ui.webp"
     },
     "recoilArrow": {
       "name": "Flèche de Recul",
-      "icon": "https://retrosurvival.online/assets/spells/cra/recoilArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/recoilArrow-ui.webp"
     },
     "lashingArrow": {
       "name": "Flèche Cinglante",
-      "icon": "https://retrosurvival.online/assets/spells/cra/lashingArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/lashingArrow-ui.webp"
     },
     "frozenArrow": {
       "name": "Flèche Glacée",
-      "icon": "https://retrosurvival.online/assets/spells/cra/frozenArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/frozenArrow-ui.webp"
     },
     "punitiveArrow": {
       "name": "Flèche Punitive",
-      "icon": "https://retrosurvival.online/assets/spells/cra/punitiveArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/punitiveArrow-ui.webp"
     },
     "harassingArrow": {
       "name": "Flèche Harcelante",
-      "icon": "https://retrosurvival.online/assets/spells/cra/harassingArrow.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/harassingArrow-ui.webp"
     },
     "distantShot": {
       "name": "Tir Eloigné",
-      "icon": "https://retrosurvival.online/assets/spells/cra/distantShot.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/distantShot-ui.webp"
     },
     "powerfulShot": {
       "name": "Tir Puissant",
-      "icon": "https://retrosurvival.online/assets/spells/cra/powerfulShot.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/powerfulShot-ui.webp"
     },
     "bowMastery": {
       "name": "Maîtrise de l'Arc",
-      "icon": "https://retrosurvival.online/assets/spells/cra/bowMastery.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/bowMastery-ui.webp"
     },
     "criticalShot": {
       "name": "Tir Critique",
-      "icon": "https://retrosurvival.online/assets/spells/cra/criticalShot.webp"
-    },
-    "arakne": {
-      "name": "Invocation d’Arakne",
-      "icon": "https://retrosurvival.online/assets/rat-noir/arakne-spell.webp"
+      "icon": "https://retrosurvival.online/assets/spells/cra/criticalShot-ui.webp"
     },
     "tremor": {
       "name": "Tremblement",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/tremor.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/tremor-ui.webp"
     },
     "paralysingPoison": {
       "name": "Poison Paralysant",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/paralysingPoison.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/paralysingPoison-ui.webp"
     },
     "aggressiveBrambles": {
       "name": "Ronces Agressives",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/aggressiveBrambles.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/aggressiveBrambles-ui.webp"
     },
     "multipleBrambles": {
       "name": "Ronces Multiples",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/multipleBrambles.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/multipleBrambles-ui.webp"
     },
     "tear": {
       "name": "Larme",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/tear.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/tear-ui.webp"
     },
     "sylvanPower": {
       "name": "Puissance Sylvestre",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/sylvanPower.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/sylvanPower-ui.webp"
     },
     "soothingBramble": {
       "name": "Ronce Apaisante",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/soothingBramble.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/soothingBramble-ui.webp"
     },
     "madGrass": {
       "name": "Herbe Folle",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/madGrass.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/madGrass-ui.webp"
     },
     "blockerDoll": {
       "name": "La Bloqueuse",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/blockerSummon.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/blockerSummon-ui.webp"
     },
     "madDoll": {
       "name": "La Folle",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/madDollSummon.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/madDollSummon-ui.webp"
     },
     "sacrificialDoll": {
       "name": "La Sacrifiée",
-      "icon": "https://retrosurvival.online/assets/spells/sadida/sacrificialDollSummon.webp"
+      "icon": "https://retrosurvival.online/assets/spells/sadida/sacrificialDollSummon-ui.webp"
+    },
+    "attraction": {
+      "name": "Attirance",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/attraction-ui.webp"
+    },
+    "sacrieurAssault": {
+      "name": "Assaut",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/sacrieurAssault-ui.webp"
+    },
+    "dissolution": {
+      "name": "Dissolution",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/dissolution-ui.webp"
+    },
+    "absorption": {
+      "name": "Absorption",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/absorption-ui.webp"
+    },
+    "punishment": {
+      "name": "Punition",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/punishment-ui.webp"
+    },
+    "fury": {
+      "name": "Furie",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/fury-ui.webp"
+    },
+    "cooperation": {
+      "name": "Coopération",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/cooperation-ui.webp"
+    },
+    "sacrieurDodge": {
+      "name": "Dérobade",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/sacrieurDodge-ui.webp"
+    },
+    "sacrieurDetour": {
+      "name": "Détour",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/sacrieurDetour-ui.webp"
+    },
+    "sacrieurSword": {
+      "name": "Épée Volante",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/sacrieurSword-ui.webp"
+    },
+    "dancingSword": {
+      "name": "Invocation d’Épée Dansante",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/dancingSword-ui.webp"
+    },
+    "forcedPunishment": {
+      "name": "Châtiment Forcé",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/forcedPunishment-ui.webp"
+    },
+    "agilePunishment": {
+      "name": "Châtiment Agile",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/agilePunishment-ui.webp"
+    },
+    "wisePunishment": {
+      "name": "Châtiment Sage",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/wisePunishment-ui.webp"
+    },
+    "vitalPunishment": {
+      "name": "Châtiment Vitalesque",
+      "icon": "https://retrosurvival.online/assets/spells/sacrieur/vitalPunishment-ui.webp"
     }
   },
   "passive": [
+    "petitFrere",
     "area",
     "bubble",
     "flamiche",
@@ -499,6 +592,7 @@
     "fourvoiement",
     "moonHammer",
     "divineSword",
+    "iopSword",
     "chance",
     "pandorasBox",
     "clumsiness",
@@ -514,13 +608,23 @@
     "cracklerSummon",
     "dragonnetSummon",
     "bearCry",
-    "frozenArrow",
     "harassingArrow",
+    "frozenArrow",
     "distantShot",
     "criticalShot",
     "tremor",
     "paralysingPoison",
-    "aggressiveBrambles"
+    "aggressiveBrambles",
+    "blockerDoll",
+    "madDoll",
+    "sacrificialDoll",
+    "forcedPunishment",
+    "agilePunishment",
+    "wisePunishment",
+    "fury",
+    "sacrieurAssault",
+    "sacrieurSword",
+    "dancingSword"
   ],
   "buffs": [
     "shield",
@@ -536,6 +640,9 @@
     "toad",
     "powerfulShot",
     "bowMastery",
-    "sylvanPower"
+    "sylvanPower",
+    "absorption",
+    "sacrieurDodge",
+    "vitalPunishment"
   ]
 }

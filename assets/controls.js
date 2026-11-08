@@ -9,6 +9,8 @@
  function refreshCursor(){
    const cursor=document.querySelector('#thor-cursor');if(!cursor)return;
    const phase=document.querySelector('main')?.className||'';
+   const dockLeft=phase.includes('phase-playing')?'104px':'12px';
+   for(const id of ['thor-settings','thor-auto-status']){const control=document.getElementById?.(id);if(control&&control.style.left!==dockLeft)control.style.left=dockLeft;}
    const scope=document.querySelector('.upgrade-panel,.loot-panel,.pause-panel,.gameover-panel,.level-select-panel,.intro-panel');
    if(cursorPhase!==phase||cursorScope!==scope){cursorPhase=phase;cursorScope=scope;pointerUsed=false;}
    const combat=phase.includes('phase-playing')&&!phase.includes('modal-open')&&!document.querySelector('.pause-panel');
@@ -206,7 +208,7 @@
    px=innerWidth/2;py=innerHeight/2;
    const aimStyle=document.createElement('style');aimStyle.textContent='.thor-aiming .touch-target-line{left:var(--thor-aim-x)!important;top:var(--thor-aim-y)!important;width:var(--thor-aim-distance)!important;transform:translateY(-50%) rotate(var(--thor-aim-angle))!important}.thor-aiming .touch-map-target{left:var(--thor-target-x)!important;top:var(--thor-target-y)!important}';document.head.append(aimStyle);
    const menu=document.createElement('button');menu.id='thor-settings';menu.type='button';menu.textContent='⚙ APK';menu.setAttribute('aria-label',text('Paramètres de jeu et manette'));
-   menu.style.cssText='position:fixed;top:12px;left:104px;z-index:2147483646;padding:6px 9px;border:1px solid #bfa77480;border-radius:8px;background:#17251ccc;color:#ffe4a0;font:600 12px sans-serif;opacity:.78';
+   menu.style.cssText='position:fixed;top:12px;left:12px;z-index:2147483646;padding:6px 9px;border:1px solid #bfa77480;border-radius:8px;background:#17251ccc;color:#ffe4a0;font:600 12px sans-serif;opacity:.78';
    menu.addEventListener('click',()=>window.ThorPreferences?.openSettings());document.body.append(menu);
    let queued=false;const observer=new MutationObserver(()=>{if(!queued){queued=true;setTimeout(()=>{queued=false;decorate()},120);}});observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['lang','class']});decorate();
    const c=document.createElement('div'); c.id='thor-cursor';

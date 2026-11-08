@@ -23,7 +23,7 @@ final class ResourcePreparation {
    }
   }
   if(!data.getString("gameHash").equals(expected))throw new IOException("Resource version mismatch");
-  JSONArray list=data.getJSONArray("paths");if(list.length()>6000)throw new IOException("Too many resources");
+  JSONArray list=data.getJSONArray("paths");if(list.length()>10000)throw new IOException("Too many resources");
   Set<String> paths=new LinkedHashSet<>();
   for(int i=0;i<list.length();i++){
    String path=list.getString(i);

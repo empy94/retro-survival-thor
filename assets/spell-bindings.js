@@ -12,8 +12,9 @@
    if(id==='jump')return 270*(1+upgrade('jumpRange')/3);
    return null;
  }
- const craAimed=new Set(['burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass']);
- function needsAim(id,awakenings={}){return (aimed.has(id)||craAimed.has(id)||id==='arakne')&&!(id==='burningGlyph'&&awakenings.burningGlyph===2)&&!(id==='explosiveArrow'&&awakenings.explosiveArrow===2);}
+ const craAimed=new Set(['attraction','dissolution','punishment','cooperation','burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass']);
+ const nativePassives=new Set(["petitFrere", "area", "bubble", "flamiche", "aggressiveGlyph", "slyTrap", "insidiousPoison", "chakra", "fourvoiement", "moonHammer", "divineSword", "iopSword", "chance", "pandorasBox", "clumsiness", "animatedBag", "animatedShovel", "shovelKiss", "slaughteringShovel", "tofuSummon", "bouftouSummon", "prespicSummon", "boarSummon", "bworkMageSummon", "cracklerSummon", "dragonnetSummon", "bearCry", "harassingArrow", "frozenArrow", "distantShot", "criticalShot", "tremor", "paralysingPoison", "aggressiveBrambles", "blockerDoll", "madDoll", "sacrificialDoll", "forcedPunishment", "agilePunishment", "wisePunishment", "fury", "sacrieurAssault", "sacrieurSword", "dancingSword"]);
+ function needsAim(id,awakenings={}){return !nativePassives.has(id)&&(aimed.has(id)||craAimed.has(id)||id==='arakne')&&!(id==='burningGlyph'&&awakenings.burningGlyph===2)&&!(id==='explosiveArrow'&&awakenings.explosiveArrow===2);}
  function radialSpec(id,upgrades={},awakenings={}){
    if(!needsAim(id,awakenings))return null;
    const native=root.thorGameAdapter?.radialSpec?.(id);if(native)return native;

@@ -1,7 +1,7 @@
 (function(root){'use strict';
  // Heuristic planner in game coordinates. Original touch handlers remain the
  // sole authority for cooldowns, terrain, damage and valid placements.
- const buffs={shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration',powerfulShot:'powerfulShotTimer',bowMastery:'bowMasteryTimer'};
+ const buffs={absorption:'absorptionReady',sacrieurDodge:'sacrieurDodgeTimer',vitalPunishment:'sacrieurShieldTimer',shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration',powerfulShot:'powerfulShotTimer',bowMastery:'bowMasteryTimer'};
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
  function allyBuff(s,spells){
   const allies=(s.allies||[]).filter(a=>a.hp>0&&[a.x,a.y].every(Number.isFinite));
@@ -44,6 +44,14 @@
      if(id==='chaferfu'){if(urgent)add(spell,null,600);continue;}
      if(id==='bearCry'||id==='toad'){const action=allyBuff(s,[spell]);if(action)candidates.push(action);continue;}
      if(id==='animatedChest'&&s.summons?.chest)continue;
+     if(id==='dissolution'){if(nearest<145&&(p.hp/p.maxHp<.8||enemies.filter(e=>distance(e,p)<160).length>=3))add(spell,{x:p.x,y:p.y},750);continue;}
+     if(id==='attraction'&&s.awakenings.attraction!==2&&(enemies.length>2||p.hp/p.maxHp<.75))continue;
+     if(id==='cooperation'||id==='sacrieurDetour'){
+       if(!urgent)continue;const range=mapping.radialSpec(id,s.upgrades,s.awakenings)?.distance||60;let best=null,bestRisk=danger(p)-35;
+       for(const e of enemies){if(distance(e,p)>range||e.x<25||e.y<25||e.x>s.width-25||e.y>s.height-25)continue;const risk=enemies.filter(v=>v!==e).reduce((v,n)=>v+Math.max(0,140+n.r-distance(e,n)),0);if(risk<bestRisk){best=e;bestRisk=risk;}}
+       if(best)add(spell,{x:best.x,y:best.y},950);continue;
+     }
+     if(['sacrieurDodge','vitalPunishment'].includes(id)&&!urgent)continue;
      if(id in buffs){const timer=p[buffs[id]]??s.buffs[buffs[id]];
        if(timer>0)continue;if(id==='invisibility'&&!urgent&&p.hp/p.maxHp>.5)continue;
        add(spell,null,(id==='shield'||id==='invisibility'?urgent?1000:300:250));continue;}
@@ -101,5 +109,5 @@
    if(root.thorControls.autoCast(chosen.spell,target)){casts++;lastSpell=chosen.spell.id;}
  }
  root.thorAutoSpells={refreshLabel(){if(badge){badge.hidden=!enabled;const key=mode==='buffs'?'Buffs auto':'Sorts auto',label=root.thorLocale?.text(key)||key;if(badge.textContent!==label)badge.textContent=label;}},configure(value,exclusions){if(exclusions!==undefined)manual=root.thorSpellPolicy?.sanitize(exclusions)||{};const next=value===true?'full':['full','buffs'].includes(value)?value:'off';if(mode!==next)lastAttempt.clear();mode=next;enabled=mode!=='off';if(!enabled){clearInterval(timer);timer=null;}else if(timer===null)timer=setInterval(tick,80);this.refreshLabel();},status(){return {enabled,mode,attempts:casts,lastSpell,plannerMs:lastMs};}};
- document.addEventListener('DOMContentLoaded',()=>{badge=document.createElement('span');badge.id='thor-auto-status';badge.style.cssText='position:fixed;top:45px;left:104px;z-index:2147483645;border:1px solid #bbce9780;border-radius:5px;padding:3px 7px;background:#17251ccc;color:#cce5aa;font:600 10px sans-serif;pointer-events:none';badge.hidden=true;document.body.append(badge);});
+ document.addEventListener('DOMContentLoaded',()=>{badge=document.createElement('span');badge.id='thor-auto-status';badge.style.cssText='position:fixed;top:45px;left:12px;z-index:2147483645;border:1px solid #bbce9780;border-radius:5px;padding:3px 7px;background:#17251ccc;color:#cce5aa;font:600 10px sans-serif;pointer-events:none';badge.hidden=true;document.body.append(badge);});
 })(typeof window==='object'?window:null);
