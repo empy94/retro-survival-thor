@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const policy=require('../assets/spell-policy.js'),mapping=require('../assets/spell-bindings.js');
-const ids=policy.catalog.classes.sadida;assert.equal(ids.length,14);
+const ids=policy.catalog.classes.sadida;assert.equal(ids.length,15);assert(ids.includes('petitFrere'));
 for(const id of ['tremor','paralysingPoison','aggressiveBrambles'])assert(!policy.allowed(id,'sadida','full',{}));
 for(const id of ['multipleBrambles','tear','soothingBramble','madGrass']){assert(mapping.needsAim(id));assert(policy.allowed(id,'sadida','full',{}));}
 const active=ids.filter(id=>!policy.isPassive(id));assert.equal(mapping.assign(active.map(id=>({id}))).filter(Boolean).length,active.length);

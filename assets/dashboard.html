@@ -23,7 +23,7 @@ window.renderThorDashboard=function(data){
  document.querySelectorAll('[data-i18n]').forEach(n=>{const value=text(n.dataset.i18n);if(n.textContent!==value)n.textContent=value;});
  renderCollection(data.collection);
  const running=data.status==='run';el('run').hidden=!running;el('empty-state').hidden=running;
- if(!running){el('phase').textContent='Retro Survival';el('empty-state').replaceChildren(node('strong',data.status==='title'?text('À l’aventure !'):text('Personnage indisponible')),node('div',data.status==='title'?text('Lance une partie sur l’écran du haut. Ton personnage et son équipement apparaîtront ici.'):text('Les informations du jeu ne sont pas disponibles pour le moment.')));selected=null;statsSignature=equipmentSignature='';return;}
+ if(!running){el('phase').textContent='Retro Survival';el('empty-state').replaceChildren(node('strong',data.status==='title'?text('À l’aventure !'):text('Personnage indisponible')),node('div',data.status==='title'&&!data.inline?text('Lance une partie sur l’écran du haut. Ton personnage et son équipement apparaîtront ici.'):text('Les informations du jeu ne sont pas disponibles pour le moment.')));selected=null;statsSignature=equipmentSignature='';return;}
  const phaseLabel=text('Niv. ')+data.level+text(' · Vague ')+data.wave+(data.phase==='paused'?text(' · Pause'):data.phase==='gameover'?text(' · Partie terminée'):'');
  if(el('phase').firstChild?.textContent!==phaseLabel)el('phase').replaceChildren(node('div',phaseLabel));
  el('run').className=data.helper?.lowHealth?'danger':'';setText('health-label',text('Points de vie')+(data.helper?.lowHealth?text(' · Danger'):''));

@@ -1,6 +1,6 @@
 (function(){'use strict';
  let opened=null;
- function close(){if(!opened)return;opened.layer.remove();opened.button.setAttribute('aria-expanded','false');opened=null;}
+ function close(){if(!opened)return;opened.layer.remove();opened.button.setAttribute('aria-expanded','false');opened.button.focus();opened=null;}
  function create(label,choices,value,onchange){
   const button=document.createElement('button');button.type='button';button.className='deck-choice';button.value=value;button.setAttribute('aria-label',label);button.setAttribute('aria-haspopup','listbox');button.setAttribute('aria-expanded','false');
   const refresh=()=>{button.textContent=(choices.find(c=>c.value===button.value)?.label||label)+' ▾';};refresh();
@@ -8,10 +8,10 @@
    const box=document.createElement('div');box.className='deck-choice-box';const title=document.createElement('strong');title.textContent=label;box.append(title);
    const list=document.createElement('div');list.className='deck-choice-list';list.setAttribute('role','listbox');list.setAttribute('aria-label',label);
    for(const choice of choices){const option=document.createElement('button');option.type='button';option.textContent=choice.label;option.setAttribute('role','option');option.setAttribute('aria-selected',String(choice.value===button.value));option.onclick=()=>{button.value=choice.value;refresh();close();onchange(choice.value);};list.append(option);}box.append(list);
-   const dismiss=document.createElement('button');dismiss.type='button';dismiss.textContent=window.thorLocale?.text('Fermer')||'Fermer';dismiss.className='deck-choice-close';dismiss.onclick=close;box.append(dismiss);layer.append(box);layer.onclick=e=>{if(e.target===layer)close();};document.body.append(layer);button.setAttribute('aria-expanded','true');opened={layer,button};
+   const dismiss=document.createElement('button');dismiss.type='button';dismiss.textContent=window.thorLocale?.text('Fermer')||'Fermer';dismiss.className='deck-choice-close';dismiss.onclick=close;box.append(dismiss);layer.append(box);layer.onclick=e=>{if(e.target===layer)close();};document.body.append(layer);button.setAttribute('aria-expanded','true');opened={layer,button};layer.querySelector('[aria-selected=true]')?.focus();
   };return button;
  }
- window.thorDeckChoice={create,close};document.addEventListener('keydown',e=>{if(opened&&e.key==='Escape'){e.preventDefault();close();}});
+ window.thorDeckChoice={create,close,layer:()=>opened?.layer};document.addEventListener('keydown',e=>{if(opened&&e.key==='Escape'){e.preventDefault();close();}});
 })();
 /* deck */
 (function(){'use strict';
@@ -26,6 +26,8 @@
   const next=JSON.stringify([character,data.locale,data.character,data.unlocked,data.spellBindings,controls.mode,manual,controls.shortcuts,data.awakenings]);if(next===signature)return;signature=next;
   document.querySelectorAll('[data-class]').forEach(n=>n.setAttribute('aria-pressed',String(n.dataset.class===character)));
   el('spell-hint').textContent=text('Touche une icône pour choisir Auto ou Manuel. Auto suit le mode global ; tes exceptions sont sauvegardées par classe.');
+  const focused=document.activeElement;
+  const focusKey=focused?.dataset.spell||focused?.dataset.binding;
   const nodes=catalog.classes[character].map(id=>{
    const meta=catalog.spells[id],passive=policy.isPassive(id,data.character===character?data.awakenings:{}),isManual=manual.includes(id),active=policy.allowed(id,character,controls.mode,controls.manual,data.character===character?data.awakenings:{});
    const b=card('button','');b.type='button';b.className='spell-card'+(isManual?' manual':'');b.disabled=passive;b.dataset.spell=id;b.setAttribute('aria-pressed',String(isManual));
@@ -37,17 +39,45 @@
    const wrapper=card('div','');wrapper.className='spell-entry';wrapper.append(b);
    if(!passive){const automatic=text('Automatique')+(data.character===character&&data.spellBindings?.find(s=>s.id===id)?' · '+data.spellBindings.find(s=>s.id===id).button:'');const choices=[{value:'',label:automatic},...(window.thorSpellBindings?.names||[]).map(name=>({value:name,label:name}))];const selector=window.thorDeckChoice.create(text('Raccourci')+' · '+text(meta.name),choices,controls.shortcuts?.[character]?.[id]||'',value=>window.ThorDeck?.setShortcut(character,id,value));selector.dataset.binding=id;wrapper.append(selector);}return wrapper;
   });el('spell-grid').replaceChildren(...nodes);
+  if(data.inline&&focusKey)el('spell-grid').querySelector(focused.dataset.spell?'[data-spell="'+focusKey+'"]':'[data-binding="'+focusKey+'"]')?.focus({preventScroll:true});
  }
  function renderOptions(){
   const controls=data.controls||{};const next=JSON.stringify([data.locale,controls]);if(next===optionsSignature)return;optionsSignature=next;
+  const focus=data.inline&&el('deck-options').contains(document.activeElement)?document.activeElement.closest('.deck-option')?.firstChild?.textContent:null;
   const rows=[],row=(label,input)=>{const r=card('label','');r.className='deck-option';r.append(card('span',text(label)),input);rows.push(r);return r;};
   const graphics=[['full','Qualité complète'],['balanced','Fluidité — objectif 60 FPS'],['no-spells','Sans animations de sorts']].map(([value,label])=>({value,label:text(label)}));row('Graphismes',window.thorDeckChoice.create(text('Graphismes'),graphics,controls.graphicsQuality==='minimal'?'no-spells':controls.graphicsQuality||'balanced',value=>saveOption('graphicsQuality',value)));
   const choices=[['off','Désactivée'],['buffs','Buffs auto uniquement'],['full','Tous les sorts intelligents']].map(([value,label])=>({value,label:text(label)}));const select=window.thorDeckChoice.create(text('Assistance des sorts'),choices,controls.mode||'off',value=>saveOption('autoSpellMode',value));row('Assistance des sorts',select);row('R3',text('Sorts auto ON/OFF en combat'));
   for(const [key,label] of [['radialAim','Visée radiale des sorts à cibler'],['hideCombatCursor','Masquer le curseur pendant les combats'],['showLabels','Touches sur les sorts actifs'],['showJoystick','Joystick visuel en bas à gauche'],['combatHelper','Alerte de PV faibles sur la fiche'],['safeAutoSell','Vendre les doublons identiques moins bons']]){const input=document.createElement('input');input.type='checkbox';input.checked=key==='safeAutoSell'?controls[key]===true:controls[key]!==false;input.onchange=()=>saveOption(key,input.checked);row(label,input);}
   for(const [key,label,min,max] of [['cursorSensitivity','Sensibilité du curseur : ',25,250],['labelOpacity','Opacité des touches : ',15,85]]){const input=document.createElement('input');input.type='range';input.min=min;input.max=max;input.value=controls[key]??(key==='cursorSensitivity'?100:45);const out=card('output',input.value+' %');input.oninput=()=>out.textContent=input.value+' %';input.onchange=()=>saveOption(key,input.value);row(label,input).append(out);}
   el('deck-options').replaceChildren(...rows);
+  if(data.inline&&focus)rows.find(r=>r.firstChild.textContent===focus)?.querySelector('button,input')?.focus({preventScroll:true});
  }
- window.thorDeckUI={page:showPage,render(next){data=next;if(data.character&&!chosenClass)character=data.character;renderSpells();renderOptions();const fps=data.phase==='playing'?data.performance?.observedFps:0;const label=text('Sauvegarde auto')+(Number.isFinite(fps)&&fps>0?' · '+Math.round(fps)+' FPS':'');if(el('deck-save').textContent!==label)el('deck-save').textContent=label;}};
+ function controller(action){
+  let current=document.activeElement;
+  const layer=window.thorDeckChoice.layer();
+  if(action==='back'){if(!layer)return false;window.thorDeckChoice.close();return true;}
+  const scope=layer||document.querySelector('.sheet');
+  const items=[...scope.querySelectorAll('button:not(:disabled), input, summary, [tabindex="0"]')].filter(n=>n.getClientRects().length);
+  if(!items.includes(current)){(layer?items[0]:document.querySelector('[data-page][aria-pressed=true]'))?.focus();return true;}
+  if(action==='confirm'){current.click();return true;}
+  if(current.matches('input[type=range]')&&(action==='left'||action==='right')){
+   if(action==='left')current.stepDown();else current.stepUp();
+   current.dispatchEvent(new Event('input'));current.dispatchEvent(new Event('change'));return true;
+  }
+  const point=n=>{const r=n.getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2];};
+  const [x,y]=point(current),horizontal=action==='left'||action==='right',sign=action==='left'||action==='up'?-1:1;
+  let next=null,best=Infinity;
+  for(const item of items){
+   if(item===current)continue;
+   const [nx,ny]=point(item),dx=nx-x,dy=ny-y,along=sign*(horizontal?dx:dy),across=Math.abs(horizontal?dy:dx);
+   if(along<=4||across>along*3)continue;
+   const score=along+across*3;
+   if(score<best){best=score;next=item;}
+  }
+  next?.focus();
+  return true;
+ }
+ window.thorDeckUI={page:showPage,controller,render(next){data=next;if(data.character&&!chosenClass)character=data.character;renderSpells();renderOptions();const fps=data.phase==='playing'?data.performance?.observedFps:0;const label=text('Sauvegarde auto')+(Number.isFinite(fps)&&fps>0?' · '+Math.round(fps)+' FPS':'');if(el('deck-save').textContent!==label)el('deck-save').textContent=label;}};
  document.querySelectorAll('[data-page]').forEach(n=>n.onclick=()=>showPage(Number(n.dataset.page)));
  document.querySelectorAll('[data-class]').forEach(n=>n.onclick=()=>{character=n.dataset.class;chosenClass=true;renderSpells();});
  const sheet=document.querySelector('.sheet');sheet.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'||e.target.closest('input,.deck-choice,.deck-choice-layer'))return;start={id:e.pointerId,x:e.clientX,y:e.clientY};},{passive:true});

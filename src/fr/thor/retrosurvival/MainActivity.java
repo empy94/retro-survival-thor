@@ -134,7 +134,8 @@ public class MainActivity extends Activity {
 
  private InputManager inputs;
  private int lastInputDevice=-1,nativeClickKey=-1;
- private TextView controllerStatus,displayStatus;
+ private TextView controllerStatus;
+ private View secondScreenSettings;
  private final InputManager.InputDeviceListener inputListener=new InputManager.InputDeviceListener(){
    public void onInputDeviceAdded(int id){refreshControllerStatus();}
    public void onInputDeviceChanged(int id){if(id==lastInputDevice)reset();refreshControllerStatus();}
@@ -145,7 +146,16 @@ public class MainActivity extends Activity {
  private void refreshControllerStatus(){if(controllerStatus!=null)controllerStatus.setText(controllerNames());}
  private float axis(MotionEvent e,int axis){InputDevice d=e.getDevice();InputDevice.MotionRange r=d==null?null:d.getMotionRange(axis,e.getSource());float v=e.getAxisValue(axis);return Math.abs(v)<=Math.max(.16f,r==null?0:r.getFlat())?0:v;}
  private boolean centeredAxis(MotionEvent e,int axis){InputDevice.MotionRange r=e.getDevice()==null?null:e.getDevice().getMotionRange(axis,e.getSource());return r!=null&&r.getMin()<0;}
- private void refreshDisplayStatus(){if(displayStatus!=null){boolean found=false;if(displays!=null)for(Display d:displays.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION))if(d.getDisplayId()!=getWindowManager().getDefaultDisplay().getDisplayId())found=true;displayStatus.setText(found?ui("Second écran compatible détecté."):ui("Un seul écran : toutes les commandes restent sur le jeu."));}}
+ private Display compatibleSecondDisplay(){
+   if(displays==null)return null;
+   int main=getWindowManager().getDefaultDisplay().getDisplayId();
+   for(Display display:displays.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION))
+     if(display.isValid()&&display.getDisplayId()!=main)return display;
+   return null;
+ }
+ private void refreshDisplayStatus(){
+   if(secondScreenSettings!=null)secondScreenSettings.setVisibility(compatibleSecondDisplay()==null?View.GONE:View.VISIBLE);
+ }
 
  private DisplayManager displays;
  private CharacterPresentation characterScreen;
@@ -194,10 +204,10 @@ public class MainActivity extends Activity {
  }
  private final Runnable characterTick=new Runnable(){public void run(){
    if(!active)return;
-   if(ready&&gameFocused()&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0){
+   if(ready&&(gameFocused()||shortcutPanel!=null)&&(characterScreen!=null||shortcutPanel!=null||getPreferences(0).getBoolean("safeAutoSell",false))){final long request=dashboardGate.begin();if(request!=0){
      dashboardUrgent=false;
      web.evaluateJavascript(companion.snapshot(localSession,"(window.thorSalePolicy?.tick(),window.thorDashboard ? window.thorDashboard.snapshot() : {status:'unavailable'})"),result->{
-       if(!dashboardGate.complete(request)||!active||!ready||!gameFocused())return;
+       if(!dashboardGate.complete(request)||!active||!ready||(!gameFocused()&&shortcutPanel==null))return;
        try{if(result.length()>65536)return;String next=new JSONObject(result).toString();if(!next.equals(characterData)){characterData=next;if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}}catch(Exception ignored){}
        finally{if(dashboardUrgent){handler.removeCallbacks(characterTick);handler.post(characterTick);}}
      });
@@ -341,7 +351,8 @@ public class MainActivity extends Activity {
    }
    if(source.length()>24000000)return null;
    byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString())&&!GameModuleVersions.oct18Shared(hash.toString())&&!GameModuleVersions.oct19Shared(hash.toString())&&!GameModuleVersions.oct19bShared(hash.toString())&&!GameModuleVersions.oct20Shared(hash.toString())&&!GameModuleVersions.oct20cShared(hash.toString())&&!GameModuleVersions.oct21Shared(hash.toString())&&!GameModuleVersions.oct21bShared(hash.toString())&&!GameModuleVersions.oct21cShared(hash.toString())&&!GameModuleVersions.oct22Shared(hash.toString())){
-    ModuleCompatibility.Match compatible;try(InputStream profile=getAssets().open("shared-contract-nov8.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
+    ModuleCompatibility.Match compatible;try(InputStream profile=getAssets().open("shared-contract-nov15.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
+    if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov8.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
     if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov5.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
     if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov1.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
     if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-oct30b.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
@@ -361,10 +372,11 @@ public class MainActivity extends Activity {
      if(localSession){byte[] bytes=localCache.getFrozen(SessionNetworkPolicy.staticPath(url));if(bytes==null)return null;source=new String(bytes,StandardCharsets.UTF_8);}
      else{HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(15000);connection.setReadTimeout(20000);try{try(InputStream in=connection.getInputStream()){source=read(in);}}finally{connection.disconnect();}try{localCache.put(request.getUrl().getPath(),source.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Module cache unavailable",cacheError);}}if(source.length()>8000000)return null;
      byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));
-     if((!localSession&&!GameModuleVersions.supported(hash.toString()))||GameModuleVersions.oct24(hash.toString())||GameModuleVersions.oct26(hash.toString())||GameModuleVersions.oct30(hash.toString())||GameModuleVersions.oct30b(hash.toString())||GameModuleVersions.nov1(hash.toString())||GameModuleVersions.nov5(hash.toString())||GameModuleVersions.nov8(hash.toString())){
+     if((!localSession&&!GameModuleVersions.supported(hash.toString()))||GameModuleVersions.oct24(hash.toString())||GameModuleVersions.oct26(hash.toString())||GameModuleVersions.oct30(hash.toString())||GameModuleVersions.oct30b(hash.toString())||GameModuleVersions.nov1(hash.toString())||GameModuleVersions.nov5(hash.toString())||GameModuleVersions.nov8(hash.toString())||GameModuleVersions.nov15(hash.toString())){
       if(localSession&&!companion.supportsLocalGame(hash.toString()))return null;
       ModuleCompatibility.Match compatible;boolean currentFamily,newFamily;
-      try(InputStream profile=getAssets().open("module-contract-nov8.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      try(InputStream profile=getAssets().open("module-contract-nov15.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov8.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov5.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov1.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-oct30b.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
@@ -476,7 +488,7 @@ public class MainActivity extends Activity {
  private void closeCharacterScreen(){if(characterScreen!=null){characterScreen.dismiss();characterScreen=null;}}
  private void showCharacterScreen(){
    if(displays==null||!active||!getPreferences(0).getBoolean("characterScreen",true)){closeCharacterScreen();return;}
-   Display target=null;for(Display d:displays.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)){if(d.getDisplayId()!=getWindowManager().getDefaultDisplay().getDisplayId()){target=d;break;}}
+   Display target=compatibleSecondDisplay();
    if(target==null){closeCharacterScreen();return;}
    if(characterScreen!=null&&characterScreen.getDisplay().getDisplayId()==target.getDisplayId())return;
    closeCharacterScreen();CharacterPresentation panel=new CharacterPresentation(this,target);characterScreen=panel;
@@ -582,13 +594,29 @@ public class MainActivity extends Activity {
    JSONObject classes=spellCatalog.optJSONObject("classes");if(classes==null||!contains(classes.optJSONArray(character),id)||contains(spellCatalog.optJSONArray("passive"),id)||!validShortcut(shortcut))return;
    try{JSONObject all=spellShortcuts(),profile=all.optJSONObject(character);if(profile==null)profile=new JSONObject();java.util.Iterator<String> keys=profile.keys();List<String> duplicates=new ArrayList<>();while(keys.hasNext()){String key=keys.next();if(shortcut.equals(profile.optString(key)))duplicates.add(key);}for(String key:duplicates)profile.remove(key);if(shortcut.isEmpty())profile.remove(id);else profile.put(id,shortcut);all.put(character,profile);getPreferences(0).edit().putString("spellShortcuts",all.toString()).apply();applySettings();}catch(Exception ignored){}
  }
- private void updateShortcutPanel(){if(shortcutPanel!=null)try{JSONObject data=new JSONObject(characterData);data.put("controls",panelOptions());shortcutPanel.evaluateJavascript("window.renderThorDashboard("+data.toString()+")",null);}catch(Exception ignored){}}
+ private void updateShortcutPanel(){if(shortcutPanel!=null)try{JSONObject data=new JSONObject(characterData);data.remove("companion");data.put("inline",true);data.put("locale",gameLanguage);data.put("controls",panelOptions());shortcutPanel.evaluateJavascript("window.renderThorDashboard("+data.toString()+")",null);}catch(Exception ignored){}}
  private void shortcutDialog(){
    final WebView editor=new WebView(this);editor.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,(int)(getResources().getDisplayMetrics().heightPixels*.65)));editor.setMinimumHeight((int)(getResources().getDisplayMetrics().heightPixels*.65));shortcutPanel=editor;editor.getSettings().setJavaScriptEnabled(true);editor.getSettings().setBlockNetworkLoads(localSession);editor.getSettings().setAllowFileAccess(false);editor.getSettings().setAllowContentAccess(false);
    editor.addJavascriptInterface(new Object(){@JavascriptInterface public void setShortcut(String character,String id,String shortcut){runOnUiThread(()->saveShortcut(character,id,shortcut));}@JavascriptInterface public void setSpellManual(String character,String id,boolean manual){runOnUiThread(()->saveSpellManual(character,id,manual));}@JavascriptInterface public void setOption(String name,String value){runOnUiThread(()->savePanelOption(name,value));}},"ThorDeck");
-   editor.setWebViewClient(new RecoveringWebViewClient(){public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return localSession?localResource(r):cacheOnlineResource(r);}public void onPageFinished(WebView v,String url){updateShortcutPanel();editor.evaluateJavascript("window.thorDeckUI.page(1)",null);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest request){return true;}});
-   try(InputStream html=getAssets().open("dashboard.html");InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js");InputStream locale=getAssets().open("locale.js");InputStream deck=getAssets().open("deck.js")){String source=read(html).replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"\n"+read(locale)+"</script>").replace("</body>","<script>"+read(deck)+"</script></body>");editor.loadDataWithBaseURL("https://retrosurvival.online/",source,"text/html","UTF-8",null);}catch(Exception ex){editor.destroy();shortcutPanel=null;return;}
-   FrameLayout editorHolder=new FrameLayout(this);int editorHeight=(int)(getResources().getDisplayMetrics().heightPixels*.65);editorHolder.setMinimumHeight(editorHeight);editorHolder.addView(editor,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,editorHeight));AlertDialog dialog=new AlertDialog.Builder(this).setTitle(ui("Raccourcis des sorts")).setView(editorHolder).setPositiveButton(ui("Fermer"),null).create();dialog.setOnDismissListener(d->{if(shortcutPanel==editor)shortcutPanel=null;editor.destroy();immersive();});dialog.show();dialog.getWindow().setLayout((int)(getResources().getDisplayMetrics().widthPixels*.94), (int)(getResources().getDisplayMetrics().heightPixels*.9));
+   editor.setWebViewClient(new RecoveringWebViewClient(){public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){return localSession?localResource(r):cacheOnlineResource(r);}public void onPageFinished(WebView v,String url){updateShortcutPanel();editor.evaluateJavascript("window.thorDeckUI.page(1);document.querySelector('[data-page=\"1\"]')?.focus()",null);}public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest request){return true;}});
+   try(InputStream html=getAssets().open("dashboard.html");InputStream policy=getAssets().open("spell-policy.js");InputStream mapping=getAssets().open("spell-bindings.js");InputStream locale=getAssets().open("locale.js");InputStream deck=getAssets().open("deck.js")){String source=read(html).replace("<head>","<head><script>"+read(policy)+"\n"+read(mapping)+"\n"+read(locale)+"</script>").replace("</body>","<script>"+read(deck)+"</script></body>");editor.loadDataWithBaseURL(gameUrl(),source,"text/html","UTF-8",null);}catch(Exception ex){editor.destroy();shortcutPanel=null;return;}
+   FrameLayout editorHolder=new FrameLayout(this);int editorHeight=(int)(getResources().getDisplayMetrics().heightPixels*.65);editorHolder.setMinimumHeight(editorHeight);editorHolder.addView(editor,new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,editorHeight));AlertDialog dialog=new AlertDialog.Builder(this).setTitle(ui("Raccourcis des sorts")).setView(editorHolder).setPositiveButton(ui("Fermer"),null).create();dialog.setOnDismissListener(d->{if(shortcutPanel==editor)shortcutPanel=null;editor.destroy();immersive();});dialog.setOnKeyListener((d,code,event)->{
+     String action;
+     switch(code){
+       case KeyEvent.KEYCODE_DPAD_UP:action="up";break;
+       case KeyEvent.KEYCODE_DPAD_DOWN:action="down";break;
+       case KeyEvent.KEYCODE_DPAD_LEFT:action="left";break;
+       case KeyEvent.KEYCODE_DPAD_RIGHT:action="right";break;
+       case KeyEvent.KEYCODE_BUTTON_A:case KeyEvent.KEYCODE_DPAD_CENTER:action="confirm";break;
+       case KeyEvent.KEYCODE_BUTTON_B:action="back";break;
+       default:return false;
+     }
+     if(event.getAction()==KeyEvent.ACTION_DOWN){
+       if("back".equals(action)){if(event.getRepeatCount()==0)editor.evaluateJavascript("window.thorDeckUI.controller('back')",handled->{if(!"true".equals(handled)&&dialog.isShowing())dialog.dismiss();});}
+       else if(event.getRepeatCount()==0||!"confirm".equals(action))editor.evaluateJavascript("window.thorDeckUI.controller("+quote(action)+")",null);
+     }
+     return true;
+   });dialog.show();editor.requestFocus();dialog.getWindow().setLayout((int)(getResources().getDisplayMetrics().widthPixels*.94), (int)(getResources().getDisplayMetrics().heightPixels*.9));
  }
  private JSONObject spellManual(){try{return new JSONObject(getPreferences(0).getString("spellManual","{}"));}catch(Exception ignored){return new JSONObject();}}
  private boolean contains(org.json.JSONArray ids,String id){if(ids==null)return false;for(int i=0;i<ids.length();i++)if(id.equals(ids.optString(i)))return true;return false;}
@@ -609,7 +637,7 @@ public class MainActivity extends Activity {
    else return;
    edit.apply();applySettings();
  }
- private void applySettings(){if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({graphicsQuality:\""+graphicsQuality()+"\",autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();}
+ private void applySettings(){if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({graphicsQuality:\""+graphicsQuality()+"\",autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
  protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);if(pendingBackup!=null)state.putString("pendingProgressBackup",pendingBackup);state.putBoolean("localSession",localSession);}
  private void exportProgress(){if(localSession){Toast.makeText(this,"Session locale temporaire : export de progression désactivé.",Toast.LENGTH_LONG).show();return;}if(!ready)return;web.evaluateJavascript("window.thorProgressBackup.export()",result->{if(result==null||"null".equals(result)){Toast.makeText(this,ui("Aucune progression à exporter"),Toast.LENGTH_LONG).show();return;}try{pendingBackup=new JSONObject(result).toString(2);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Retro-Survival-progression.json");startActivityForResult(intent,EXPORT_PROGRESS);}catch(Exception ignored){}});}
  private void importProgress(){new AlertDialog.Builder(this).setMessage(ui("Restaurer remplacera la progression locale et redémarrera le jeu.")).setNegativeButton(ui("Annuler"),null).setPositiveButton(ui("Choisir le fichier"),(dialog,which)->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE),IMPORT_PROGRESS)).show();}
@@ -625,6 +653,7 @@ public class MainActivity extends Activity {
    for(int i=0;i<graphicsKeys.length;i++){RadioButton choice=new RadioButton(this);choice.setId(View.generateViewId());choice.setTag(graphicsKeys[i]);choice.setText(ui(graphicsLabels[i]));graphics.addView(choice);if(graphicsQuality().equals(graphicsKeys[i]))graphics.check(choice.getId());}layout.addView(graphics);
    graphics.setOnCheckedChangeListener((group,id)->{RadioButton choice=group.findViewById(id);if(choice!=null)savePanelOption("graphicsQuality",(String)choice.getTag());});
    controllerStatus=new TextView(this);refreshControllerStatus();layout.addView(controllerStatus);
+   Button shortcuts=new Button(this);shortcuts.setText(ui("Raccourcis des sorts"));shortcuts.setOnClickListener(v->shortcutDialog());layout.addView(shortcuts);
    Switch labels=new Switch(this);labels.setText(ui("Touches sur les sorts actifs"));labels.setChecked(p.getBoolean("showLabels",true));layout.addView(labels);
    TextView opacity=new TextView(this);opacity.setText(ui("Opacité des touches : ")+p.getInt("labelOpacity",45)+" %");layout.addView(opacity);
    SeekBar slider=new SeekBar(this);slider.setMax(85);slider.setMin(15);slider.setProgress(p.getInt("labelOpacity",45));layout.addView(slider);
@@ -635,15 +664,16 @@ public class MainActivity extends Activity {
    RadioGroup auto=new RadioGroup(this);String[] modes={"off","buffs","full"};String[] names={"Désactivée","Buffs auto uniquement","Tous les sorts intelligents"};
    for(int i=0;i<modes.length;i++){RadioButton choice=new RadioButton(this);choice.setId(View.generateViewId());choice.setTag(modes[i]);choice.setText(ui(names[i]));auto.addView(choice);if(modes[i].equals(autoMode()))auto.check(choice.getId());}layout.addView(auto);
    auto.setOnCheckedChangeListener((group,id)->{RadioButton choice=group.findViewById(id);if(choice!=null){p.edit().putString("autoSpellMode",(String)choice.getTag()).apply();applySettings();}});
-   TextView autoHint=new TextView(this);autoHint.setText(ui("Buffs : dès qu’ils sont disponibles. Tous les sorts : buffs, attaques et zones. Tu gardes le déplacement et les choix."));layout.addView(autoHint);Button shortcuts=new Button(this);shortcuts.setText(ui("Raccourcis des sorts"));shortcuts.setOnClickListener(v->shortcutDialog());layout.addView(shortcuts);
+   TextView autoHint=new TextView(this);autoHint.setText(ui("Buffs : dès qu’ils sont disponibles. Tous les sorts : buffs, attaques et zones. Tu gardes le déplacement et les choix."));layout.addView(autoHint);
    Switch cursor=new Switch(this);cursor.setText(ui("Masquer le curseur pendant les combats"));cursor.setChecked(p.getBoolean("hideCombatCursor",true));layout.addView(cursor);cursor.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("hideCombatCursor",v).apply();applySettings();});
    Switch sale=new Switch(this);sale.setText(ui("Vendre les doublons identiques moins bons"));sale.setChecked(p.getBoolean("safeAutoSell",false));layout.addView(sale);sale.setOnCheckedChangeListener((button,value)->{p.edit().putBoolean("safeAutoSell",value).apply();applySettings();});
    Switch helper=new Switch(this);helper.setText(ui("Alerte de PV faibles sur la fiche"));helper.setChecked(p.getBoolean("combatHelper",true));layout.addView(helper);helper.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("combatHelper",v).apply();applySettings();});
    Switch radial=new Switch(this);radial.setText(ui("Visée radiale des sorts à cibler"));radial.setChecked(p.getBoolean("radialAim",true));layout.addView(radial);radial.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("radialAim",v).apply();applySettings();});
    Switch joystick=new Switch(this);joystick.setText(ui("Joystick visuel en bas à gauche"));joystick.setChecked(p.getBoolean("showJoystick",true));layout.addView(joystick);
-   Switch second=new Switch(this);second.setText(ui("Personnage sur le second écran"));second.setChecked(p.getBoolean("characterScreen",true));layout.addView(second);
-   displayStatus=new TextView(this);refreshDisplayStatus();layout.addView(displayStatus);
+   LinearLayout secondScreen=new LinearLayout(this);secondScreen.setOrientation(LinearLayout.VERTICAL);
+   Switch second=new Switch(this);second.setText(ui("Personnage sur le second écran"));second.setChecked(p.getBoolean("characterScreen",true));secondScreen.addView(second);
    second.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("characterScreen",v).apply();showCharacterScreen();});
+   secondScreenSettings=secondScreen;layout.addView(secondScreen);refreshDisplayStatus();
    TextView hint=new TextView(this);hint.setText(ui("Les commandes restent actives lorsque leurs repères sont masqués."));hint.setPadding(0,pad/2,0,0);layout.addView(hint);
    labels.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showLabels",v).apply();applySettings();});
    joystick.setOnCheckedChangeListener((b,v)->{p.edit().putBoolean("showJoystick",v).apply();applySettings();});
@@ -655,7 +685,7 @@ public class MainActivity extends Activity {
    TextView updateHint=new TextView(this);updateHint.setText("Vérification au lancement et chaque jour si Android l’autorise. Installation après ton accord.");layout.addView(updateHint);
    ScrollView scroll=new ScrollView(this);scroll.addView(layout);
    boolean[] showHelp={false};AlertDialog dialog=new AlertDialog.Builder(this).setTitle(ui("Paramètres de jeu et manette")).setView(scroll).setPositiveButton(ui("Fermer"),null).setNeutralButton(ui("Commandes"),(d,w)->{showHelp[0]=true;help();}).create();
-   dialog.setOnDismissListener(d->{controllerStatus=null;displayStatus=null;if(resumeGame&&!showHelp[0]&&ready)web.evaluateJavascript("window.thorControls.endPreferences()",null);if(web!=null)web.requestFocus();immersive();});dialog.show();
+   dialog.setOnDismissListener(d->{controllerStatus=null;secondScreenSettings=null;if(resumeGame&&!showHelp[0]&&ready)web.evaluateJavascript("window.thorControls.endPreferences()",null);if(web!=null)web.requestFocus();immersive();});dialog.show();
  }
  public void onRequestPermissionsResult(int request,String[] permissions,int[] results){super.onRequestPermissionsResult(request,permissions,results);if(request==16003&&results.length>0&&results[0]==PackageManager.PERMISSION_GRANTED)UpdateChecker.notifyAvailable(this,UpdateChecker.available(this));}
  private void pin(){ShortcutManager sm=getSystemService(ShortcutManager.class);if(sm.isRequestPinShortcutSupported())sm.requestPinShortcut(new ShortcutInfo.Builder(this,"retro-survival").setShortLabel("Retro Survival").setIcon(Icon.createWithResource(this,fr.thor.retrosurvival.R.drawable.icon)).setIntent(new Intent(this,MainActivity.class).setAction(Intent.ACTION_MAIN)).build(),null);else Toast.makeText(this,ui("L’icône est disponible dans la liste des applications."),Toast.LENGTH_LONG).show();}
