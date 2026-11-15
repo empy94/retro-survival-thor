@@ -19,6 +19,7 @@ import java.util.*;
 
 public class MainActivity extends Activity {
  private WebView web,shortcutPanel;
+ private Dialog discordSignIn;
  private java.util.concurrent.atomic.AtomicBoolean resourceCancellation;
  private ProgressDialog resourceProgress;
  private FrameLayout gameSurface;private LinearLayout loadPanel;private long loadGeneration;private boolean loadFailed;
@@ -284,8 +285,12 @@ public class MainActivity extends Activity {
    web.setWebViewClient(new RecoveringWebViewClient(){
      public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){
        if(localSession)return !SessionNetworkPolicy.LOCAL_HOST.equals(r.getUrl().getHost());
+       if(r.isForMainFrame()&&"GET".equals(r.getMethod())&&DiscordSignIn.route(r.getUrl().toString())==DiscordSignIn.Route.START){
+         openDiscordSignIn(r.getUrl().toString());return true;
+       }
        if("https".equals(r.getUrl().getScheme())&&"retrosurvival.online".equals(r.getUrl().getHost()))return false;
-       try{startActivity(new Intent(Intent.ACTION_VIEW,r.getUrl()));}catch(Exception ignored){}return true;
+       if(r.isForMainFrame())try{startActivity(new Intent(Intent.ACTION_VIEW,r.getUrl()));}catch(Exception ignored){}
+       return true;
      }
      public WebResourceResponse shouldInterceptRequest(WebView v,WebResourceRequest r){
        String route=r.getUrl().getPath();boolean official="retrosurvival.online".equals(r.getUrl().getHost());
@@ -319,6 +324,88 @@ public class MainActivity extends Activity {
      }
    });
    web.loadUrl(gameUrl());web.requestFocus();
+ }
+ private void openDiscordSignIn(String start){
+   if(localSession||discordSignIn!=null||isFinishing())return;
+   // Separate view with no game bridge. Both views use Android's app cookie store.
+   final WebView signIn=new WebView(this);
+   WebSettings settings=signIn.getSettings();
+   settings.setJavaScriptEnabled(true);
+   settings.setDomStorageEnabled(true);
+   settings.setAllowFileAccess(false);
+   settings.setAllowContentAccess(false);
+   settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+   final Dialog dialog=new Dialog(this,android.R.style.Theme_Material_NoActionBar);
+   LinearLayout panel=new LinearLayout(this);panel.setOrientation(LinearLayout.VERTICAL);
+   LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);
+   int pad=(int)(16*getResources().getDisplayMetrics().density);
+   header.setPadding(pad,0,pad,0);
+   TextView title=new TextView(this);title.setText(ui("Connexion Discord")+" · discord.com");title.setTextSize(18);
+   header.addView(title,new LinearLayout.LayoutParams(0,-2,1));
+   Button cancel=new Button(this);cancel.setText(ui("Annuler"));cancel.setOnClickListener(v->dialog.dismiss());header.addView(cancel);
+   panel.addView(header,new LinearLayout.LayoutParams(-1,-2));
+   ProgressBar loading=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+   panel.addView(loading,new LinearLayout.LayoutParams(-1,(int)(3*getResources().getDisplayMetrics().density)));
+   panel.addView(signIn,new LinearLayout.LayoutParams(-1,0,1));
+   signIn.setWebChromeClient(new WebChromeClient(){
+     @Override public void onProgressChanged(WebView view,int progress){
+       loading.setProgress(progress);
+       loading.setVisibility(progress<100?View.VISIBLE:View.GONE);
+     }
+     @Override public boolean onConsoleMessage(ConsoleMessage message){return true;}
+   });
+   dialog.setContentView(panel);
+   discordSignIn=dialog;
+   dialog.setCanceledOnTouchOutside(false);
+   dialog.setOnDismissListener(d->{
+     discordSignIn=null;
+     signIn.stopLoading();signIn.destroy();
+     if(!isFinishing()&&!isDestroyed()){web.requestFocus();immersive();}
+   });
+   signIn.setWebViewClient(new WebViewClient(){
+     private boolean finished;
+     private void finish(String url){
+       if(finished||discordSignIn!=dialog)return;
+       finished=true;
+       dialog.dismiss();
+       if(!localSession&&!isFinishing()&&!isDestroyed())web.loadUrl(url);
+     }
+     private void fail(){
+       if(finished||discordSignIn!=dialog)return;
+       finished=true;
+       dialog.dismiss();
+       Toast.makeText(MainActivity.this,ui("La connexion Discord a échoué. Réessaie depuis le jeu."),Toast.LENGTH_LONG).show();
+     }
+     @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){
+       if(!request.isForMainFrame())return false;
+       String url=request.getUrl().toString();
+       DiscordSignIn.Route route=DiscordSignIn.route(url);
+       if(route==DiscordSignIn.Route.RESULT){finish(url);return true;}
+       if(route==DiscordSignIn.Route.BLOCK){fail();return true;}
+       return false;
+     }
+     @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){
+       if(request.isForMainFrame()&&DiscordSignIn.route(request.getUrl().toString())==DiscordSignIn.Route.BLOCK)
+         return new WebResourceResponse("text/plain","UTF-8",new ByteArrayInputStream(new byte[0]));
+       return null;
+     }
+     @Override public void onPageStarted(WebView view,String url,android.graphics.Bitmap icon){
+       DiscordSignIn.Route route=DiscordSignIn.route(url);
+       if(route==DiscordSignIn.Route.RESULT)finish(url);
+       else if(route==DiscordSignIn.Route.BLOCK)fail();
+     }
+     @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){
+       if(request.isForMainFrame())fail();
+     }
+     @Override public void onReceivedHttpError(WebView view,WebResourceRequest request,WebResourceResponse response){
+       if(request.isForMainFrame())fail();
+     }
+   });
+   dialog.show();
+   Window window=dialog.getWindow();
+   if(window!=null)window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT);
+   signIn.requestFocus();
+   signIn.loadUrl(start);
  }
  private void showLoadingPanel(){
   hideLoadPanel();loadPanel=new LinearLayout(this);loadPanel.setOrientation(1);loadPanel.setGravity(Gravity.CENTER);loadPanel.setBackgroundColor(0xff17251c);
@@ -484,7 +571,7 @@ public class MainActivity extends Activity {
  public void onWindowFocusChanged(boolean focus){super.onWindowFocusChanged(focus);if(focus){immersive();if(characterScreen!=null)characterScreen.flush();requestCharacterRefresh();}else reset();syncActive();}
  protected void onResume(){super.onResume();if(!localSession&&!updateStarted){updateStarted=true;UpdateChecker.schedule(this);new Thread(()->{String tag=UpdateChecker.check(this,false);UpdateChecker.notifyAvailable(this,tag);if(!tag.isEmpty())runOnUiThread(()->{if(active)Toast.makeText(this,"Nouvelle APK "+tag+" disponible dans ⚙ APK → Mises à jour.",Toast.LENGTH_LONG).show();});},"RetroUpdateStartup").start();}active=true;previousTick=SystemClock.uptimeMillis();handler.post(tick);handler.post(characterTick);if(web!=null)web.onResume();syncActive();showCharacterScreen();}
  protected void onPause(){reset();active=false;syncActive();handler.removeCallbacks(tick);handler.removeCallbacks(characterTick);closeCharacterScreen();if(web!=null)web.onPause();super.onPause();}
- protected void onDestroy(){if(resourceCancellation!=null)resourceCancellation.set(true);if(resourceProgress!=null){try{resourceProgress.dismiss();}catch(IllegalArgumentException ignored){}resourceProgress=null;}if(inputs!=null)inputs.unregisterInputDeviceListener(inputListener);if(displays!=null)displays.unregisterDisplayListener(displayListener);closeCharacterScreen();if(web!=null)web.destroy();super.onDestroy();}
+ protected void onDestroy(){if(discordSignIn!=null)discordSignIn.dismiss();if(resourceCancellation!=null)resourceCancellation.set(true);if(resourceProgress!=null){try{resourceProgress.dismiss();}catch(IllegalArgumentException ignored){}resourceProgress=null;}if(inputs!=null)inputs.unregisterInputDeviceListener(inputListener);if(displays!=null)displays.unregisterDisplayListener(displayListener);closeCharacterScreen();if(web!=null)web.destroy();super.onDestroy();}
  private void closeCharacterScreen(){if(characterScreen!=null){characterScreen.dismiss();characterScreen=null;}}
  private void showCharacterScreen(){
    if(displays==null||!active||!getPreferences(0).getBoolean("characterScreen",true)){closeCharacterScreen();return;}
