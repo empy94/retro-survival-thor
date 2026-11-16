@@ -14,17 +14,22 @@ public final class DiscordSignInTest {
   expect(DISCORD,"https://discord.com/verify");
   expect(DISCORD,"https://discord.com/api/oauth2/authorize");
   expect(DISCORD,"https://discord.com/channels/@me");
-  expect(GAME_HOME,"https://retrosurvival.online/");
-  expect(GAME_HOME,"https://retrosurvival.online/?unrelated=discord=linked");
-  expect(GAME_HOME,"https://retrosurvival.online/?discord=");
+  expect(RESULT,"https://retrosurvival.online/");
+  expect(RESULT,"https://retrosurvival.online/?unrelated=discord=linked");
+  expect(RESULT,"https://retrosurvival.online/?discord=");
+  expect(RESULT,"https://retrosurvival.online");
+  expect(GAME,"https://retrosurvival.online/api/auth/discord/callback/");
+  expect(GAME,"https://retrosurvival.online/other?discord=linked");
+  expect(GAME,"https://retrosurvival.online/api/auth/discord%2fstart");
+  expect(IGNORE,"about:blank");
+  expect(IGNORE,"discord://action/oauth2/authorize?state=sample");
   for(String url:new String[]{
     "https://discord.gg/sample","https://discord.com.evil.example/login",
-    "https://retrosurvival.online/other?discord=linked",
-    "https://retrosurvival.online/api/auth/discord/start/extra","https://retrosurvival.online/api/auth/discord%2fstart",
     "https://retrosurvival.online.evil.example/api/auth/discord/start","http://discord.com/login",
     "https://discord.com:8443/login","https://dummy@discord.com/login","https://discord.com@evil.example/login",
-    "intent://discord.com/login","javascript:alert(1)",null
+    "intent://discord.com/login","discord://untrusted/oauth2/authorize","javascript:alert(1)",null
   })expect(BLOCK,url);
+  if(!"example.test".equals(DiscordSignIn.blockedDestination("https://example.test/callback?code=secret#token")))throw new AssertionError("Only the host can be shown");
   System.out.println("Discord routing: provider, callback, game return and invalid URLs passed");
  }
  private static void expect(DiscordSignIn.Route route,String url){

@@ -368,18 +368,20 @@ public class MainActivity extends Activity {
      if(!isFinishing()&&!isDestroyed()){web.requestFocus();immersive();}
    });
    class SignInClient extends WebViewClient {
-     private boolean finished,callbackSeen;
+     private boolean finished;
      void restart(){
-       callbackSeen=false;
        issue.setVisibility(View.GONE);retry.setVisibility(View.GONE);
        signIn.stopLoading();signIn.loadUrl(start);
      }
      private void finish(String url){
        if(finished||discordSignIn!=dialog)return;
        finished=true;
-       dialog.dismiss();
-       // A fresh top-level request in the game view now carries the account cookie.
-       if(!localSession&&!isFinishing()&&!isDestroyed())web.loadUrl(url);
+       // Let the navigation callback finish before closing the auth view.
+       handler.post(()->{
+         if(discordSignIn!=dialog||!dialog.isShowing())return;
+         dialog.dismiss();
+         if(!localSession&&!isFinishing()&&!isDestroyed())web.loadUrl(url);
+       });
      }
      private void report(String message,String code){
        if(finished||discordSignIn!=dialog)return;
@@ -389,15 +391,12 @@ public class MainActivity extends Activity {
      private boolean handleNavigation(String url){
        DiscordSignIn.Route route=DiscordSignIn.route(url);
        switch(route){
-         case START:case DISCORD:return false;
-         case CALLBACK:callbackSeen=true;return false;
+         case START:case DISCORD:case CALLBACK:case GAME:return false;
+         case IGNORE:return true;
          case RESULT:finish(url);return true;
-         case GAME_HOME:
-           if(callbackSeen){finish(url);return true;}
-           break;
          default:break;
        }
-       report("La redirection de connexion a été bloquée.", "RS-DISCORD-REDIRECT");
+       report("La redirection de connexion a été bloquée.", "RS-DISCORD-REDIRECT · "+DiscordSignIn.blockedDestination(url));
        return true;
      }
      @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){
@@ -409,7 +408,7 @@ public class MainActivity extends Activity {
        return null;
      }
      @Override public void onPageStarted(WebView view,String url,android.graphics.Bitmap icon){
-       if(!"about:blank".equals(url)&&handleNavigation(url))view.stopLoading();
+       if(!"about:blank".equals(url)&&handleNavigation(url)&&!finished)view.stopLoading();
      }
      @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){
        if(request.isForMainFrame())report("La page de connexion n’a pas pu se charger.", "RS-DISCORD-RESEAU-"+Math.abs(error.getErrorCode()));
