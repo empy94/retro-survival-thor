@@ -63,3 +63,19 @@ c.button(3,false);assert.equal(events.slice(start).filter(e=>e.type==='pointerup
 c.button(2,false);c.button(2,false);
 assert.equal(events.slice(start).filter(e=>e.type==='pointerup').length,1);assert.equal(frames.size,0);
 console.log('Travel aiming: forward, follow, direct stick direction, retained direction, range, return, cursor restoration and spell isolation passed');
+
+// A manual targeted cast can start on a native enemy position. Moving the aim
+// stick takes over immediately, including when held before the cast.
+id='burningGlyph';travel.doubleTarget=null;c.stick(0,0);c.rightStick(0,0);
+let hintedRange=0;
+context.window.thorDashboard.manualAimTarget=range=>{hintedRange=range;return ()=>({x:485,y:282});};
+c.button(2,true);frame();assert.equal(hintedRange,200);assert.deepEqual(target(),{x:485,y:282});
+c.rightStick(0,1);frame();assert.deepEqual(target(),{x:player.x,y:player.y+50});c.cancel();
+c.rightStick(-.58,0);c.button(2,true);frame();assert.deepEqual(target(),{x:player.x-50,y:player.y});c.cancel();
+
+// The native renderer interprets 110 CSS pixels as full spell range.
+context.window.thorGameAdapter={touchAimSpan:()=>110};
+c.button(2,true);c.rightStick(.58,0);frame();
+assert.deepEqual(target(),{x:player.x+50,y:player.y},'reticle stays in visible screen coordinates');
+assert.ok(Math.abs(events.at(-1).x-player.x-55)<1e-8,'manual cast sends 50% of the native 110-pixel span');
+c.button(2,false);

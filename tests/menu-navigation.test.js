@@ -56,3 +56,12 @@ docked=true;assert(!liveNav.active(),'new docked window starts in combat');
 console.log('Live side panels: D-pad ownership, analog movement, held-input priority, confirmation and real modal fallback passed');
 
 liveNav.analog(1,0,11);liveNav.step(0,1,12);liveNav.analog(.98,.02,13);assert(liveNav.active());liveNav.analog(.96,.04,14);assert(!liveNav.active(),'slow accumulated stick movement also reclaims combat');
+
+const help=item('?',55),choice1=item('Unlock',70),choice2=item('Upgrade',180);
+choice1.getAttribute=k=>k==='data-pad-default'?'true':k==='data-pad-key'?'first':null;
+choice2.getAttribute=k=>k==='data-pad-key'?'second':null;
+const choices=panel([help,choice1,choice2]);
+choices.hasAttribute=k=>k==='data-pad-scope';choices.getAttribute=k=>k==='aria-labelledby'?'levelup-title':null;
+dialogs=[choices];const beforeChoice=clicked;nav.step(1,0,20);
+assert(selected(choice1)&&!selected(help));
+nav.step(1,0,21);assert(selected(choice2));assert(nav.activate());assert.equal(clicked,beforeChoice+1);

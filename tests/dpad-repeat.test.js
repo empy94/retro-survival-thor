@@ -10,3 +10,8 @@ b=boot();for(let t=0;t<490;t+=16)b.frame(t,0,0,0,1);assert.equal(b.moves.length,
 b=boot();b.time=0;b.c.dpadKey('down',true);b.c.dpadKey('down',false);b.time=40;b.c.dpadKey('down',true);b.c.dpadKey('down',false);assert.equal(b.moves.length,2,'quick key taps between frames are not lost');
 b=boot();b.c.dpadKey('down',true);b.c.cancel();for(let t=16;t<300;t+=16)b.frame(t);assert.equal(b.moves.length,1,'focus reset releases all D-pad sources');
 console.log('D-pad: brief taps, idle stick interleaving, duplicate key/HAT streams, bounded hold repeat, between-frame taps and focus reset passed.');
+
+b=boot();b.c.dpad(0,1);b.c.dpad(0,0);b.c.dpadRepeat();
+assert.equal(b.moves.length,1,'a complete HAT tap between frame updates still navigates');
+b.time=40;b.c.dpad(0,1);b.c.dpad(0,0);b.c.dpadRepeat();
+assert.equal(b.moves.length,2,'a second HAT tap does not need a frame either');

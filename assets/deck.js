@@ -23,11 +23,12 @@
  function renderSpells(){
   const policy=window.thorSpellPolicy;if(!policy)return;
   const controls=data.controls||{},catalog=policy.catalog,manual=controls.manual?.[character]||[];
-  const next=JSON.stringify([character,data.locale,data.character,data.unlocked,data.spellBindings,controls.mode,manual,controls.shortcuts,data.awakenings]);if(next===signature)return;signature=next;
+  const next=JSON.stringify([character,data.locale,data.character,data.unlocked,data.spellBindings,controls.mode,controls.controllerLayout,manual,controls.shortcuts,data.awakenings]);if(next===signature)return;signature=next;
   document.querySelectorAll('[data-class]').forEach(n=>n.setAttribute('aria-pressed',String(n.dataset.class===character)));
   el('spell-hint').textContent=text('Touche une icône pour choisir Auto ou Manuel. Auto suit le mode global ; tes exceptions sont sauvegardées par classe.');
   const focused=document.activeElement;
   const focusKey=focused?.dataset.spell||focused?.dataset.binding;
+  const displayButton=button=>window.thorSpellBindings?.buttonLabel?.(button,controls.controllerLayout)||button;
   const nodes=catalog.classes[character].map(id=>{
    const meta=catalog.spells[id],passive=policy.isPassive(id,data.character===character?data.awakenings:{}),isManual=manual.includes(id),active=policy.allowed(id,character,controls.mode,controls.manual,data.character===character?data.awakenings:{});
    const b=card('button','');b.type='button';b.className='spell-card'+(isManual?' manual':'');b.disabled=passive;b.dataset.spell=id;b.setAttribute('aria-pressed',String(isManual));
@@ -37,7 +38,7 @@
    b.setAttribute('aria-label',text(meta.name)+' · '+text(passive?'Auto du jeu':isManual?'Manuel':'Auto'));
    b.onclick=()=>{window.ThorDeck?.setSpellManual(character,id,!isManual);};
    const wrapper=card('div','');wrapper.className='spell-entry';wrapper.append(b);
-   if(!passive){const automatic=text('Automatique')+(data.character===character&&data.spellBindings?.find(s=>s.id===id)?' · '+data.spellBindings.find(s=>s.id===id).button:'');const choices=[{value:'',label:automatic},...(window.thorSpellBindings?.names||[]).map(name=>({value:name,label:name}))];const selector=window.thorDeckChoice.create(text('Raccourci')+' · '+text(meta.name),choices,controls.shortcuts?.[character]?.[id]||'',value=>window.ThorDeck?.setShortcut(character,id,value));selector.dataset.binding=id;wrapper.append(selector);}return wrapper;
+   if(!passive){const automatic=text('Automatique')+(data.character===character&&data.spellBindings?.find(s=>s.id===id)?' · '+displayButton(data.spellBindings.find(s=>s.id===id).button):'');const choices=[{value:'',label:automatic},...(window.thorSpellBindings?.names||[]).map(name=>({value:name,label:displayButton(name)}))];const selector=window.thorDeckChoice.create(text('Raccourci')+' · '+text(meta.name),choices,controls.shortcuts?.[character]?.[id]||'',value=>window.ThorDeck?.setShortcut(character,id,value));selector.dataset.binding=id;wrapper.append(selector);}return wrapper;
   });el('spell-grid').replaceChildren(...nodes);
   if(data.inline&&focusKey)el('spell-grid').querySelector(focused.dataset.spell?'[data-spell="'+focusKey+'"]':'[data-binding="'+focusKey+'"]')?.focus({preventScroll:true});
  }

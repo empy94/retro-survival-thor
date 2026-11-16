@@ -35,6 +35,7 @@
    }
    return {live,hud};
  }
+ const targetable=e=>e.hp>0&&e.state!=='dead'&&e.kind!=='oto-mustam'&&!e.ratRaid&&!(e.invisibleTimer>0)&&!(e.arrival>0)&&(window.thorGameData?.canTargetEnemy?window.thorGameData.canTargetEnemy(e):!(e.kind==='boo'&&(!e.boo||e.boo.phase==='puddle'||e.boo.phase==='emerge'&&e.boo.age<.06||e.boo.phase==='attack'&&e.boo.age>=1.74)));
  window.thorDashboard={
  context(){this.playerPosition();return liveRef?.current||null;},
  character(){this.playerPosition();return window.thorSpellPolicy?.classFor(liveRef?.current);},
@@ -49,7 +50,25 @@
      allies:(s.osamodas?.summons||[]).filter(a=>a.hp>0).slice(0,64).map(a=>copy(a,['x','y','hp','maxHp','toadTimer','bearCryTimer'])),
      double:s.sram?.double?.hp>0&&s.sram.double.life>0?copy(s.sram.double,['x','y','swapCooldown']):null,
      traps:includeTargets?(s.sram?.traps||[]).filter(t=>t.life>0).slice(0,72).map(t=>copy(t,['x','y'])):[],
-     enemies:includeTargets?(s.enemies||[]).filter(e=>e.hp>0&&e.state!=='dead'&&e.kind!=='oto-mustam'&&!e.ratRaid&&!(e.invisibleTimer>0)&&!(e.arrival>0)&&(window.thorGameData?.canTargetEnemy?window.thorGameData.canTargetEnemy(e):!(e.kind==='boo'&&(!e.boo||e.boo.phase==='puddle'||e.boo.phase==='emerge'&&e.boo.age<.06||e.boo.phase==='attack'&&e.boo.age>=1.74)))).slice(0,128).map(e=>({...copy(e,['x','y','r','hp']),kind:e.kind,...enemyMotion(s,e)})):[]};
+     enemies:includeTargets?(s.enemies||[]).filter(targetable).slice(0,128).map(e=>({...copy(e,['x','y','r','hp']),kind:e.kind,...enemyMotion(s,e)})):[]};
+ },
+ manualAimTarget(range,forward){
+   if(!this.playerPosition()||!(range>0))return null;
+   const state=liveRef.current,player=state.player,heading=Math.hypot(forward.x,forward.y)||1;
+   let target=null,best=range;
+   for(const enemy of state.enemies||[]){
+     const dx=enemy.x-player.x,dy=enemy.y-player.y,distance=Math.hypot(dx,dy);
+     if(distance<=0||distance>best||dx*forward.x+dy*forward.y<distance*heading*.35||!targetable(enemy))continue;
+     target=enemy;best=distance;
+   }
+   if(!target)return null;
+   return maximum=>{
+     if(liveRef?.current!==state||!targetable(target)||Math.hypot(target.x-player.x,target.y-player.y)>maximum)return null;
+     const rect=liveCanvas.getBoundingClientRect(),x=rect.left+target.x*rect.width/state.width,y=rect.top+target.y*rect.height/state.height;
+     const dx=(target.x-player.x)*rect.width/state.width,dy=(target.y-player.y)*rect.height/state.height;
+     // A touch delta below this cutoff invokes native automatic targeting.
+     return Math.hypot(dx,dy)>12.1?{x,y}:null;
+   };
  },
  travelState(){
    const position=this.playerPosition();if(!position)return null;

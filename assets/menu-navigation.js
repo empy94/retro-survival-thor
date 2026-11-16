@@ -7,17 +7,20 @@
    // The outer dialog owns actions. Inner loot-panel comparison cards can have
    // no buttons and must never steal the navigation scope.
    const dialogs=[...main.querySelectorAll('[role="dialog"]')].filter(visible);
-   if(dialogs.length)return dialogs.at(-1);
+   if(dialogs.length)return dialogs.filter(el=>el.hasAttribute?.('data-pad-scope')).at(-1)||dialogs.at(-1);
    const panels=[...main.querySelectorAll('.levelup-overlay,.pause-panel,.gameover-panel,.level-select-panel,.intro-panel')].filter(visible);
    return panels.at(-1)||main;
  }
- function playing(){const main=document.querySelector('main');return !!main&&main.classList.contains('phase-playing')&&!main.classList.contains('modal-open')&&!main.querySelector('.pause-panel');}
+ function playing(){const main=document.querySelector('main');return !!main&&main.classList.contains('phase-playing')&&!main.classList.contains('modal-open')&&!main.querySelector('.pause-panel')&&!main.querySelector('[data-pad-scope][aria-modal="true"]');}
  function available(){const main=document.querySelector('main');return !!main&&(!playing()||scope()!==main);}
  function resumeCombat(){if(!playing())return false;choiceFocus=false;clear();lastScope=null;return true;}
  function menu(){if(!available()){choiceFocus=false;clear();lastScope=null;return false;}return !playing()||choiceFocus;}
  function candidates(root=scope()){
    if(!root)return [];
-   return [...root.querySelectorAll('button,[role="button"],a[href],input[type="submit"]')].filter(el=>visible(el)&&!el.disabled&&el.getAttribute('aria-disabled')!=='true'&&!el.matches('.pause-toggle,.fullscreen-toggle,.settings-toggle,.language-choice,#thor-settings')&&!el.closest('.touch-controls'));
+   const items=[...root.querySelectorAll('button,[role="button"],a[href],input[type="submit"]')].filter(el=>visible(el)&&!el.disabled&&el.getAttribute('aria-disabled')!=='true'&&!el.matches('.pause-toggle,.fullscreen-toggle,.settings-toggle,.language-choice,#thor-settings')&&!el.closest('.touch-controls'));
+   const choice=['levelup-title','loot-title'].includes(root.getAttribute?.('aria-labelledby'));
+   const actions=choice?items.filter(el=>el.getAttribute('data-pad-key')!==null):[];
+   return actions.length?actions:items;
  }
  function identity(el){let fiber=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))];for(let i=0;fiber&&i<4;i++,fiber=fiber.return)if(fiber.key)return 'key:'+fiber.key;return el.id||el.getAttribute('data-loot-key')||el.getAttribute('aria-label')||el.textContent?.trim().slice(0,150)||'';}
  function sync(){
@@ -37,7 +40,7 @@
    if(direction===lastDirection&&now<nextRepeat)return true;
    nextRepeat=now+(direction===lastDirection?200:500);lastDirection=direction;
    if(!items.length)return true;
-   if(!selected){choose(items[0]);return true;}
+   if(!selected){choose(items.find(el=>el.getAttribute('data-pad-default')==='true')||items[0]);return true;}
    let next;
    if(direction==='right'||direction==='left'){const a=selected.getBoundingClientRect(),sign=direction==='right'?1:-1;const ax=a.left+a.width/2,ay=a.top+a.height/2;next=items.filter(el=>el!==selected).map(el=>{const r=el.getBoundingClientRect(),dx=(r.left+r.width/2-ax)*sign,dy=Math.abs(r.top+r.height/2-ay);return {el,dx,cost:dx+dy*4};}).filter(v=>v.dx>4).sort((a,b)=>a.cost-b.cost)[0]?.el;const peers=selected.matches('.merchant-offer')?items.filter(el=>el.matches('.merchant-offer')):items;if(!next)next=peers[(peers.indexOf(selected)+sign+peers.length)%peers.length];}
    else{
@@ -46,7 +49,12 @@
    }
    choose(next);return true;
  }
- function activate(){if(!menu())return false;const items=sync();if(!selected||!items.includes(selected))return false;const el=selected;bookmarks.set(lastScope,{el,key:identity(el),index:items.indexOf(el)});lastDirection='';nextRepeat=0;el.click();return true;}
+ function activate(){if(!menu())return false;const items=sync();
+   if(!selected&&['levelup-title','loot-title'].includes(lastScope?.getAttribute?.('aria-labelledby'))){
+     choose(items.find(el=>el.getAttribute('data-pad-default')==='true'));
+     return true;
+   }
+   if(!selected||!items.includes(selected))return false;const el=selected;bookmarks.set(lastScope,{el,key:identity(el),index:items.indexOf(el)});lastDirection='';nextRepeat=0;el.click();return true;}
  function dpad(x,y,now,fresh=false){
    const direction=Math.max(Math.abs(x),Math.abs(y))<.5?'':Math.abs(x)>=Math.abs(y)?(x>0?'right':'left'):(y>0?'down':'up');
    const press=!!direction&&(fresh||direction!==lastPad);lastPad=direction;

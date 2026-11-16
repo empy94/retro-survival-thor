@@ -143,8 +143,40 @@ public class MainActivity extends Activity {
    public void onInputDeviceRemoved(int id){if(id==lastInputDevice){reset();lastInputDevice=-1;}refreshControllerStatus();}
  };
  private boolean isController(InputDevice d){return d!=null&&(d.supportsSource(InputDevice.SOURCE_GAMEPAD)||d.supportsSource(InputDevice.SOURCE_JOYSTICK));}
- private String controllerNames(){List<String> names=new ArrayList<>();for(int id:InputDevice.getDeviceIds()){InputDevice d=InputDevice.getDevice(id);if(isController(d)&&!names.contains(d.getName()))names.add(d.getName());}return names.isEmpty()?ui("Aucune manette détectée — le tactile reste disponible."):ui("Manette détectée : ")+android.text.TextUtils.join(", ",names);}
- private void refreshControllerStatus(){if(controllerStatus!=null)controllerStatus.setText(controllerNames());}
+ private boolean dualSense(InputDevice d){
+   if(d==null)return false;
+   int product=d.getProductId();
+   return d.getVendorId()==0x054c&&(product==0x0ce6||product==0x0df2)||
+     d.getName().toLowerCase(Locale.ROOT).contains("dualsense");
+ }
+ private String controllerLayout(){
+   if(lastInputDevice!=-1)return dualSense(InputDevice.getDevice(lastInputDevice))?"playstation":"standard";
+   for(int id:InputDevice.getDeviceIds())if(dualSense(InputDevice.getDevice(id)))return "playstation";
+   return "standard";
+ }
+ private void useController(InputDevice device){
+   if(device==null||lastInputDevice==device.getId())return;
+   String previous=controllerLayout();
+   lastInputDevice=device.getId();
+   if(!previous.equals(controllerLayout()))refreshControllerStatus();
+ }
+ private String controllerNames(){
+   List<String> names=new ArrayList<>();
+   for(int id:InputDevice.getDeviceIds()){
+     InputDevice d=InputDevice.getDevice(id);
+     if(isController(d)||dualSense(d)){
+       String name=dualSense(d)?"DualSense (PS5)":d.getName();
+       if(!names.contains(name))names.add(name);
+     }
+   }
+   return names.isEmpty()?ui("Aucune manette détectée — le tactile reste disponible."):ui("Manette détectée : ")+android.text.TextUtils.join(", ",names);
+ }
+ private void refreshControllerStatus(){
+   if(controllerStatus!=null)controllerStatus.setText(controllerNames());
+   if(ready)web.evaluateJavascript("window.thorControls.setControllerLayout("+quote(controllerLayout())+")",null);
+   if(characterScreen!=null)characterScreen.update(characterData);
+   updateShortcutPanel();
+ }
  private float axis(MotionEvent e,int axis){InputDevice d=e.getDevice();InputDevice.MotionRange r=d==null?null:d.getMotionRange(axis,e.getSource());float v=e.getAxisValue(axis);return Math.abs(v)<=Math.max(.16f,r==null?0:r.getFlat())?0:v;}
  private boolean centeredAxis(MotionEvent e,int axis){InputDevice.MotionRange r=e.getDevice()==null?null:e.getDevice().getMotionRange(axis,e.getSource());return r!=null&&r.getMin()<0;}
  private Display compatibleSecondDisplay(){
@@ -239,7 +271,7 @@ public class MainActivity extends Activity {
      controlPulse.sent(now,controlInput);
      float mx=lx,my=ly;
      final float rightX=rx,rightY=ry,elapsed=dt;
-     web.evaluateJavascript((localSession?companion.get("frame"):"")+"window.thorControls.stick("+mx+","+my+");window.thorControls.dpad("+hx+","+hy+");window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
+     web.evaluateJavascript((localSession?companion.get("frame"):"")+"window.thorControls.stick("+mx+","+my+");window.thorControls.dpadRepeat();window.thorControls.rightStick("+rightX+","+rightY+")",radial->{
      if(!controlGate.complete(request))return;
      if(!active||!ready)return;
      if(!"true".equals(radial)&&(Math.abs(rightX)>.16f||Math.abs(rightY)>.16f)){
@@ -645,16 +677,29 @@ public class MainActivity extends Activity {
  private void direction(String k,boolean down){if(down&&directions.add(k))key(k,k,true);else if(!down&&directions.remove(k))key(k,k,false);}
  private void reset(){if(nativeClickKey!=-1){click(false);nativeClickKey=-1;}if(ready)web.evaluateJavascript("window.thorControls.cancel()",null);for(String k:new HashSet<>(directions))direction(k,false);for(int k:new HashSet<>(held)){String[] b=binding(k);if(b!=null)key(b[0],b[1],false);}if(ready)web.evaluateJavascript("window.thorControls.stick(0,0)",null);held.clear();triggerHold.clear();lx=ly=rx=ry=hx=hy=0;}
  public boolean dispatchGenericMotionEvent(MotionEvent e){
-   if((e.getSource()&InputDevice.SOURCE_JOYSTICK)==InputDevice.SOURCE_JOYSTICK&&e.getAction()==MotionEvent.ACTION_MOVE){
-     if(!getWindow().getDecorView().hasWindowFocus())return super.dispatchGenericMotionEvent(e);
-     lastInputDevice=e.getDeviceId();
+   boolean stickSource=e.isFromSource(InputDevice.SOURCE_JOYSTICK);
+   if(e.getAction()!=MotionEvent.ACTION_MOVE||(!stickSource&&!e.isFromSource(InputDevice.SOURCE_DPAD))||
+      !getWindow().getDecorView().hasWindowFocus())return super.dispatchGenericMotionEvent(e);
+   useController(e.getDevice());
+   for(int i=0;i<e.getHistorySize();i++)
+     updateHat(e.getHistoricalAxisValue(MotionEvent.AXIS_HAT_X,i),e.getHistoricalAxisValue(MotionEvent.AXIS_HAT_Y,i));
+   updateHat(e.getAxisValue(MotionEvent.AXIS_HAT_X),e.getAxisValue(MotionEvent.AXIS_HAT_Y));
+   if(stickSource){
      lx=axis(e,MotionEvent.AXIS_X);ly=axis(e,MotionEvent.AXIS_Y);
      boolean standard=centeredAxis(e,MotionEvent.AXIS_Z)&&centeredAxis(e,MotionEvent.AXIS_RZ);
-     rx=axis(e,standard?MotionEvent.AXIS_Z:MotionEvent.AXIS_RX);ry=axis(e,standard?MotionEvent.AXIS_RZ:MotionEvent.AXIS_RY);hx=axis(e,MotionEvent.AXIS_HAT_X);hy=axis(e,MotionEvent.AXIS_HAT_Y);
+     rx=axis(e,standard?MotionEvent.AXIS_Z:MotionEvent.AXIS_RX);ry=axis(e,standard?MotionEvent.AXIS_RZ:MotionEvent.AXIS_RY);
      trigger(KeyEvent.KEYCODE_BUTTON_L2,Math.max(e.getAxisValue(MotionEvent.AXIS_LTRIGGER),e.getAxisValue(MotionEvent.AXIS_BRAKE))>.5f);
      trigger(KeyEvent.KEYCODE_BUTTON_R2,Math.max(e.getAxisValue(MotionEvent.AXIS_RTRIGGER),e.getAxisValue(MotionEvent.AXIS_GAS))>.5f);
-     android.util.Log.d("ThorRetro","sticks "+lx+","+ly+" right "+rx+","+ry);return true;
-   }return super.dispatchGenericMotionEvent(e);
+   }
+   return true;
+ }
+ private float hatDirection(float value){return value>=.5f?1:value<=-.5f?-1:0;}
+ private void updateHat(float x,float y){
+   x=hatDirection(x);y=hatDirection(y);
+   if(x==hx&&y==hy)return;
+   hx=x;hy=y;
+   // Preserve press and release even if Android batches them in one event.
+   if(ready)web.evaluateJavascript("window.thorControls.dpad("+hx+","+hy+")",null);
  }
  private void trigger(int k,boolean down){triggerInput(k,down,true);}
  private void triggerInput(int k,boolean down,boolean axis){
@@ -672,9 +717,13 @@ public class MainActivity extends Activity {
  }
  public boolean dispatchKeyEvent(KeyEvent e){
    if(!getWindow().getDecorView().hasWindowFocus())return super.dispatchKeyEvent(e);
-   if(isController(e.getDevice()))lastInputDevice=e.getDeviceId();
+   if(isController(e.getDevice())||dualSense(e.getDevice()))useController(e.getDevice());
    int k=e.getKeyCode();boolean down=e.getAction()==KeyEvent.ACTION_DOWN;
    if(k==KeyEvent.KEYCODE_BUTTON_SELECT){if(down&&e.getRepeatCount()==0)settings();return true;}
+   if(k==KeyEvent.KEYCODE_DPAD_CENTER&&e.getDevice()!=null&&!e.getDevice().isVirtual()){
+     if(down&&e.getRepeatCount()==0&&ready)web.evaluateJavascript("window.thorMenu?.activate()",null);
+     return true;
+   }
    if(k==KeyEvent.KEYCODE_BUTTON_THUMBR||k==KeyEvent.KEYCODE_BUTTON_A){
      if(e.getRepeatCount()==0){if(down){if(!held.add(k))return true;if(ready)web.evaluateJavascript(k==KeyEvent.KEYCODE_BUTTON_A?"window.thorControls.controller(\"A\",true)":"(()=>{const mode=window.thorControls?.toggleAutoSpells();return mode===false||mode===undefined?(window.thorMenu?window.thorMenu.activate():false):mode;})()",used->{if(k==KeyEvent.KEYCODE_BUTTON_THUMBR&&Arrays.asList("\"off\"","\"buffs\"","\"full\"").contains(used)){savePanelOption("autoSpellMode",used.substring(1,used.length()-1));requestCharacterRefresh();return;}if(!active||!ready||!getWindow().getDecorView().hasWindowFocus())return;if(!"true".equals(used)){click(true);if(held.contains(k))nativeClickKey=k;else click(false);}});}else{held.remove(k);if(k==KeyEvent.KEYCODE_BUTTON_A&&ready)web.evaluateJavascript("window.thorControls.controller(\"A\",false)",null);if(nativeClickKey==k){click(false);nativeClickKey=-1;}}}return true;
    }
@@ -737,7 +786,7 @@ public class MainActivity extends Activity {
  }
  private String graphicsQuality(){String value=getPreferences(0).getString("graphicsQuality","balanced");if("minimal".equals(value))return "no-spells";return Arrays.asList("full","balanced","no-spells").contains(value)?value:"balanced";}
  private JSONObject panelOptions(){
-   JSONObject data=new JSONObject();android.content.SharedPreferences p=getPreferences(0);try{data.put("mode",autoMode());data.put("graphicsQuality",graphicsQuality());data.put("manual",spellManual());data.put("shortcuts",spellShortcuts());for(String key:Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper","safeAutoSell"))data.put(key,p.getBoolean(key,!"safeAutoSell".equals(key)));data.put("cursorSensitivity",p.getInt("cursorSensitivity",100));data.put("labelOpacity",p.getInt("labelOpacity",45));}catch(Exception ignored){}return data;
+   JSONObject data=new JSONObject();android.content.SharedPreferences p=getPreferences(0);try{data.put("controllerLayout",controllerLayout());data.put("mode",autoMode());data.put("graphicsQuality",graphicsQuality());data.put("manual",spellManual());data.put("shortcuts",spellShortcuts());for(String key:Arrays.asList("showLabels","showJoystick","radialAim","hideCombatCursor","combatHelper","safeAutoSell"))data.put(key,p.getBoolean(key,!"safeAutoSell".equals(key)));data.put("cursorSensitivity",p.getInt("cursorSensitivity",100));data.put("labelOpacity",p.getInt("labelOpacity",45));}catch(Exception ignored){}return data;
  }
  private void savePanelOption(String name,String value){
    android.content.SharedPreferences.Editor edit=getPreferences(0).edit();
@@ -748,7 +797,7 @@ public class MainActivity extends Activity {
    else return;
    edit.apply();applySettings();
  }
- private void applySettings(){if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({graphicsQuality:\""+graphicsQuality()+"\",autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
+ private void applySettings(){if(characterScreen!=null)characterScreen.update(characterData);updateShortcutPanel();if(!ready)return;syncActive();android.content.SharedPreferences p=getPreferences(0);web.evaluateJavascript("window.thorControls.setControllerLayout("+quote(controllerLayout())+");window.thorSalePolicy?.configure("+p.getBoolean("safeAutoSell",false)+");window.thorControls.configure({graphicsQuality:\""+graphicsQuality()+"\",autoSpellMode:\""+autoMode()+"\",spellManual:"+spellManual().toString()+",spellShortcuts:"+spellShortcuts().toString()+",autoSpells:"+!autoMode().equals("off")+",hideCombatCursor:"+p.getBoolean("hideCombatCursor",true)+",combatHelper:"+p.getBoolean("combatHelper",true)+",radialAim:"+p.getBoolean("radialAim",true)+",showLabels:"+p.getBoolean("showLabels",true)+",labelOpacity:"+(p.getInt("labelOpacity",45)/100.0)+",showJoystick:"+p.getBoolean("showJoystick",true)+"})",null);}
  protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);if(pendingBackup!=null)state.putString("pendingProgressBackup",pendingBackup);state.putBoolean("localSession",localSession);}
  private void exportProgress(){if(localSession){Toast.makeText(this,"Session locale temporaire : export de progression désactivé.",Toast.LENGTH_LONG).show();return;}if(!ready)return;web.evaluateJavascript("window.thorProgressBackup.export()",result->{if(result==null||"null".equals(result)){Toast.makeText(this,ui("Aucune progression à exporter"),Toast.LENGTH_LONG).show();return;}try{pendingBackup=new JSONObject(result).toString(2);Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE).putExtra(Intent.EXTRA_TITLE,"Retro-Survival-progression.json");startActivityForResult(intent,EXPORT_PROGRESS);}catch(Exception ignored){}});}
  private void importProgress(){new AlertDialog.Builder(this).setMessage(ui("Restaurer remplacera la progression locale et redémarrera le jeu.")).setNegativeButton(ui("Annuler"),null).setPositiveButton(ui("Choisir le fichier"),(dialog,which)->startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/json").addCategory(Intent.CATEGORY_OPENABLE),IMPORT_PROGRESS)).show();}

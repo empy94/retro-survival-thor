@@ -64,3 +64,9 @@ for(const id of Object.keys(policy.catalog.spells))for(const evolution of [null,
 
 assert.equal(mapping.radialSpec('shovelThrow',{enutrofSpell:{shovelThrow:{range:2}}}).distance,600);
 assert.equal(mapping.radialSpec('shovelKiss',{enutrofSpell:{shovelKiss:{range:2}}},{shovelKiss:1}),null);
+
+assert.equal(mapping.buttonLabel('A','playstation'),'✕');
+assert.equal(mapping.buttonLabel('B','playstation'),'○');
+assert.equal(mapping.buttonLabel('L1 + X','playstation'),'L1 + □');
+assert.equal(mapping.buttonLabel('R2 + Y','playstation'),'R2 + △');
+assert.equal(mapping.buttonLabel('L1 + X','standard'),'L1 + X');

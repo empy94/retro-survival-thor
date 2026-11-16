@@ -38,7 +38,8 @@
      let label=el.querySelector('.thor-button-label');
      if(!spell){label?.remove();return;}
      if(!label){label=document.createElement('span');label.className='thor-button-label';label.setAttribute('aria-hidden','true');label.style.cssText='position:absolute;right:3px;top:3px;z-index:3;border:1px solid #ffe4a0;border-radius:5px;padding:2px 4px;background:#ffda83;color:#18221b;font:900 11px/1.15 sans-serif;pointer-events:none;box-shadow:0 1px 3px #0008';if(getComputedStyle(el).position==='static')el.style.position='relative';el.append(label);}
-     if(label.textContent!==spell.button)label.textContent=spell.button;
+     const button=window.thorSpellBindings.buttonLabel?.(spell.button,settings.controllerLayout)||spell.button;
+     if(label.textContent!==button)label.textContent=button;
      label.title=window.thorSpellBindings.isHeld?.(spell.id)?text('Maintenir pour canaliser, relâcher pour arrêter'):spell.id==='brokle'&&window.thorDashboard?.abilities().awakenings?.brokle!==1?text('Relâcher pour lancer'):spell.aimed?text('Maintenir, viser au stick droit, relâcher'):text('Appuyer pour lancer');
      label.style.display=settings.showLabels?'':'none';label.style.opacity=String(settings.labelOpacity);
    });
@@ -72,12 +73,23 @@
        // Stay above the game's touch-vector threshold to avoid an auto-aim cast.
        const ratio=spec.variable?Math.min(1,Math.max(held.distanceRatio,12.1/(range*Math.min(travel.scaleX,travel.scaleY)))):1;
        targetX=player.x+d.x/length*range*ratio*travel.scaleX;targetY=player.y+d.y/length*range*ratio*travel.scaleY;
+       const hint=!held.rightDirection&&spec.variable?held.targetHint?.(range):null;
+       if(hint){targetX=hint.x;targetY=hint.y;}
      }
    }
    const rect=held.controls.getBoundingClientRect(),dx=targetX-player.x,dy=targetY-player.y;
-   // The game keeps a fixed touch origin; translate the virtual finger so its
-   // vector always equals cursor minus current player. Never write game state.
-   return {x:rect.left+held.originX+dx,y:rect.top+held.originY+dy,player,rect,dx,dy,targetX,targetY,range,travel,showRange,fixed};
+   // Keep the reticle in screen coordinates, but send native touch units.
+   // The browser holds the same touch origin even when the player moves.
+   let inputScale=1;
+   const span=held.travel?0:window.thorGameAdapter?.touchAimSpan?.(held.id);
+   if(span>0){
+     const state=travel||window.thorDashboard?.travelState(),distance=range??(state&&window.thorSpellBindings.radialSpec(held.id,state.upgrades,state.awakenings)?.distance);
+     if(state&&distance>0){
+       const pixels=Math.hypot(dx,dy);
+       if(pixels>0)inputScale=Math.max(12.1,span*Math.min(1,Math.hypot(dx/state.scaleX,dy/state.scaleY)/distance))/pixels;
+     }
+   }
+   return {x:rect.left+held.originX+dx*inputScale,y:rect.top+held.originY+dy*inputScale,player,rect,dx,dy,targetX,targetY,range,travel,showRange,fixed};
  }
  function updateAim(){
    if(!ability)return;
@@ -119,13 +131,15 @@
      requestAnimationFrame(()=>{if(!valid()||!point()){if(autoPointer===held)cancelAuto();return;}event(el,'pointermove',182,held.x,held.y);requestAnimationFrame(()=>{if(!valid()||!point()){if(autoPointer===held)cancelAuto();return;}autoPointer=null;event(el,'pointerup',182,held.x,held.y);});});return true;
    },
    bindings(){return bindings().map(s=>s?{button:s.button,id:s.id,name:s.name,aimed:s.aimed,travel:window.thorSpellBindings.isTravel(s.id)}:null);},
+   setControllerLayout(layout){if(settings.controllerLayout!==layout){settings.controllerLayout=layout;decorate();}},
    helperEnabled(){return settings.combatHelper;},
    pad(){pointerUsed=false;refreshCursor();},
-   rightStick(x,y){const length=Math.hypot(x,y),choices=window.thorMenu?.active()&&window.thorMenu?.combat?.(),moved=length>.16&&(Math.hypot(rightPrevious.x,rightPrevious.y)<=.16||Math.hypot(x-rightPrevious.x,y-rightPrevious.y)>.04);if(length>.16){manual();if(moved)window.thorMenu?.resumeCombat?.();}if(!choices||moved||length<=.16)rightPrevious={x,y};if(choices&&!moved)return true;if(!ability?.radial)return false;if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
+   rightStick(x,y){const length=Math.hypot(x,y),choices=window.thorMenu?.active()&&window.thorMenu?.combat?.(),moved=length>.16&&(Math.hypot(rightPrevious.x,rightPrevious.y)<=.16||Math.hypot(x-rightPrevious.x,y-rightPrevious.y)>.04);if(length>.16&&!choices||choices&&length>.24&&moved){manual();if(moved)window.thorMenu?.resumeCombat?.();}if(!choices||moved||length<=.16)rightPrevious={x,y};if(choices&&(!moved||length<=.24))return true;if(!ability?.radial)return false;if(length>.16){ability.rightDirection={x,y};ability.distanceRatio=Math.max(0,Math.min(1,(length-.16)/.84));}return true;},
    menuFocus(){manual();finish('pointercancel');for(const route of padRoutes.values()){route.suppressed=true;route.pending=false;}},
    dpad(x,y){hat={x,y};updateDpad();},
+   dpadRepeat(){updateDpad();},
    dpadKey(direction,down){if(!['up','down','left','right'].includes(direction))return;if(down)directionKeys.add(direction);else directionKeys.delete(direction);updateDpad();},
-   cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();directionKeys.clear();hat={x:0,y:0};updateDpad();window.thorMenu?.clear();},
+   cancel(){manual();finish('pointercancel');padHeld.clear();padRoutes.clear();directionKeys.clear();hat={x:0,y:0};rightPrevious={x:0,y:0};updateDpad();window.thorMenu?.clear();},
    configure(value){if(['full','balanced','minimal','no-spells'].includes(value.graphicsQuality))window.thorGraphicsQuality=value.graphicsQuality;window.thorGraphics?.configure(value.graphicsQuality);if(Object.prototype.hasOwnProperty.call(value,'spellShortcuts')&&JSON.stringify(value.spellShortcuts)!==JSON.stringify(settings.spellShortcuts)){finish('pointercancel');padHeld.clear();padRoutes.clear();}const before=settings.autoSpellMode;settings={...settings,...value};if(settings.autoSpells&&['buffs','full'].includes(settings.autoSpellMode))resumeAutoMode=settings.autoSpellMode;if(!settings.autoSpells||before!==settings.autoSpellMode||Object.prototype.hasOwnProperty.call(value,'spellManual'))cancelAuto();window.thorAutoSpells?.configure(settings.autoSpells===true?(settings.autoSpellMode||'full'):'off',settings.spellManual);decorate();},
    toggleAutoSpells(){
      const main=document.querySelector('main');
@@ -189,6 +203,10 @@
      ability={el,index,controls,id:spell.id,travel,radial,variable:spec?.variable,distanceRatio:1,x:player.x,y:player.y,originX:player.x-rect.left,originY:player.y-rect.top,
        forward:Math.hypot(leftX,leftY)>.16?{x:leftX,y:leftY}:{x:Math.cos(state?.angle||0),y:Math.sin(state?.angle||0)}};
      if(radial){
+       const rightLength=Math.hypot(rightPrevious.x,rightPrevious.y);
+       if(rightLength>.16){ability.rightDirection=rightPrevious;ability.distanceRatio=Math.min(1,(rightLength-.16)/.84);}
+       else if(spec.variable&&window.thorSpellBindings.canSuggestTarget?.(spell.id))
+         ability.targetHint=window.thorDashboard?.manualAimTarget?.(spec.distance,ability.forward);
        ability.cursor=document.querySelector('#thor-cursor');if(ability.cursor){ability.cursorDisplay=ability.cursor.style.display;ability.cursor.style.display='none';}
        const ring=document.createElement('div');ring.className='thor-travel-radius';ring.style.cssText='position:absolute;transform:translate(-50%,-50%);border:1px dashed #ffe19299;border-radius:50%;pointer-events:none;box-sizing:border-box';controls.append(ring);ability.radius=ring;
        const caption=document.createElement('span');caption.style.cssText='position:absolute;transform:translateX(-50%);white-space:nowrap;color:#ffe4a0;background:#17251ccc;border-radius:5px;padding:3px 5px;font:600 10px sans-serif;pointer-events:none';controls.append(caption);ability.caption=caption;

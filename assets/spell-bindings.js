@@ -4,6 +4,10 @@
  const aimed=new Set(["cawotte","dash","immobilizationGlyph","burningGlyph","staffBoomerang","cut","swordOfFate","jump","intimidation","celestialSword","iopSword","brokle","lethalAttack","massTrap","repulsiveTrap","sramDouble","fear","arnaque","cracklerStrike","toad","shovelJudgment","mound","animatedChest","shovelThrow","corruption"]);
  const names=['X','Y','L1','R1','L2','R2','A','B',...['L1','R1','L2','R2'].flatMap(m=>['X','Y','A','B'].map(b=>m+' + '+b))];
  const travel=new Set(['dash','jump']);
+ const targetHints=new Set(['burningGlyph','cut','intimidation','celestialSword','brokle','lethalAttack','massTrap','repulsiveTrap','cracklerStrike','shovelJudgment','mound','shovelThrow','corruption','burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass','dissolution','punishment']);
+ const sonyFaces={A:'✕',B:'○',X:'□',Y:'△'};
+ function buttonLabel(button,layout){return layout==='playstation'?button.split(' + ').map(key=>sonyFaces[key]||key).join(' + '):button;}
+ function canSuggestTarget(id){return targetHints.has(id);}
  function isTravel(id){return travel.has(id);}
  function isHeld(id){return id==='stingingClaw';}
  function travelRange(id,upgrades={},awakenings={}){
@@ -50,6 +54,6 @@
    }
    return slots;
  }
- const api={names,needsAim,assign,isTravel,isHeld,travelRange,radialSpec};
+ const api={names,needsAim,assign,isTravel,isHeld,travelRange,radialSpec,buttonLabel,canSuggestTarget};
  if(typeof module==='object'&&module.exports)module.exports=api;else root.thorSpellBindings=api;
 })(typeof window==='object'?window:globalThis);
