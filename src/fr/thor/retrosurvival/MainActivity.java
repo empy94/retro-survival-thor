@@ -306,7 +306,9 @@ public class MainActivity extends Activity {
          c.setRequestProperty("Accept-Language","fr-FR,fr;q=0.9");c.setUseCaches(false);c.setRequestProperty("Cache-Control","no-cache");
          String cookies=CookieManager.getInstance().getCookie(r.getUrl().toString());if(cookies!=null)c.setRequestProperty("Cookie",cookies);
          int status=c.getResponseCode();if(status!=200){c.disconnect();return null;}
-         List<String> setCookies=c.getHeaderFields().get("Set-Cookie");if(setCookies!=null)for(String cookie:setCookies)CookieManager.getInstance().setCookie(r.getUrl().toString(),cookie);
+         for(Map.Entry<String,List<String>> header:c.getHeaderFields().entrySet())
+           if("Set-Cookie".equalsIgnoreCase(header.getKey()))for(String cookie:header.getValue())
+             CookieManager.getInstance().setCookie(r.getUrl().toString(),cookie);
          String html;try(InputStream in=c.getInputStream()){html=read(in);}finally{c.disconnect();}
          int head=html.indexOf("<head>");if(head<0)return null;
          try{localCache.put("/",html.getBytes(StandardCharsets.UTF_8));}catch(Exception cacheError){android.util.Log.w("ThorRetro","Root cache unavailable",cacheError);}
@@ -343,7 +345,10 @@ public class MainActivity extends Activity {
    TextView title=new TextView(this);title.setText(ui("Connexion Discord")+" · discord.com");title.setTextSize(18);
    header.addView(title,new LinearLayout.LayoutParams(0,-2,1));
    Button cancel=new Button(this);cancel.setText(ui("Annuler"));cancel.setOnClickListener(v->dialog.dismiss());header.addView(cancel);
+   Button retry=new Button(this);retry.setText(ui("Réessayer"));retry.setVisibility(View.GONE);header.addView(retry);
    panel.addView(header,new LinearLayout.LayoutParams(-1,-2));
+   TextView issue=new TextView(this);issue.setPadding(pad,0,pad,pad/2);issue.setVisibility(View.GONE);
+   panel.addView(issue,new LinearLayout.LayoutParams(-1,-2));
    ProgressBar loading=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
    panel.addView(loading,new LinearLayout.LayoutParams(-1,(int)(3*getResources().getDisplayMetrics().density)));
    panel.addView(signIn,new LinearLayout.LayoutParams(-1,0,1));
@@ -362,27 +367,41 @@ public class MainActivity extends Activity {
      signIn.stopLoading();signIn.destroy();
      if(!isFinishing()&&!isDestroyed()){web.requestFocus();immersive();}
    });
-   signIn.setWebViewClient(new WebViewClient(){
-     private boolean finished;
+   class SignInClient extends WebViewClient {
+     private boolean finished,callbackSeen;
+     void restart(){
+       callbackSeen=false;
+       issue.setVisibility(View.GONE);retry.setVisibility(View.GONE);
+       signIn.stopLoading();signIn.loadUrl(start);
+     }
      private void finish(String url){
        if(finished||discordSignIn!=dialog)return;
        finished=true;
        dialog.dismiss();
+       // A fresh top-level request in the game view now carries the account cookie.
        if(!localSession&&!isFinishing()&&!isDestroyed())web.loadUrl(url);
      }
-     private void fail(){
+     private void report(String message,String code){
        if(finished||discordSignIn!=dialog)return;
-       finished=true;
-       dialog.dismiss();
-       Toast.makeText(MainActivity.this,ui("La connexion Discord a échoué. Réessaie depuis le jeu."),Toast.LENGTH_LONG).show();
+       issue.setText(ui(message)+" · "+code);issue.setVisibility(View.VISIBLE);
+       retry.setVisibility(View.VISIBLE);
+     }
+     private boolean handleNavigation(String url){
+       DiscordSignIn.Route route=DiscordSignIn.route(url);
+       switch(route){
+         case START:case DISCORD:return false;
+         case CALLBACK:callbackSeen=true;return false;
+         case RESULT:finish(url);return true;
+         case GAME_HOME:
+           if(callbackSeen){finish(url);return true;}
+           break;
+         default:break;
+       }
+       report("La redirection de connexion a été bloquée.", "RS-DISCORD-REDIRECT");
+       return true;
      }
      @Override public boolean shouldOverrideUrlLoading(WebView view,WebResourceRequest request){
-       if(!request.isForMainFrame())return false;
-       String url=request.getUrl().toString();
-       DiscordSignIn.Route route=DiscordSignIn.route(url);
-       if(route==DiscordSignIn.Route.RESULT){finish(url);return true;}
-       if(route==DiscordSignIn.Route.BLOCK){fail();return true;}
-       return false;
+       return request.isForMainFrame()&&handleNavigation(request.getUrl().toString());
      }
      @Override public WebResourceResponse shouldInterceptRequest(WebView view,WebResourceRequest request){
        if(request.isForMainFrame()&&DiscordSignIn.route(request.getUrl().toString())==DiscordSignIn.Route.BLOCK)
@@ -390,17 +409,23 @@ public class MainActivity extends Activity {
        return null;
      }
      @Override public void onPageStarted(WebView view,String url,android.graphics.Bitmap icon){
-       DiscordSignIn.Route route=DiscordSignIn.route(url);
-       if(route==DiscordSignIn.Route.RESULT)finish(url);
-       else if(route==DiscordSignIn.Route.BLOCK)fail();
+       if(!"about:blank".equals(url)&&handleNavigation(url))view.stopLoading();
      }
      @Override public void onReceivedError(WebView view,WebResourceRequest request,WebResourceError error){
-       if(request.isForMainFrame())fail();
+       if(request.isForMainFrame())report("La page de connexion n’a pas pu se charger.", "RS-DISCORD-RESEAU-"+Math.abs(error.getErrorCode()));
      }
      @Override public void onReceivedHttpError(WebView view,WebResourceRequest request,WebResourceResponse response){
-       if(request.isForMainFrame())fail();
+       if(request.isForMainFrame()){
+         // Some provider checks have an HTTP error status and still offer an action.
+         // Keep the page available instead of closing the login automatically.
+         String step=DiscordSignIn.route(request.getUrl().toString())==DiscordSignIn.Route.DISCORD?"DISCORD":"JEU";
+         report("Le service de connexion a signalé une erreur.", "RS-"+step+"-HTTP-"+response.getStatusCode());
+       }
      }
-   });
+   }
+   SignInClient client=new SignInClient();
+   signIn.setWebViewClient(client);
+   retry.setOnClickListener(v->client.restart());
    dialog.show();
    Window window=dialog.getWindow();
    if(window!=null)window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT);

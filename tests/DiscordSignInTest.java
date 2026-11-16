@@ -11,10 +11,15 @@ public final class DiscordSignInTest {
   expect(DISCORD,"https://discord.com/oauth2/authorize?client_id=sample&state=sample");
   expect(DISCORD,"https://discord.com/login?redirect_to=%2Foauth2%2Fauthorize");
   expect(DISCORD,"https://discord.com/mfa");
+  expect(DISCORD,"https://discord.com/verify");
+  expect(DISCORD,"https://discord.com/api/oauth2/authorize");
+  expect(DISCORD,"https://discord.com/channels/@me");
+  expect(GAME_HOME,"https://retrosurvival.online/");
+  expect(GAME_HOME,"https://retrosurvival.online/?unrelated=discord=linked");
+  expect(GAME_HOME,"https://retrosurvival.online/?discord=");
   for(String url:new String[]{
-    "https://discord.gg/sample","https://discord.com/invite/sample","https://discord.com/channels/@me",
-    "https://retrosurvival.online/","https://retrosurvival.online/other?discord=linked",
-    "https://retrosurvival.online/?unrelated=discord=linked","https://retrosurvival.online/?discord=",
+    "https://discord.gg/sample","https://discord.com.evil.example/login",
+    "https://retrosurvival.online/other?discord=linked",
     "https://retrosurvival.online/api/auth/discord/start/extra","https://retrosurvival.online/api/auth/discord%2fstart",
     "https://retrosurvival.online.evil.example/api/auth/discord/start","http://discord.com/login",
     "https://discord.com:8443/login","https://dummy@discord.com/login","https://discord.com@evil.example/login",

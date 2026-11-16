@@ -5,7 +5,7 @@ import java.net.URI;
 final class DiscordSignIn {
  static final String START="/api/auth/discord/start";
  private static final String CALLBACK="/api/auth/discord/callback";
- enum Route { START, CALLBACK, RESULT, DISCORD, BLOCK }
+ enum Route { START, CALLBACK, RESULT, GAME_HOME, DISCORD, BLOCK }
 
  static Route route(String url){
   if(url==null)return Route.BLOCK;
@@ -18,14 +18,15 @@ final class DiscordSignIn {
     if(START.equals(path))return Route.START;
     if(CALLBACK.equals(path))return Route.CALLBACK;
     String query=uri.getRawQuery();
-    if("/".equals(path)&&query!=null){
-     for(String field:query.split("&"))if(field.matches("discord=[a-z-]{1,32}"))return Route.RESULT;
+    if("/".equals(path)){
+     if(query!=null)for(String field:query.split("&"))
+      if(field.matches("discord=[a-z-]{1,32}"))return Route.RESULT;
+     return Route.GAME_HOME;
     }
    }
-   if("discord.com".equalsIgnoreCase(uri.getHost())&&path!=null&&
-      (path.equals("/oauth2/authorize")||path.equals("/oauth2/authorized")||
-       path.equals("/login")||path.startsWith("/login/")||
-       path.equals("/mfa")||path.startsWith("/mfa/")))return Route.DISCORD;
+   // Login, device verification and authorization are all handled by the same
+   // provider origin. The isolated view deliberately has no game bridge.
+   if("discord.com".equalsIgnoreCase(uri.getHost()))return Route.DISCORD;
   }catch(IllegalArgumentException ignored){}
   return Route.BLOCK;
  }
