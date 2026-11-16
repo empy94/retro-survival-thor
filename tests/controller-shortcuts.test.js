@@ -43,3 +43,24 @@ inMenu=true;const modeCount=autoModes.length;assert.equal(controls.toggleAutoSpe
 context.document.hidden=true;assert.equal(controls.toggleAutoSpells(),false);context.document.hidden=false;
 controls.setActive(false);assert.equal(controls.toggleAutoSpells(),false);controls.setActive(true);
 console.log('R3: exact full/buffs restoration and menu/background guards passed');
+
+// A very short cast can release before React commits the press. The route
+// must keep its original spell through that frame and avoid double release.
+controls.setActive(true);context.document.hidden=false;
+ids=['burningGlyph','shield'];elements=buttons();
+elements[0].getAttribute=name=>name==='data-ability'?'burningGlyph':null;
+elements[0].__reactFiberTest.key='obsolete-key';
+window.thorGameAdapter={touchNeedsCommit:id=>id==='burningGlyph'};
+const frames=[];context.requestAnimationFrame=fn=>{frames.push(fn);return frames.length;};
+controls.configure({spellShortcuts:{feca:{burningGlyph:'R2',shield:'X'}}});events.length=0;
+controls.controller('R2',true);controls.controller('R2',false);controls.controller('R2',false);
+assert.deepEqual(events,[['burningGlyph','pointerdown']]);
+frames.shift()();
+assert.deepEqual(events,[['burningGlyph','pointerdown'],['burningGlyph','pointermove'],['burningGlyph','pointerup']]);
+// A modifier delayed for a chord cannot cast the replacement spell when the
+// UI changes while the button is held.
+events.length=0;controls.configure({spellShortcuts:{feca:{shield:'L1'}}});
+controls.controller('L1',true);elements[1].isConnected=false;
+ids=['burningGlyph','speed'];elements=buttons();
+controls.controller('L1',false);
+assert.deepEqual(events,[]);

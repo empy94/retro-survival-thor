@@ -494,7 +494,8 @@ public class MainActivity extends Activity {
    }
    if(source.length()>24000000)return null;
    byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest(source.getBytes(StandardCharsets.UTF_8));StringBuilder hash=new StringBuilder();for(byte b:digest)hash.append(String.format(java.util.Locale.ROOT,"%02x",b&255));if(!GameModuleVersions.oct17Shared(hash.toString())&&!GameModuleVersions.dockedShared(hash.toString())&&!GameModuleVersions.oct18Shared(hash.toString())&&!GameModuleVersions.oct19Shared(hash.toString())&&!GameModuleVersions.oct19bShared(hash.toString())&&!GameModuleVersions.oct20Shared(hash.toString())&&!GameModuleVersions.oct20cShared(hash.toString())&&!GameModuleVersions.oct21Shared(hash.toString())&&!GameModuleVersions.oct21bShared(hash.toString())&&!GameModuleVersions.oct21cShared(hash.toString())&&!GameModuleVersions.oct22Shared(hash.toString())){
-    ModuleCompatibility.Match compatible;try(InputStream profile=getAssets().open("shared-contract-nov15.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
+    ModuleCompatibility.Match compatible;try(InputStream profile=getAssets().open("shared-contract-nov16.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
+    if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov15.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
     if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov8.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
     if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov5.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
     if(compatible==null)try(InputStream profile=getAssets().open("shared-contract-nov1.json")){compatible=ModuleCompatibility.resolveShared(source,read(profile));}
@@ -518,7 +519,8 @@ public class MainActivity extends Activity {
      if((!localSession&&!GameModuleVersions.supported(hash.toString()))||GameModuleVersions.oct24(hash.toString())||GameModuleVersions.oct26(hash.toString())||GameModuleVersions.oct30(hash.toString())||GameModuleVersions.oct30b(hash.toString())||GameModuleVersions.nov1(hash.toString())||GameModuleVersions.nov5(hash.toString())||GameModuleVersions.nov8(hash.toString())||GameModuleVersions.nov15(hash.toString())){
       if(localSession&&!companion.supportsLocalGame(hash.toString()))return null;
       ModuleCompatibility.Match compatible;boolean currentFamily,newFamily;
-      try(InputStream profile=getAssets().open("module-contract-nov15.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      try(InputStream profile=getAssets().open("module-contract-nov16.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
+      if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov15.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov8.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov5.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}
       if(compatible==null)try(InputStream profile=getAssets().open("module-contract-nov1.json")){compatible=ModuleCompatibility.resolve(source,read(profile));}

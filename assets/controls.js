@@ -22,7 +22,8 @@
    const spells=[...document.querySelectorAll('.touch-ability')].map(el=>{
      let f=el[Object.keys(el).find(k=>k.startsWith('__reactFiber'))];
      // The keyed touch button carries the stable spell ID, independent of locale.
-     let id=null;for(let i=0;f&&i<4;i++,f=f.return){if(f.key){id=f.key;break;}}
+     let id=el.getAttribute('data-ability');
+     for(let i=0;!id&&f&&i<4;i++,f=f.return)if(f.key)id=f.key;
      return {el,id,name:el.getAttribute('aria-label')||''};
    });
    return window.thorSpellBindings.assign(spells,window.thorDashboard?.abilities(refresh).awakenings||{},settings.spellShortcuts?.[window.thorDashboard?.character?.()]);
@@ -55,7 +56,7 @@
    if(held||directionHeld)window.thorMenu?.dpad?.(x,y,performance.now());
    directionHeld=held;
  }
- function capture(el){if(el.__thorCapture)return;const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179&&id!==182&&id!==183)real(id);};el.__thorCapture=true;}
+ function capture(el){if(el.__thorCapture)return;const real=el.setPointerCapture.bind(el);el.setPointerCapture=id=>{if(id!==179&&id!==181&&id!==182&&id!==183)real(id);};el.__thorCapture=true;}
  function aimPoint(held){
    const player=window.thorDashboard?.playerPosition();if(!player)return null;
    let targetX=px,targetY=py,range=null,travel=null,showRange=true,fixed=null;
@@ -80,20 +81,25 @@
    const rect=held.controls.getBoundingClientRect(),dx=targetX-player.x,dy=targetY-player.y;
    // Keep the reticle in screen coordinates, but send native touch units.
    // The browser holds the same touch origin even when the player moves.
-   let inputScale=1;
-   const span=held.travel?0:window.thorGameAdapter?.touchAimSpan?.(held.id);
-   if(span>0){
-     const state=travel||window.thorDashboard?.travelState(),distance=range??(state&&window.thorSpellBindings.radialSpec(held.id,state.upgrades,state.awakenings)?.distance);
+   let input={x:dx,y:dy};
+   if(!held.travel){
+     const state=travel||window.thorDashboard?.travelState?.();
+     const distance=range??(state&&window.thorSpellBindings.radialSpec(held.id,state.upgrades,state.awakenings)?.distance);
      if(state&&distance>0){
-       const pixels=Math.hypot(dx,dy);
-       if(pixels>0)inputScale=Math.max(12.1,span*Math.min(1,Math.hypot(dx/state.scaleX,dy/state.scaleY)/distance))/pixels;
+       const ratio=Math.min(1,Math.hypot(dx/state.scaleX,dy/state.scaleY)/distance);
+       const normalized=window.thorGameAdapter?.touchAimDelta?.(held.id,held.originX+rect.left,held.originY+rect.top,dx,dy,ratio);
+       if(normalized)input=normalized;
+       else{
+         const span=window.thorGameAdapter?.touchAimSpan?.(held.id),pixels=Math.hypot(dx,dy);
+         if(span>0&&pixels>0){const k=Math.max(12.1,span*ratio)/pixels;input={x:dx*k,y:dy*k};}
+       }
      }
    }
-   return {x:rect.left+held.originX+dx*inputScale,y:rect.top+held.originY+dy*inputScale,player,rect,dx,dy,targetX,targetY,range,travel,showRange,fixed};
+   return {x:rect.left+held.originX+input.x,y:rect.top+held.originY+input.y,player,rect,dx,dy,targetX,targetY,range,travel,showRange,fixed};
  }
  function updateAim(){
    if(!ability)return;
-   if(!ability.el.isConnected||document.querySelector('main')?.classList.contains('modal-open')){finish('pointercancel');return;}
+   if(!ability.el.isConnected||document.querySelector('main')?.classList.contains('modal-open')||window.thorMenu?.active?.()){finish('pointercancel');return;}
    const p=aimPoint(ability);if(!p){finish('pointercancel');return;}
    ability.x=p.x;ability.y=p.y;
    event(ability.el,'pointermove',179,p.x,p.y);
@@ -103,7 +109,17 @@
    style.setProperty('--thor-target-x',(p.targetX-p.rect.left)+'px');style.setProperty('--thor-target-y',(p.targetY-p.rect.top)+'px');
    if(ability.radius){const ring=ability.radius.style;ring.left=(p.player.x-p.rect.left)+'px';ring.top=(p.player.y-p.rect.top)+'px';ring.width=p.range*p.travel.scaleX*2+'px';ring.height=p.range*p.travel.scaleY*2+'px';ring.display=p.range&&p.showRange?'':'none';const caption=p.fixed||(p.range===0?text('Relâcher pour lancer'):ability.variable?text('Stick droit : direction et distance'):text('Stick droit : direction'));if(ability.caption.textContent!==caption)ability.caption.textContent=caption;ability.caption.style.left=(p.player.x-p.rect.left)+'px';ability.caption.style.top=(p.player.y-p.rect.top+20)+'px';}
  }
- function aimTick(){aimFrame=null;updateAim();if(ability)aimFrame=requestAnimationFrame(aimTick);}
+ function aimTick(){
+   aimFrame=null;updateAim();if(!ability)return;
+   if(ability.releasePending){finish('pointerup');return;}
+   ability.committed=true;
+   aimFrame=requestAnimationFrame(aimTick);
+ }
+ function release(index){
+   if(ability?.index!==index)return;
+   if(ability.deferRelease&&!ability.committed){ability.releasePending=true;return;}
+   finish('pointerup');
+ }
  function finish(type){
    const held=ability;if(!held)return;
    if(type==='pointerup'&&!held.channel){const p=aimPoint(held);if(p){held.x=p.x;held.y=p.y;}else type='pointercancel';}
@@ -173,34 +189,40 @@
    controller(button,down){
      // Routes are captured at press time: releasing a modifier or changing a
      // spell list must not release a different spell than the one being held.
-     if(!down){padHeld.delete(button);const route=padRoutes.get(button);padRoutes.delete(button);if(!route)return true;if(!route.suppressed){if(route.pending)this.button(route.index,true);this.button(route.index,false);}return true;}
+     if(!down){padHeld.delete(button);const route=padRoutes.get(button);padRoutes.delete(button);if(!route)return true;if(!route.suppressed){if(route.pending)this.button(route.index,true,route.spell);this.button(route.index,false);}return true;}
      if(padHeld.has(button))return true;
      if(window.thorMenu?.active()){padHeld.add(button);padRoutes.set(button,{suppressed:true});if(button==='A')return window.thorMenu.activate()||!!window.thorMenu.combat?.();return true;}
      manual();const slots=bindings(true),modifiers=['L1','R1','L2','R2'];
      padHeld.add(button);
      const chord=['X','Y','A','B'].includes(button)?modifiers.map(m=>padHeld.has(m)?slots.find(s=>s?.button===m+' + '+button):null).find(Boolean):null;
-     if(chord){for(const m of modifiers){const route=padRoutes.get(m);if(route&&!route.suppressed){route.suppressed=true;if(ability?.index===route.index)finish('pointercancel');}}padRoutes.set(button,{index:chord.index});this.button(chord.index,true);return true;}
+     if(chord){for(const m of modifiers){const route=padRoutes.get(m);if(route&&!route.suppressed){route.suppressed=true;if(ability?.index===route.index)finish('pointercancel');}}padRoutes.set(button,{index:chord.index,spell:chord});this.button(chord.index,true,chord);return true;}
      const spell=slots.find(s=>s?.button===button);
      if(!spell)return button!=='A'||!!window.thorMenu?.combat?.();
-     const pending=modifiers.includes(button)&&!spell.aimed&&!window.thorSpellBindings.isHeld?.(spell.id);padRoutes.set(button,{index:spell.index,pending});if(!pending)this.button(spell.index,true);return true;
+     const pending=modifiers.includes(button)&&!spell.aimed&&!window.thorSpellBindings.isHeld?.(spell.id);padRoutes.set(button,{index:spell.index,spell,pending});if(!pending)this.button(spell.index,true,spell);return true;
    },
-   button(index,down){
-     if(!down&&ability?.index===index){finish('pointerup');return;}
-     if(!down)return;
+   button(index,down,boundSpell){
+     if(!down){release(index);return;}
      manual();
      if(document.querySelector('main')?.classList.contains('modal-open'))return;
-     const spell=bindings(true)[index];const el=spell?.el;if(!el||el.getAttribute('aria-disabled')==='true')return;
+     const spell=boundSpell||bindings(true)[index];const el=spell?.el;if(!el?.isConnected||el.getAttribute('aria-disabled')==='true')return;
      const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
      if(window.thorSpellBindings.isHeld?.(spell.id)){if(ability)return;capture(el);ability={el,index,id:spell.id,channel:true,x,y};event(el,'pointerdown',183,x,y);return;}
-     if(!spell.aimed){event(el,'pointerdown',181,x,y);event(el,'pointerup',181,x,y);return;}
+     const nativeAim=window.thorGameAdapter?.touchNeedsCommit?.(spell.id)??(spell.aimed&&!!el.getAttribute('data-ability'));
+     if(!spell.aimed){
+       if(nativeAim){if(ability)return;capture(el);}
+       event(el,'pointerdown',181,x,y);
+       if(nativeAim)requestAnimationFrame(()=>{if(el.isConnected)event(el,!foreground||document.hidden||window.thorMenu?.active?.()?'pointercancel':'pointerup',181,x,y);});
+       else event(el,'pointerup',181,x,y);
+       return;
+     }
      if(ability)return;
      const player=window.thorDashboard?.playerPosition(true),controls=el.closest('.touch-controls');
      if(!player||!controls)return;
      const rect=controls.getBoundingClientRect();
-     const travel=window.thorSpellBindings.isTravel(spell.id),radial=travel||settings.radialAim,state=radial?window.thorDashboard?.travelState():null;
-     const spec=radial&&state?window.thorSpellBindings.radialSpec(spell.id,state.upgrades,state.awakenings):null;
-     if(radial&&!spec)return;
-     ability={el,index,controls,id:spell.id,travel,radial,variable:spec?.variable,distanceRatio:1,x:player.x,y:player.y,originX:player.x-rect.left,originY:player.y-rect.top,
+     const travel=window.thorSpellBindings.isTravel(spell.id), wantsRadial=travel||settings.radialAim,state=wantsRadial?window.thorDashboard?.travelState():null;
+     const spec=wantsRadial&&state?window.thorSpellBindings.radialSpec(spell.id,state.upgrades,state.awakenings):null;
+     const radial=!!spec;
+     ability={el,index,controls,id:spell.id,travel,radial,deferRelease:nativeAim,variable:spec?.variable,distanceRatio:1,x:player.x,y:player.y,originX:player.x-rect.left,originY:player.y-rect.top,
        forward:Math.hypot(leftX,leftY)>.16?{x:leftX,y:leftY}:{x:Math.cos(state?.angle||0),y:Math.sin(state?.angle||0)}};
      if(radial){
        const rightLength=Math.hypot(rightPrevious.x,rightPrevious.y);
