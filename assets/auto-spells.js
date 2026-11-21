@@ -1,7 +1,7 @@
 (function(root){'use strict';
  // Heuristic planner in game coordinates. Original touch handlers remain the
  // sole authority for cooldowns, terrain, damage and valid placements.
- const buffs={absorption:'absorptionReady',sacrieurDodge:'sacrieurDodgeTimer',vitalPunishment:'sacrieurShieldTimer',shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration',powerfulShot:'powerfulShotTimer',bowMastery:'bowMasteryTimer'};
+ const buffs={xelorMummification:'xelorMummification',xelorBlur:'xelorBlur',absorption:'absorptionReady',sacrieurDodge:'sacrieurDodgeTimer',vitalPunishment:'sacrieurShieldTimer',shield:'shieldTimer',speed:'speedBoostTimer',staffScience:'science',power:'power',invisibility:'invisible',vitality:'vitality',mutilation:'mutilation',amplification:'amplification',acceleration:'acceleration',powerfulShot:'powerfulShotTimer',bowMastery:'bowMasteryTimer'};
  const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
  function allyBuff(s,spells){
   const allies=(s.allies||[]).filter(a=>a.hp>0&&[a.x,a.y].every(Number.isFinite));
@@ -41,6 +41,7 @@
        if(['blockerDoll','madDoll','sacrificialDoll'].includes(id)){add(spell,null,200);continue;}
        if(['tear','soothingBramble','madGrass'].includes(id)&&root?.thorGameAdapter?.sadidaTarget){const target=root.thorGameAdapter.sadidaTarget(id);if(target&&Number.isFinite(target.x)&&Number.isFinite(target.y))add(spell,target,id==='tear'?220:urgent?800:200);continue;}
      }
+     if(id==='soulCapture'){const target=root?.thorGameAdapter?.captureTarget?.();if(target&&Number.isFinite(target.x)&&Number.isFinite(target.y))add(spell,{x:target.x,y:target.y},800);continue;}
      if(id==='chaferfu'){if(urgent)add(spell,null,600);continue;}
      if(id==='bearCry'||id==='toad'){const action=allyBuff(s,[spell]);if(action)candidates.push(action);continue;}
      if(id==='animatedChest'&&s.summons?.chest)continue;
@@ -56,7 +57,7 @@
        if(timer>0)continue;if(id==='invisibility'&&!urgent&&p.hp/p.maxHp>.5)continue;
        add(spell,null,(id==='shield'||id==='invisibility'?urgent?1000:300:250));continue;}
      const spec=mapping.radialSpec(id,s.upgrades,s.awakenings);
-     if(id==='dash'||id==='jump'||id==='sramDouble'&&s.double&&s.awakenings.sramDouble===2){
+     if(['dash','jump','xelorTeleport','xelorFlight'].includes(id)||id==='sramDouble'&&s.double&&s.awakenings.sramDouble===2){
        if(!urgent)continue;let best=null,bestRisk=danger(p)-35;
        const fixed=id==='dash'&&s.awakenings.dash===3&&p.teleportReturnTimer>0?{x:p.teleportReturnX,y:p.teleportReturnY}:id==='sramDouble'?s.double:null;
        const points=fixed?[fixed]:Array.from({length:16},(_,i)=>({x:p.x+Math.cos(i*Math.PI/8)*spec.distance,y:p.y+Math.sin(i*Math.PI/8)*spec.distance}));
@@ -68,9 +69,9 @@
        const range=id==='liberation'?150*(1+(s.upgrades.liberationRadius||0)*.15):id==='intimidation'?125:110;
        if(nearest<=range)add(spell,id==='brokle'?{x:p.x,y:p.y}:null,id==='liberation'&&urgent?850:120);continue;
      }
-     if(!spec){if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&(['enutrof','osamodas'].includes(s.character)||s.levelId==='arena')&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
+     if(!spec){if(id==='xelorRewind'){continue;}if(id==='earlyRetreat'){if(urgent)add(spell,null,700);}else if(!spell.aimed&&(['enutrof','osamodas'].includes(s.character)||s.levelId==='arena')&&!(id==='animatedChest'&&s.summons?.chest))add(spell,null,100);continue;}
      const range=id==='swordOfFate'?Math.hypot(s.width,s.height):id==='fear'?300:spec.distance;
-     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow','burningArrow','recoilArrow','lashingArrow'].includes(id);
+     const directional=['staffBoomerang','cut','swordOfFate','fear','arnaque','shovelThrow','burningArrow','recoilArrow','lashingArrow','xelorDarkRay'].includes(id);
      const enutrofRadius={shovelJudgment:85,slaughteringShovel:125,shovelKiss:50,mound:195,corruption:100};
      const radius=id in enutrofRadius?enutrofRadius[id]*(1+(Number(s.upgrades.enutrofSpell?.[id]?.radius)||0)*.1)*(id==='mound'&&s.awakenings.mound===1?1.5:1):id==='massTrap'?57.5:id==='celestialSword'?105:id==='lethalAttack'?80:id==='immobilizationGlyph'||id==='burningGlyph'?100:60;
      let best=null,bestScore=0;

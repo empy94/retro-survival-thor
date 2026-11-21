@@ -3,8 +3,8 @@
  // IDs used by the official game's touch controls (checked 2026-10-09).
  const aimed=new Set(["cawotte","dash","immobilizationGlyph","burningGlyph","staffBoomerang","cut","swordOfFate","jump","intimidation","celestialSword","iopSword","brokle","lethalAttack","massTrap","repulsiveTrap","sramDouble","fear","arnaque","cracklerStrike","toad","shovelJudgment","mound","animatedChest","shovelThrow","corruption"]);
  const names=['X','Y','L1','R1','L2','R2','A','B',...['L1','R1','L2','R2'].flatMap(m=>['X','Y','A','B'].map(b=>m+' + '+b))];
- const travel=new Set(['dash','jump']);
- const targetHints=new Set(['burningGlyph','cut','intimidation','celestialSword','brokle','lethalAttack','massTrap','repulsiveTrap','cracklerStrike','shovelJudgment','mound','shovelThrow','corruption','burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass','dissolution','punishment']);
+ const travel=new Set(['dash','jump','xelorTeleport','xelorFlight']);
+ const targetHints=new Set(['xelorDust','xelorDial','xelorStrike','xelorDarkRay','burningGlyph','cut','intimidation','celestialSword','brokle','lethalAttack','massTrap','repulsiveTrap','cracklerStrike','shovelJudgment','mound','shovelThrow','corruption','burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass','dissolution','punishment']);
  const sonyFaces={A:'✕',B:'○',X:'□',Y:'△'};
  function buttonLabel(button,layout){return layout==='playstation'?button.split(' + ').map(key=>sonyFaces[key]||key).join(' + '):button;}
  function canSuggestTarget(id){return targetHints.has(id);}
@@ -16,9 +16,9 @@
    if(id==='jump')return 270*(1+upgrade('jumpRange')/3);
    return null;
  }
- const craAimed=new Set(['attraction','dissolution','punishment','cooperation','burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass']);
- const nativePassives=new Set(["petitFrere", "area", "bubble", "flamiche", "aggressiveGlyph", "slyTrap", "insidiousPoison", "chakra", "fourvoiement", "moonHammer", "divineSword", "iopSword", "chance", "pandorasBox", "clumsiness", "animatedBag", "animatedShovel", "shovelKiss", "slaughteringShovel", "tofuSummon", "bouftouSummon", "prespicSummon", "boarSummon", "bworkMageSummon", "cracklerSummon", "dragonnetSummon", "bearCry", "harassingArrow", "frozenArrow", "distantShot", "criticalShot", "tremor", "paralysingPoison", "aggressiveBrambles", "blockerDoll", "madDoll", "sacrificialDoll", "forcedPunishment", "agilePunishment", "wisePunishment", "fury", "sacrieurAssault", "sacrieurSword", "dancingSword"]);
- function needsAim(id,awakenings={}){return !nativePassives.has(id)&&(aimed.has(id)||craAimed.has(id)||id==='arakne')&&!(id==='burningGlyph'&&awakenings.burningGlyph===2)&&!(id==='explosiveArrow'&&awakenings.explosiveArrow===2);}
+ const craAimed=new Set(['xelorTeleport','xelorFlight','xelorDust','xelorDial','xelorStrike','xelorDarkRay','soulCapture','attraction','dissolution','punishment','cooperation','burningArrow','explosiveArrow','moleEye','dispersingArrow','recoilArrow','lashingArrow','punitiveArrow','multipleBrambles','tear','soothingBramble','madGrass']);
+ const nativePassives=new Set(["petitFrere", "area", "bubble", "flamiche", "aggressiveGlyph", "slyTrap", "insidiousPoison", "chakra", "fourvoiement", "moonHammer", "divineSword", "iopSword", "chance", "pandorasBox", "clumsiness", "animatedBag", "animatedShovel", "shovelKiss", "slaughteringShovel", "tofuSummon", "bouftouSummon", "prespicSummon", "boarSummon", "bworkMageSummon", "cracklerSummon", "dragonnetSummon", "bearCry", "harassingArrow", "frozenArrow", "distantShot", "criticalShot", "tremor", "paralysingPoison", "aggressiveBrambles", "blockerDoll", "madDoll", "sacrificialDoll", "forcedPunishment", "agilePunishment", "wisePunishment", "fury", "sacrieurAssault", "sacrieurSword", "dancingSword", "xelorSlow", "xelorCounter", "xelorSeeker", "xelorHourglass", "xelorClock", "xelorDevotion"]);
+ function needsAim(id,awakenings={}){return !nativePassives.has(id)&&(aimed.has(id)||craAimed.has(id)||id==='arakne')&&!(id==='burningGlyph'&&awakenings.burningGlyph===2)&&!(id==='explosiveArrow'&&awakenings.explosiveArrow===2)&&!(id==='xelorDarkRay'&&awakenings.xelorDarkRay===3);}
  function radialSpec(id,upgrades={},awakenings={}){
    if(!needsAim(id,awakenings))return null;
    const native=root.thorGameAdapter?.radialSpec?.(id);if(native)return native;

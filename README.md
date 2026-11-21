@@ -11,6 +11,8 @@ Android 9+ · Connexion Internet nécessaire · Français / English / Español
 
 10 secondes de gameplay réel · APK 1.11.0 · Deux écrans enregistrés simultanément, intégrés dans un visuel du Thor.
 
+**Mise à jour 1.26.7** — compatibilité avec le jeu du 21 novembre : Xélor, Capture d’Âmes, nouvelles collections et nouveaux succès. Réglages auto/manuels pour les neuf classes et commandes conservés. Chargement du module principal allégé en mémoire ; les trois réglages graphiques restent disponibles.
+
 **Mise à jour 1.26.2** — la connexion Discord depuis le menu Sauvegarde s’ouvre dans l’APK et revient au jeu après l’autorisation.
 
 **Mise à jour 1.26.1** — compatibilité avec la version du jeu du 15 novembre. Ouvre **⚙ APK → Raccourcis des sorts** pour retrouver la fiche, les sorts et les options sur l’écran principal. Les raccourcis et le mode auto/manuel sont enregistrés par classe. Le réglage du second écran s’affiche quand Android en détecte un compatible.

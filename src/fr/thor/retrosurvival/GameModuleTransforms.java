@@ -5,6 +5,14 @@ import java.util.Arrays;
 final class GameModuleTransforms {
  static String oct22(String source){String transformed=oct21(source);return transformed==null?null:hud(transformed.replace("m??a.current[e],Et,u))","m??a.current[e],kn,u))"));}
  static String hud(String source){java.util.regex.Matcher match=java.util.regex.Pattern.compile("[A-Za-z_$][A-Za-z0-9_$]*=e=>\\{[A-Za-z_$][A-Za-z0-9_$]*\\(\\{pet:e\\.pet\\?").matcher(source);if(!match.find())return source;String anchor=match.group();if(match.find())return source;return source.replace(anchor,anchor.replace("=e=>{","=e=>{if(window.thorHudDue?.(e)===false)return;"));}
+ static String nov21(String source){
+  java.util.regex.Matcher raster=java.util.regex.Pattern.compile("let [A-Za-z_$][A-Za-z0-9_$]*=e\\.localeRef\\?\\.current\\?\\?`fr`,[A-Za-z_$][A-Za-z0-9_$]*=Math\\.min\\(devicePixelRatio,2\\)[,;]").matcher(source);if(!raster.find())return null;String render=raster.group();if(raster.find())return null;
+  String[] before={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);c.width=", render, "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:o.particles)", "n.drawImage(l,0,0,t.width,t.height)"};
+  String[] after={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,window.thorRenderScale??2);c.width=", render.replace("devicePixelRatio,2)","devicePixelRatio,window.thorRenderScale??2)"), "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{if(window.thorRenderSpellMarker?.(n,e,t,r,s,c,d,f,m??a.current[e],Et,u))return;let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:(window.thorVisualParticles?.(o)??o.particles))", "(window.thorDrawMap?.(n,l,t.width,t.height)||n.drawImage(l,0,0,t.width,t.height))"};
+  for(String anchor:before)if(source.indexOf(anchor)<0||source.indexOf(anchor)!=source.lastIndexOf(anchor))return null;
+  for(int i=0;i<before.length;i++)source=source.replace(before[i],after[i]);
+  return source.replaceAll("n\\.shadowBlur=([0-9]+(?:\\.[0-9]+)?)","n.shadowBlur=(window.thorDecorativeBlur?.($1)??$1)");
+ }
  static String oct21(String source){
   java.util.regex.Matcher raster=java.util.regex.Pattern.compile("let [A-Za-z_$][A-Za-z0-9_$]*=e\\.localeRef\\?\\.current\\?\\?`fr`,[A-Za-z_$][A-Za-z0-9_$]*=Math\\.min\\(devicePixelRatio,2\\);").matcher(source);if(!raster.find())return null;String render=raster.group();if(raster.find())return null;
   String[] before={"let t=e.getBoundingClientRect(),n=Math.min(devicePixelRatio,2);c.width=", render, "(e,t,r,i,o,s,c=1,l=!0,u=0,d=1,f=1,p=0,m)=>{let h=m??a.current[e];", "for(let e of o.wabbitSecret||o.dragoeufSecret?.room?[]:o.particles)", "n.drawImage(r,0,0,t.width,t.height)"};

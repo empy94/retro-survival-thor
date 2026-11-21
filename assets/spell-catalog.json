@@ -1,5 +1,27 @@
 {
   "classes": {
+    "xelor": [
+      "xelorSlow",
+      "xelorCounter",
+      "xelorTeleport",
+      "xelorDust",
+      "xelorFlight",
+      "xelorSeeker",
+      "xelorDial",
+      "xelorMummification",
+      "xelorBlur",
+      "xelorStrike",
+      "xelorRewind",
+      "xelorDarkRay",
+      "xelorHourglass",
+      "xelorClock",
+      "xelorDevotion",
+      "cawotte",
+      "chaferfu",
+      "arakne",
+      "petitFrere",
+      "soulCapture"
+    ],
     "sadida": [
       "tremor",
       "paralysingPoison",
@@ -15,7 +37,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "sacrieur": [
       "attraction",
@@ -36,7 +59,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "cra": [
       "burningArrow",
@@ -55,7 +79,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "osamodas": [
       "tofuSummon",
@@ -74,7 +99,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "enutrof": [
       "chance",
@@ -96,7 +122,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "sram": [
       "invisibility",
@@ -114,7 +141,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "feca": [
       "shield",
@@ -132,7 +160,8 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ],
     "iop": [
       "cut",
@@ -151,10 +180,71 @@
       "cawotte",
       "chaferfu",
       "arakne",
-      "petitFrere"
+      "petitFrere",
+      "soulCapture"
     ]
   },
   "spells": {
+    "xelorSlow": {
+      "name": "Ralentissement",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorSlow-ui.webp"
+    },
+    "xelorCounter": {
+      "name": "Contre",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorCounter-ui.webp"
+    },
+    "xelorTeleport": {
+      "name": "Téléportation",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorTeleport-ui.webp"
+    },
+    "xelorDust": {
+      "name": "Poussière Temporelle",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorDust-ui.webp"
+    },
+    "xelorFlight": {
+      "name": "Fuite",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorFlight-ui.webp"
+    },
+    "xelorSeeker": {
+      "name": "Aiguille Chercheuse",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorSeeker-ui.webp"
+    },
+    "xelorDial": {
+      "name": "Cadran de Xélor",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorDial-ui.webp"
+    },
+    "xelorMummification": {
+      "name": "Momification",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorMummification-ui.webp"
+    },
+    "xelorBlur": {
+      "name": "Flou",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorBlur-ui.webp"
+    },
+    "xelorStrike": {
+      "name": "Frappe de Xélor",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorStrike-ui.webp"
+    },
+    "xelorRewind": {
+      "name": "Raulebaque",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorRewind-ui.webp"
+    },
+    "xelorDarkRay": {
+      "name": "Rayon Obscur",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorDarkRay-ui.webp"
+    },
+    "xelorHourglass": {
+      "name": "Sablier de Xélor",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorHourglass-ui.webp"
+    },
+    "xelorClock": {
+      "name": "Horloge",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorClock-ui.webp"
+    },
+    "xelorDevotion": {
+      "name": "Dévouement",
+      "icon": "https://retrosurvival.online/assets/spells/xelor/xelorDevotion-ui.webp"
+    },
     "petitFrere": {
       "name": "Petit Frère",
       "icon": "https://retrosurvival.online/assets/stats/class-enutrof-ui.webp"
@@ -170,6 +260,10 @@
     "arakne": {
       "name": "Invocation d'Arakne",
       "icon": "https://retrosurvival.online/assets/rat-noir/arakne-spell-ui.webp"
+    },
+    "soulCapture": {
+      "name": "Capture d'Âmes",
+      "icon": "https://retrosurvival.online/assets/grobe/soul-capture-spell-ui.webp"
     },
     "tofuSummon": {
       "name": "Invocation de Tofu",
@@ -624,7 +718,13 @@
     "fury",
     "sacrieurAssault",
     "sacrieurSword",
-    "dancingSword"
+    "dancingSword",
+    "xelorSlow",
+    "xelorCounter",
+    "xelorSeeker",
+    "xelorHourglass",
+    "xelorClock",
+    "xelorDevotion"
   ],
   "buffs": [
     "shield",
@@ -643,6 +743,8 @@
     "sylvanPower",
     "absorption",
     "sacrieurDodge",
-    "vitalPunishment"
+    "vitalPunishment",
+    "xelorMummification",
+    "xelorBlur"
   ]
 }

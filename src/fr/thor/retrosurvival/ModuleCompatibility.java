@@ -13,7 +13,7 @@ final class ModuleCompatibility {
   String hook(){StringBuilder out=new StringBuilder();try{for(int i=0;i<hooks.length();i++)out.append('\n').append(render(hooks.getJSONArray(i),names));}catch(JSONException error){throw new IllegalArgumentException(error);}return out.toString();}
  }
  static Match resolve(String source,String profile){return resolve(source,profile,8000000);}
- static Match resolveShared(String source,String profile){return resolve(source,profile,24000000);}
+ static Match resolveShared(String source,String profile){return resolve(source,profile,32000000);}
  private static Match resolve(String source,String profile,int sourceLimit){
   if(source==null||source.length()>sourceLimit||profile==null||profile.length()>1000000)return null;
   try{
@@ -73,4 +73,3 @@ final class ModuleCompatibility {
  private static boolean identifier(String s){return !s.isEmpty()&&identifierChar(s.charAt(0))&&!(s.charAt(0)>='0'&&s.charAt(0)<='9')&&s.chars().allMatch(c->identifierChar((char)c));}
  private static String render(JSONArray parts,Map<String,String> names)throws JSONException{StringBuilder out=new StringBuilder();for(int i=0;i<parts.length();i++){Object p=parts.get(i);if(p instanceof String)out.append((String)p);else{String name=names.get(((JSONObject)p).getString("symbol"));if(name==null)throw new IllegalArgumentException("Unbound symbol");out.append(name);}}return out.toString();}
 }
-
